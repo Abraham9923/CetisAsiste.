@@ -44,7 +44,10 @@ cómo se dan de alta los datos**. El *porqué* de las decisiones está en los AD
 | Copia de las reglas en el proyecto | `firebase/firestore.rules` |
 | Copia de los índices en el proyecto | `firebase/firestore.indexes.json` |
 | Copia de los perfiles de usuario | `firebase/roles.json` |
-| Configuración para la herramienta `firebase` (futuro) | `firebase/firebase.json` y `firebase/.firebaserc` |
+| Configuración para la herramienta `firebase` (publicar la web, emuladores) | `firebase/firebase.json` y `firebase/.firebaserc` |
+| Pruebas de las reglas | `firebase/pruebas-reglas/` |
+| Datos de prueba para el emulador | `firebase/emulador/datos-de-prueba.mjs` |
+| Código de la web que habla con Firebase | `web/js/datos.js` |
 | Código de la app que habla con Firebase | `app/src/main/java/com/example/cetisasiste/datos/` |
 
 > **Importante:** si cambias las reglas en la consola, copia el mismo texto en
@@ -424,7 +427,7 @@ los "moldes" que Control Escolar asigna al dar de alta una cuenta (campo `usuari
 | `etiqueta` | string | Padre de familia (texto en tarjetas; el alumno dice "Estudiante") |
 | `descripcion` | string | Sigue las entradas y salidas de su hijo, los avisos y el calendario del plantel. |
 | `plataformas` | array de string | ["android"] o ["web"] |
-| `plataformaConfirmada` | boolean | true (Enfermería: false, "web por confirmar") |
+| `plataformaConfirmada` | boolean | true (Enfermería era false, "web por confirmar"; el usuario la confirmó el 20 oct: **hay que ponerla en true en la consola**) |
 | `inicioDeSesion` | string | `noControl` (alumno) o `usuario` (los demás) |
 | `camposDelUsuario` | array de string | ["hijos"] — campos extra que lleva `usuarios/{uid}` con este rol |
 | `cambioDeContrasenaObligatorio` | boolean | false (prefecto: true) |
@@ -440,7 +443,7 @@ Resumen de los 6 perfiles:
 | `padre` | Padre de familia | Android | usuario | `hijos` | No | 9 | 8 |
 | `prefecto` | Prefecto | Android | usuario | — | **Sí** | 8 | 9 |
 | `profesor` | Profesor | Android | usuario | `grupos` | No | 6 | 6 |
-| `enfermeria` | Enfermería | Web (por confirmar) | usuario | — | No | 4 | 4 |
+| `enfermeria` | Enfermería | Web (confirmada el 20 oct, ADR-011) | usuario | — | No | 4 | 4 |
 | `control_escolar` | Control Escolar | Web | usuario | — | No | 8 | 11 |
 
 Los permisos de cada uno (salen del documento "Pantallas por rol",
@@ -480,7 +483,7 @@ Son los ids de la colección `roles` (§4.9).
 | `padre` | Padre de familia o tutor | Sí (vistas XML de padre; antes Compose) |
 | `prefecto` | Prefecto | Sí (vistas XML), con escáner QR, captura por No. de control, resultado y alertas |
 | `profesor` | Profesor | Sí (vistas XML): grupos, alumnos, estatus y salida del grupo |
-| `enfermeria` | Enfermería | No (web, por confirmar): ve un aviso |
+| `enfermeria` | Enfermería | No: usa la web (ADR-011); en la app ve un aviso |
 | `control_escolar` | Control Escolar | No (web): ve un aviso |
 
 ### 5.2 Estatus (`alumnos/{m}/estatus.tipo`)
@@ -857,6 +860,27 @@ Además (ya con la estructura por semestre de ADR-005):
 los 4 documentos de `usuarios` de la tabla; `alumnos/25311754` (con sus `inscripciones` y
 `privado`); y `grupos/2026-2027-1_102` (al borrarlo, la consola también borra su `horario`).
 El semestre `periodos/2026-2027-1` y `periodoActual` **no** son de prueba: se quedan.
+
+---
+
+## 10.2 La web y la base de datos
+
+La web de Control Escolar y Enfermería (carpeta `web/`, ADR-011) usa la **misma base, las
+mismas cuentas y las mismas reglas**. Su único archivo que habla con Firebase es
+`web/js/datos.js`.
+
+| Pantalla de la web | Lee | Escribe (todo de una vez, con avisos a los padres) |
+|---|---|---|
+| Iniciar sesión | `usuarios/{uid}` (solo entran `control_escolar` y `enfermeria`) | — |
+| Alumnos | `grupos` del semestre y turno; `alumnos` del grupo (inscritos, por apellido) o por `nombreBusqueda` (empieza con…); o `alumnos/{No. de control}` | — |
+| Perfil del alumno | `alumnos/{n}` (en vivo), `estatus`, `cambiosDeEstado`, `privado/salud`; Control Escolar también `privado/datos` y sus `registros` del semestre | — |
+| Pase de salud (Enfermería) | — | Crea `alumnos/{n}/estatus` (`pase_salud`, vale hoy) y un aviso `estatus` a cada padre |
+| Activar/desactivar por salud (Enfermería) o por pago (Control Escolar) | — | Cambia `activoPorSalud` o `activoPorPago` y `actualizadoEn`; crea `cambiosDeEstado` (`campo`, `valor`, `motivo`, `fecha`, `por`, `porNombre`) y un aviso `estado` a cada padre |
+| Datos de salud | `privado/salud` | Guarda `privado/salud` (solo los campos de la pantalla) |
+| Nuevo estatus (Control Escolar) | `configuracion/plantel` | Crea `estatus` (con `vigenteHasta` opcional) y, si el tipo se avisa (§4.8), un aviso `estatus` a cada padre |
+| Entradas y salidas (Control Escolar) | `periodos/{periodoActual}/registros` del día elegido, en vivo (con "solo alertas", el índice `fecha`, `alerta`, `fechaHora`) | — |
+| Avisos al padre (Control Escolar) | `configuracion/plantel` | Cambia `avisarAlPadreEstatus`, `avisarAlPadreAlertas` y `actualizadoEn` |
+| Notificaciones | `usuarios/{uid}/notificaciones` (en vivo) | `leida` = true |
 
 ---
 

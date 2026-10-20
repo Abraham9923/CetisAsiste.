@@ -28,6 +28,7 @@ resolver un pendiente, cámbialo aquí.
 | 2 | **Probar en el teléfono** las vistas de padre, profesor y prefecto | Usuario | Ya están instaladas, pero solo se probó con la cuenta del alumno. Detalle en la sección 10 |
 | 3 | **Decidir el plan de Firebase** (Spark, gratis, o Blaze, de pago) | Usuario y plantel | Con 2,500 alumnos el plan Spark se queda corto en lecturas diarias; hay que decidir antes de cargar a todo el plantel. Sin Blaze tampoco hay validación del escaneo en el servidor ni avisos push. Con los avisos al padre (ADR-010) se llega a unas 17,500 escrituras al día, cerca del límite gratis (20,000) |
 | 4 | **Publicar `firebase/firestore.rules` en la consola, crear el índice nuevo y, al mismo tiempo, instalar la app nueva** en los teléfonos de prueba | Usuario | Las reglas nuevas (ADR-009 y ADR-010) piden `noControl` y avisos firmados (`creadaPor`): con la app anterior el escaneo ya no se guardaría. El índice es `registros` (`fecha` ↑, `alerta` ↑, `fechaHora` ↓); sin él, "Alertas de hoy" se ve vacía |
+| 5 | **Registrar la web en Firebase, llenar `web/js/config.js` y publicarla** con Firebase Hosting | Usuario | Sin esto Control Escolar y Enfermería siguen usando la consola. Pasos en [web/README.md](../web/README.md) |
 
 Origen: base de datos §11, traspaso §8, ADR-002 (acción 3) y ADR-005 (acción 8).
 
@@ -64,7 +65,7 @@ Origen: traspaso §8.
 | ¿Qué pasa al escanear a un alumno con falta notificada, reporte, llamada de atención o alta para prácticas? | Las alertas del escaneo | Hoy no generan alerta; "en prácticas" puede salir sin alerta (ADR-009) | Pantallas por rol (tabla de estatus) |
 | ¿Cada cuánto vence la contraseña y a quién aplica: solo al prefecto o a todo el personal? | El valor `diasVenceContrasena` en `configuracion/plantel` | Vence a los 90 días **para cualquier rol**, incluidos alumno y padre (0 = no vence) | Base de datos §11, ADR-006, pantallas por rol |
 | ¿Qué especialidades hay y desde qué semestre se separan? | El catálogo `especialidades` | El campo `especialidadId` existe pero vacío; las reglas ya están, sin documentos | ADR-005 (acción 10), base de datos §11 |
-| ¿Enfermería trabaja solo en web? | Si hace falta una vista Android mínima para dar el pase de salud | En la app, Enfermería ve un aviso; la web está por confirmar | Pantallas por rol, base de datos §5.1 |
+| ~~¿Enfermería trabaja solo en web?~~ **Sí** (el usuario, 20 oct) | Si hace falta una vista Android mínima para dar el pase de salud | Enfermería usa la web (ADR-011); en la app ve un aviso | Pantallas por rol, base de datos §5.1 |
 | ¿El padre puede mostrar el código QR de su hijo, o solo verlo? | La pantalla Código QR del padre | Uso por confirmar | Pantallas por rol |
 | ¿El alumno y el padre ven en la app si el alumno está inactivo? | Las pantallas de alumno y padre | Por definir | Pantallas por rol |
 
@@ -163,20 +164,30 @@ Origen: Figma (diferencias), ADR-006 (acción 6), ADR-007 (acción 9), traspaso 
 
 ## 8. Web de Control Escolar y Enfermería
 
-No existe todavía (se haría con Firebase Hosting). Mientras, los datos se dan de alta desde la
-consola de Firebase con las recetas de la base de datos (§9).
+**Primera versión hecha el 20 de octubre** (ADR-011, carpeta `web/`, cómo usarla en
+[web/README.md](../web/README.md)): acceso, alumnos (búsqueda y por grupo), perfil, pase de
+salud, activar/desactivar por salud y por pago, nuevo estatus, datos de salud, entradas y
+salidas del día, avisos al padre y notificaciones. Falta **publicarla** (§1, punto 5).
 
-Todas sus pantallas están pendientes de programar. Estas, además, **ni siquiera tienen
-wireframe**:
+Lo que falta en la web:
+
+| Rol | Pendiente | Detalle |
+|---|---|---|
+| Control Escolar | **Alta de alumnos, padres y personal** | La web no puede crear cuentas de Authentication sin un servidor: hace falta el script de administración con el Admin SDK (ARQUITECTURA.md E1), que también sirve para la importación masiva (§9) |
+| Control Escolar | Editar datos del alumno | Hoy solo se ven; al editar el nombre hay que cambiar las dos copias (`alumnos` y `usuarios`) |
+| Control Escolar | Publicar anuncios y eventos | Hoy desde la consola (BASE_DE_DATOS §9.6) |
+| Ambos | App Check | ARQUITECTURA.md B3 |
+
+Estas pantallas siguen pendientes y, además, **ni siquiera tienen wireframe**:
 
 | Rol | Pantalla | Para qué sirve |
 |---|---|---|
-| Control Escolar | Estatus del alumno | Consultar y modificar cualquier estatus |
+| Control Escolar | Estatus del alumno | Consultar y modificar cualquier estatus (**consultar y agregar ya está** en el perfil; falta modificar y borrar) |
 | Control Escolar | Altas para prácticas | Registrar al alumno que sale a prácticas |
 | Control Escolar | Cambio de grupo o turno | Mover al alumno de grupo o turno |
 | Control Escolar | Horarios | Consultar y administrar los horarios de los grupos |
-| Control Escolar | Entradas y salidas | Revisar quién ya entró o salió |
-| Enfermería | Perfil del alumno | Datos y estatus del alumno |
+| Control Escolar | ~~Entradas y salidas~~ | Hecho (ADR-011) |
+| Enfermería | ~~Perfil del alumno~~ | Hecho (ADR-011) |
 
 Origen: pantallas por rol, base de datos §11, traspaso §8.
 

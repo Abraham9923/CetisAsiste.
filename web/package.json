@@ -1,0 +1,13 @@
+{
+  "name": "cetisasiste-web",
+  "private": true,
+  "description": "Web de Control Escolar y Enfermería. No necesita instalarse para usarse: ver README.md. Este archivo solo sirve para las pruebas (npm test y npm run recorrido).",
+  "type": "module",
+  "scripts": {
+    "test": "node --test pruebas/*.test.js",
+    "recorrido": "node pruebas/recorrido.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.0"
+  }
+}

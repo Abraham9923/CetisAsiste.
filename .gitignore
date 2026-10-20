@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Registros de los emuladores de Firebase
+*-debug.log

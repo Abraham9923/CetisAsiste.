@@ -13,6 +13,44 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ## 20 de octubre de 2026
 
+### 20-03. Primera versión de la web de Control Escolar y Enfermería (ADR-011)
+
+- **Pedido del usuario:** "empieza a crear el apartado web, son 2 usuarios".
+- **Qué se hizo:**
+  - Carpeta nueva **`web/`**: una página con HTML, CSS y JavaScript **sin compilar**, con la
+    librería de Firebase 12.19.0 desde `gstatic.com`. Colores, letra y logo de la app.
+  - **Acceso:** usuario o correo y contraseña, como la app; solo entran `control_escolar` y
+    `enfermeria`; los demás ven "Esta cuenta se usa en la app…". Cambio de contraseña
+    obligatorio si toca. La cuenta se escucha en vivo.
+  - **Enfermería:** alumnos por grupo y búsqueda, perfil, **pase de salida por salud**,
+    **activar/desactivar por salud** y datos de salud.
+  - **Control Escolar:** lo mismo para ver alumnos, **activar/desactivar por pago**, **nuevo
+    estatus**, datos personales, entradas y salidas del alumno, **Entradas y salidas del
+    día** (en vivo, "solo alertas") y **Avisos al padre** (guarda
+    `configuracion/plantel.avisarAlPadreEstatus` y `avisarAlPadreAlertas`).
+  - Cada acción se guarda en un lote con los **avisos a los padres** (ADR-010), firmada con el
+    uid de la sesión. Notificaciones propias con contador en el menú.
+  - **Hosting:** `firebase/firebase.json` publica `web/` y configura los emuladores de
+    Authentication, Firestore y Hosting.
+  - **Emulador:** `firebase/emulador/datos-de-prueba.mjs` carga cuentas y datos "Prueba".
+  - La app ahora dice "El perfil de … se usa desde la web de CetisAsiste, en una computadora"
+    (antes: "que todavía no está lista"). `firebase/roles.json`: Enfermería confirmada en web.
+- **Archivos:** `web/` (nuevo: `index.html`, `css/estilos.css`, `js/*.js`,
+  `js/pantallas/*.js`, `pruebas/`, `README.md`, `package.json`, fuentes y logo copiados de la
+  app), `firebase/firebase.json`, `firebase/emulador/datos-de-prueba.mjs` (nuevo),
+  `firebase/roles.json`, `.gitignore`, `app/src/main/res/values/strings.xml`,
+  `ui/CetisApp.kt` (comentario). Documentos: ADR-011 (nuevo), BASE_DE_DATOS.md (§2, §4.9,
+  §10), PENDIENTES.md (§1, §8), TRASPASO_AGENTE.md.
+- **Cómo se comprobó:** `npm test` en `web/` pasa **10 pruebas** (`avisos.js` y
+  `formatos.js`). Con los emuladores (reglas reales) y Chromium, `npm run recorrido` pasa los
+  **18 pasos**: el padre no entra; Enfermería da un pase y desactiva por salud (en la base
+  quedan el estatus firmado y 2 avisos al padre); el cambio de contraseña obligatorio
+  funciona; Control Escolar activa por pago, pone un castigo (aviso al padre), ve 3 entradas
+  con 2 alertas, guarda los avisos al padre y marca sus notificaciones como leídas; en un
+  teléfono de 390 px no hay scroll horizontal. Se revisaron las capturas (se corrigió el
+  contraste de la tarjeta guinda y el menú del teléfono). La app vuelve a compilar con sus 30
+  pruebas. **No se probó con la base real** (falta registrar la web en Firebase y publicarla).
+
 ### 20-02. Revisión de la arquitectura de todo el sistema
 
 - **Pedido del usuario:** "analiza la arquitectura del proyecto, dime qué le mejorarías".

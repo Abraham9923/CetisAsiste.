@@ -106,7 +106,7 @@
     <string name="error_cargar_datos">No se pudieron cargar los datos. Revisa tu conexión.</string>
     <string name="sin_alumno_vinculado">Tu cuenta no tiene un alumno vinculado. Acude a Control Escolar.</string>
     <string name="rol_sin_pantallas">Hola, %1$s. Las pantallas de %2$s todavía no están en la app.</string>
-    <string name="rol_solo_web">Hola, %1$s. El perfil de %2$s se usa desde la web, que todavía no está lista.</string>
+    <string name="rol_solo_web">Hola, %1$s. El perfil de %2$s se usa desde la web de CetisAsiste, en una computadora. Pide la dirección a Control Escolar.</string>
     <string name="vacio_anuncios">Todavía no hay anuncios.</string>
     <string name="vacio_registros">Todavía no hay entradas ni salidas registradas.</string>
     <string name="vacio_notificaciones">No hay notificaciones de hoy.</string>
