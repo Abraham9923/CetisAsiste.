@@ -30,6 +30,7 @@ import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import com.example.cetisasiste.R
+import com.example.cetisasiste.datos.Avisos
 import java.util.Locale
 
 /*
@@ -85,7 +86,8 @@ object VistasComunes {
      * opción cierra el menú y llama a [irA]. "Notificaciones" (debajo de las opciones) llama a
      * [onNotificaciones], lo mismo que la campana de Inicio. "Cerrar sesión", hasta abajo,
      * pregunta antes (diálogo de cerrar sesión) y luego llama a [onCerrarSesion]. Si la
-     * pantalla no tiene ☰, no hace nada.
+     * pantalla no tiene ☰, no hace nada. [sinLeer] es cuántos avisos sin leer hay: sale como
+     * contador junto a "Notificaciones".
      */
     fun <T> conectarMenu(
         pantalla: View,
@@ -96,10 +98,23 @@ object VistasComunes {
         irA: (T) -> Unit,
         onNotificaciones: () -> Unit,
         onCerrarSesion: () -> Unit,
+        sinLeer: Int = 0,
     ) {
         pantalla.alTocar(R.id.btn_menu) {
-            mostrarMenu(pantalla as FrameLayout, nombre, rol, pestanas, activa, irA, onNotificaciones, onCerrarSesion)
+            mostrarMenu(pantalla as FrameLayout, nombre, rol, pestanas, activa, irA, onNotificaciones, onCerrarSesion, sinLeer)
         }
+    }
+
+    /**
+     * La campana de Inicio (btn_notificaciones): con punto rojo solo si hay avisos sin leer, y
+     * para quien usa lector de pantalla dice cuántos ("Notificaciones, 3 sin leer").
+     */
+    fun marcarCampana(pantalla: View, sinLeer: Int) {
+        val campana = pantalla.findViewById<ImageView>(R.id.btn_notificaciones) ?: return
+        campana.setImageResource(if (sinLeer > 0) R.drawable.ic_bell_badge else R.drawable.ic_bell)
+        val texto = pantalla.context.getString(R.string.alumno_notificaciones)
+        campana.contentDescription =
+            if (sinLeer > 0) pantalla.context.getString(R.string.comun_campana_sin_leer, texto, Avisos.textoSinLeer(sinLeer)) else texto
     }
 
     /**
@@ -115,6 +130,7 @@ object VistasComunes {
         irA: (T) -> Unit,
         onNotificaciones: () -> Unit,
         onCerrarSesion: () -> Unit,
+        sinLeer: Int,
     ) {
         if (raiz.findViewById<View>(R.id.menu) != null) return  // ya está abierto
         val contexto = raiz.context
@@ -147,6 +163,13 @@ object VistasComunes {
                 cerrar()
                 if (!esActiva) irA(pestana.destino)
             }
+        }
+        menu.mostrar(R.id.txt_sin_leer, sinLeer > 0)
+        menu.texto(R.id.txt_sin_leer, Avisos.textoSinLeer(sinLeer))
+        if (sinLeer > 0) {
+            menu.findViewById<View>(R.id.opcion_notificaciones).contentDescription = contexto.getString(
+                R.string.comun_campana_sin_leer, contexto.getString(R.string.alumno_notificaciones), Avisos.textoSinLeer(sinLeer),
+            )
         }
         menu.alTocar(R.id.opcion_notificaciones) {
             cerrar()
@@ -329,9 +352,11 @@ object VistasComunes {
 
     // ---------- Notificaciones (comun_notificaciones.xml) ----------
 
+    /** comun_notificaciones.xml. "Marcar todas como leídas" solo sale si hay alguna sin leer. */
     fun llenarNotificaciones(vista: View, deHoy: List<Notificacion>, anteriores: List<Notificacion>) {
         llenarLista(vista.findViewById(R.id.lista_hoy), deHoy, R.layout.comun_item_notificacion, ::llenarNotificacion)
         vista.mostrar(R.id.txt_vacio_hoy, deHoy.isEmpty())
+        vista.mostrar(R.id.txt_marcar_leidas, (deHoy + anteriores).any { !it.leida })
         llenarLista(vista.findViewById(R.id.lista_anteriores), anteriores, R.layout.comun_item_notificacion, ::llenarNotificacion)
         vista.mostrar(R.id.txt_anteriores, anteriores.isNotEmpty())
     }
@@ -344,11 +369,19 @@ object VistasComunes {
             TipoNotificacion.Anuncio -> R.drawable.ic_announcements
             TipoNotificacion.Recordatorio -> R.drawable.ic_calendar
             TipoNotificacion.Credencial -> R.drawable.ic_id_card
+            TipoNotificacion.Alerta -> R.drawable.ic_warning
+            TipoNotificacion.Estatus -> R.drawable.ic_flag
+            TipoNotificacion.Estado -> R.drawable.ic_id_card
+            TipoNotificacion.SalidaDeGrupo -> R.drawable.ic_flag
             TipoNotificacion.Aviso -> R.drawable.ic_announcements
         }
         fila.findViewById<ImageView>(R.id.img_icono).setImageResource(icono)
         fila.findViewById<View>(R.id.circulo).setBackgroundResource(
-            if (notificacion.tipo == TipoNotificacion.Salida) R.drawable.shape_circulo_accent else R.drawable.shape_circulo_brand,
+            when (notificacion.tipo) {
+                TipoNotificacion.Alerta -> R.drawable.shape_circulo_peligro
+                TipoNotificacion.Salida, TipoNotificacion.SalidaDeGrupo -> R.drawable.shape_circulo_accent
+                else -> R.drawable.shape_circulo_brand
+            },
         )
         fila.setBackgroundResource(if (notificacion.leida) R.drawable.shape_tarjeta else R.drawable.shape_tarjeta_sin_leer)
         fila.texto(R.id.txt_titulo, notificacion.titulo)

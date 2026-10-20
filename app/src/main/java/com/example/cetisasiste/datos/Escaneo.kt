@@ -80,8 +80,11 @@ object Escaneo {
      * Un castigo cuenta si su `vigenteHasta` todavía no pasa. Si no tiene fecha de fin (el
      * plantel todavía no dice cuánto dura un castigo), cuenta solo el día en que se puso.
      */
-    fun tieneCastigoVigente(estatus: List<EstatusDoc>, ahora: Date): Boolean =
-        estatus.any { it.tipo == TipoEstatus.CASTIGO && aplicaHoy(it, ahora) }
+    fun tieneCastigoVigente(estatus: List<EstatusDoc>, ahora: Date): Boolean = castigoVigente(estatus, ahora) != null
+
+    /** El castigo que cuenta hoy (el más reciente de la lista), o null si no hay. Lo muestra el resultado. */
+    fun castigoVigente(estatus: List<EstatusDoc>, ahora: Date): EstatusDoc? =
+        estatus.firstOrNull { it.tipo == TipoEstatus.CASTIGO && aplicaHoy(it, ahora) }
 
     /** El estatus sigue vigente: hasta su `vigenteHasta`, o si no tiene, solo el día de su `fecha`. */
     private fun aplicaHoy(estatus: EstatusDoc, ahora: Date): Boolean {

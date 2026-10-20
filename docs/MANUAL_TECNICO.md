@@ -115,7 +115,8 @@ app/src/main/
 │   │   ├── Modelos.kt             ← Forma de cada documento de Firestore
 │   │   ├── CetisRepositorio.kt    ← Sesión, consultas, escuchas, guardar estatus/salidas, contraseña
 │   │   ├── Formatos.kt            ← Fechas "Hoy · 5 oct", horas "7:05 am", semestre, QR
-│   │   └── Escaneo.kt             ← Qué alerta toca al escanear (sin Firebase; tiene pruebas)
+│   │   ├── Escaneo.kt             ← Qué alerta toca al escanear (sin Firebase; tiene pruebas)
+│   │   └── Avisos.kt              ← A quién se le avisa de qué y cómo se arma un aviso (sin Firebase; tiene pruebas)
 │   └── ui/
 │       ├── CetisApp.kt            ← Bienvenida → iniciar sesión → pantallas según el rol
 │       ├── comun/                 ← LO QUE COMPARTEN LOS ROLES
@@ -373,8 +374,21 @@ CetisApp ──► CetisRepositorio.iniciarSesion(No. de control o usuario, cont
   el número, `CetisRepositorio.datosDelEscaneo` lee al alumno, `Escaneo.alerta` decide la
   alerta y `CetisRepositorio.registrarEscaneo` guarda todo de una vez (registro, ubicación y
   aviso a los padres). La app pide el permiso de cámara al abrir el escáner.
+- **Avisos (notificaciones dentro de la app, ADR-010):** todos van al buzón de cada cuenta,
+  `usuarios/{uid}/notificaciones`. `Avisos.kt` decide a quién (padres del alumno, según
+  `configuracion/plantel`) y arma el documento con `Avisos.nuevo(...)`; quien guarda (el
+  escaneo o el estatus del profesor) lo mete **en el mismo lote** que lo demás, para que se
+  guarde todo o nada. La campana se enciende con `sinLeerEnVivo(uid)` (`ui/comun/Carga.kt`) y
+  `VistasComunes.marcarCampana`; la lista se escucha con
+  `CetisRepositorio.escucharNotificaciones`.
+- **Para agregar un aviso nuevo:** 1) si es un tipo nuevo, agrégalo a `TipoAviso`
+  (`Modelos.kt`), a la lista de `avisoValido` en `firebase/firestore.rules` y a su prueba en
+  `firebase/pruebas-reglas`; 2) arma el aviso con `Avisos.nuevo(...)` (texto en
+  `strings_*.xml`); 3) guárdalo en el mismo lote que la acción, en `CetisRepositorio`.
 - **Pruebas sin teléfono:** `app/src/test/.../EscaneoTest.kt` revisa las reglas de las alertas
-  y del No. de control. Se corren con `./gradlew.bat :app:testDebugUnitTest`.
+  y del No. de control; `AvisosTest.kt`, a quién se avisa y cómo se arma el aviso. Se corren
+  con `./gradlew.bat :app:testDebugUnitTest`. Las reglas de Firestore tienen sus propias
+  pruebas en `firebase/pruebas-reglas` (necesitan Node.js).
 
 ---
 

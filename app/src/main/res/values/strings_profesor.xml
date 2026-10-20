@@ -37,6 +37,13 @@
     <string name="profesor_estatus_guardado">Se guardó el estatus.</string>
     <string name="profesor_estatus_error_tipo">Elige el tipo de estatus.</string>
     <string name="profesor_estatus_error_descripcion">Escribe una descripción.</string>
+    <string name="profesor_estatus_aviso_padre">Su padre o tutor recibirá un aviso en la app con el tipo de estatus y esta descripción.</string>
+    <!-- Aviso al padre (usuarios/{uid}/notificaciones, ADR-010).
+         Título: %1$s = tipo ("Falta"). Mensaje: %1$s = tipo en minúsculas, %2$s = nombre del alumno,
+         %3$s = nombre del profesor, %4$s = descripción.
+         Ej.: "Pedro Pozo le registró a Juan Pérez: falta. Motivo: no entró a Química" -->
+    <string name="profesor_aviso_estatus_titulo">Nuevo estatus: %1$s</string>
+    <string name="profesor_aviso_estatus_mensaje">%3$s le registró a %2$s: %1$s. Motivo: %4$s</string>
 
     <!-- Dar salida al grupo -->
     <string name="profesor_titulo_dar_salida">Dar salida al grupo</string>

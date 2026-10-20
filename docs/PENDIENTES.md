@@ -1,6 +1,6 @@
 # Pendientes — CetisAsiste
 
-**Fecha:** 19 de octubre de 2026
+**Fecha:** 20 de octubre de 2026 (actualizado con ADR-010 y la web)
 **Qué es:** todos los pendientes del proyecto en un solo lugar. Se juntaron de la base de
 datos, el manual técnico, el traspaso, los ADR, el documento "Pantallas por rol", el
 documento de Figma y la bitácora. Cada pendiente dice **quién tiene que actuar** y **de
@@ -26,7 +26,8 @@ resolver un pendiente, cámbialo aquí.
 |---|---|---|---|
 | 1 | **Borrar las colecciones viejas** `CetisAsiste/Usuarios` y los 2 documentos viejos de `usuarios` que tienen contraseñas a la vista | Usuario, desde la consola de Firebase | Son contraseñas guardadas sin cifrar. Claude no las borró a propósito: borrar datos lo decide el usuario |
 | 2 | **Probar en el teléfono** las vistas de padre, profesor y prefecto | Usuario | Ya están instaladas, pero solo se probó con la cuenta del alumno. Detalle en la sección 10 |
-| 3 | **Decidir el plan de Firebase** (Spark, gratis, o Blaze, de pago) | Usuario y plantel | Con 2,500 alumnos el plan Spark se queda corto en lecturas diarias; hay que decidir antes de cargar a todo el plantel. Sin Blaze tampoco hay validación del escaneo en el servidor ni avisos push |
+| 3 | **Decidir el plan de Firebase** (Spark, gratis, o Blaze, de pago) | Usuario y plantel | Con 2,500 alumnos el plan Spark se queda corto en lecturas diarias; hay que decidir antes de cargar a todo el plantel. Sin Blaze tampoco hay validación del escaneo en el servidor ni avisos push. Con los avisos al padre (ADR-010) se llega a unas 17,500 escrituras al día, cerca del límite gratis (20,000) |
+| 4 | **Publicar `firebase/firestore.rules` en la consola, crear el índice nuevo y, al mismo tiempo, instalar la app nueva** en los teléfonos de prueba | Usuario | Las reglas nuevas (ADR-009 y ADR-010) piden `noControl` y avisos firmados (`creadaPor`): con la app anterior el escaneo ya no se guardaría. El índice es `registros` (`fecha` ↑, `alerta` ↑, `fechaHora` ↓); sin él, "Alertas de hoy" se ve vacía |
 
 Origen: base de datos §11, traspaso §8, ADR-002 (acción 3) y ADR-005 (acción 8).
 
@@ -37,10 +38,12 @@ Origen: base de datos §11, traspaso §8, ADR-002 (acción 3) y ADR-005 (acción
 1. Probar en el teléfono las vistas de padre, profesor y prefecto, y el menú ☰ de los cuatro
    roles, y revisar lo que salga.
 2. Decidir el plan de Firebase.
-3. Escaneo del prefecto: escáner QR, captura por No. de control, resultado y alertas.
+3. ~~Escaneo del prefecto: escáner QR, captura por No. de control, resultado y alertas.~~
+   Hecho (ADR-009); avisos y alertas del día, hechos (ADR-010).
 4. Validación del escaneo en el servidor y avisos push al padre (si se aprueba Blaze).
 5. Importación masiva de alumnos y cambio de semestre.
-6. Web de Control Escolar y Enfermería.
+6. Web de Control Escolar y Enfermería. **Empezada el 20 de octubre** (ADR-011, carpeta
+   `web/`): falta publicarla y lo que dice la sección 8.
 7. Recuperar contraseña olvidada, padre con varios hijos y vigencia de los castigos.
 8. Ajustar las vistas de prefecto y profesor a su Figma, cuando el usuario lo pida.
 9. Decidir las diferencias entre el documento de roles y la app.
@@ -56,7 +59,8 @@ Origen: traspaso §8.
 |---|---|---|---|
 | ¿Qué hace el prefecto ante cada alerta: deja pasar, retiene o avisa a alguien? | Si la pantalla de alerta necesita botones (dejar pasar, retener) | El escaneo ya existe: muestra la alerta y la guarda en el registro; con alerta, la ubicación del alumno no cambia (ADR-009) | Pantallas por rol |
 | ¿Quién pone un castigo disciplinario y cuánto dura? | Si el profesor puede poner castigos y el campo `vigenteHasta` | El profesor puede poner castigos y se guardan sin fecha de fin. Al escanear, un castigo sin fecha de fin cuenta **solo el día en que se puso** (ADR-009) | Base de datos §11, manual §11, pantallas por rol |
-| ¿Qué diferencia hay entre reporte y llamada de atención? ¿Los ven el alumno y el padre? | Qué estatus se muestran en las pantallas de alumno y padre | Por definir | Pantallas por rol |
+| ¿Qué diferencia hay entre reporte y llamada de atención? ¿Los ven el alumno y el padre? | Qué estatus se muestran en las pantallas de alumno y padre | Desde ADR-010 el **padre recibe un aviso** de cada falta, reporte, llamada de atención y castigo (con la descripción); el alumno no | Pantallas por rol, ADR-010 |
+| ¿De qué se le avisa al padre? | `configuracion/plantel.avisarAlPadreEstatus` y `avisarAlPadreAlertas` | Por omisión: los cuatro estatus del profesor y las alertas "inactivo" y "salida fuera de horario" (además de cada entrada y salida). Se cambia en la consola sin programar | ADR-010 |
 | ¿Qué pasa al escanear a un alumno con falta notificada, reporte, llamada de atención o alta para prácticas? | Las alertas del escaneo | Hoy no generan alerta; "en prácticas" puede salir sin alerta (ADR-009) | Pantallas por rol (tabla de estatus) |
 | ¿Cada cuánto vence la contraseña y a quién aplica: solo al prefecto o a todo el personal? | El valor `diasVenceContrasena` en `configuracion/plantel` | Vence a los 90 días **para cualquier rol**, incluidos alumno y padre (0 = no vence) | Base de datos §11, ADR-006, pantallas por rol |
 | ¿Qué especialidades hay y desde qué semestre se separan? | El catálogo `especialidades` | El campo `especialidadId` existe pero vacío; las reglas ya están, sin documentos | ADR-005 (acción 10), base de datos §11 |
@@ -90,8 +94,7 @@ Origen: pantallas por rol (comparación con la app y ajustes pendientes en Figma
 
 | Pendiente | Detalle | Origen |
 |---|---|---|
-| **Publicar las reglas nuevas y pasar los datos de prueba a 14 dígitos** | Sin esto el alumno de prueba no entra: las reglas viejas buscan `matricula` y su número tiene 8 dígitos. Pasos en BASE_DE_DATOS §10.1 (lo hace el usuario en la consola) | ADR-009 (acciones 4 a 6) |
-| "Últimos escaneos" en el Inicio del prefecto | Está en Figma; hoy el Inicio muestra las salidas de grupo | Figma |
+| **Publicar las reglas nuevas y pasar los datos de prueba a 14 dígitos** | Sin esto el alumno de prueba no entra: las reglas viejas buscan `matricula` y su número tiene 8 dígitos. Pasos en BASE_DE_DATOS §10.1 (lo hace el usuario en la consola). Las reglas ya incluyen lo de ADR-010 | ADR-009 (acciones 4 a 6), ADR-010 (acciones 3 y 4) |
 | **Recuperar una contraseña olvidada** | "¿Olvidaste tu contraseña?" no abre nada. Los correos internos (`@cetis61.mx`) no reciben mensajes, así que hay que decidir otro camino. Mientras, Control Escolar la cambia en la consola (base de datos, receta §9.8) | ADR-003 (acción 5), base de datos §11, manual §11 |
 | **Padre con varios hijos** | Hoy se muestra el primero de su lista `hijos`. Falta una pantalla para elegir hijo | ADR-004 (acción 4), base de datos §11, manual §11 |
 | Textos del padre | Ver sección 4 | Manual §11 |
@@ -152,7 +155,8 @@ Origen: Figma (diferencias), ADR-006 (acción 6), ADR-007 (acción 9), traspaso 
 |---|---|---|
 | Plan de Firebase | Ver sección 1 | ADR-002, ADR-005 |
 | **Validar el escaneo en el servidor** | Una función `validarEscaneo` en Cloud Functions que revise estatus, guarde el registro y avise. Necesita el plan Blaze; mientras, las reglas limitan quién escribe | ADR-002 (acción 4), base de datos §11 |
-| **Avisos push al padre** | Con Cloud Messaging, cuando su hijo entra o sale. Depende de Cloud Functions | ADR-002 (acción 4), base de datos §11 |
+| **Avisos push al padre** | Con Cloud Messaging. Ya todo llega al buzón `usuarios/{uid}/notificaciones` (ADR-010): basta una Cloud Function que escuche ese buzón y mande el push a `tokensFcm`. Depende de Cloud Functions | ADR-002 (acción 4), ADR-010 (acción 8) |
+| **Borrar los avisos vencidos** | Cada aviso trae `venceEn` (60 días). Activar una política TTL sobre ese campo si la consola lo permite; si no, con una Cloud Function o desde la web | ADR-010 (acción 6) |
 | Borrar las colecciones viejas | Ver sección 1 | Base de datos §11 |
 
 ---
@@ -195,7 +199,8 @@ Origen: pantallas por rol, base de datos §11, traspaso §8.
 | Padre | Entrar con `padre.prueba` y revisar todas sus pantallas con datos reales | ADR-006 (acción 5), traspaso §8 |
 | Profesor | Entrar con `profesor.prueba`, guardar un estatus y dar salida al grupo | ADR-006 (acción 5), traspaso §8 |
 | Prefecto | Entrar con `prefecto.prueba`: la salida que dio el profesor debe aparecer en su Inicio, en tiempo real | ADR-006 (acción 5), traspaso §8 |
-| Escaneo | Con `prefecto.prueba`: escanear el QR del alumno de prueba (en otro teléfono), probar Entrada y Salida, teclear el No. de control y provocar cada alerta cambiando campos en la consola | ADR-009 (acción 7) |
+| Escaneo | Con `prefecto.prueba`: escanear el QR del alumno de prueba (en otro teléfono), probar Entrada y Salida, teclear el No. de control y provocar cada alerta cambiando campos en la consola. Revisar que el resultado diga el motivo y que la alerta salga en "Alertas de hoy" | ADR-009 (acción 7), ADR-010 |
+| Avisos | Con `padre.prueba` abierto: el prefecto registra una entrada y el profesor pone una falta; el aviso debe aparecer solo, la campana encenderse y el menú ☰ decir "2". "Marcar todas como leídas" apaga la campana | ADR-010 (acción 7) |
 | Menú ☰ de padre, prefecto y profesor | Abrirlo en cada pantalla principal; elegir una opción; "Notificaciones"; cerrarlo tocando fuera y con "atrás"; "Cerrar sesión" pregunta y sale. **Con el alumno ya se probó y funciona** (bitácora 19-33 y 19-34) | ADR-007 (acción 8) |
 | Otros tamaños | Nunca se ha probado en tabletas, en horizontal ni con la letra del sistema agrandada | Manual §11 |
 

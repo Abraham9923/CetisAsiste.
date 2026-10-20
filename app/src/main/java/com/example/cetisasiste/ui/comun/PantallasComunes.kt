@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import com.example.cetisasiste.datos.Formatos
 import com.example.cetisasiste.datos.NotificacionDoc
 import com.example.cetisasiste.datos.ResultadoContrasena
 import com.example.cetisasiste.datos.Sesion
+import com.example.cetisasiste.datos.TipoAviso
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -75,30 +77,36 @@ fun CalendarioXml(
     }
 }
 
-/** Avisos personales de la cuenta (usuarios/{uid}/notificaciones), separados en hoy y anteriores. */
+/**
+ * Avisos personales de la cuenta (usuarios/{uid}/notificaciones), separados en hoy y
+ * anteriores. Se escuchan en tiempo real: un aviso nuevo aparece sin salir de la pantalla, y
+ * al marcarlos como leídos la campana se apaga sola.
+ *
+ * [extrasDeHoy] son avisos que no están en el buzón y se muestran arriba de los de hoy (el
+ * prefecto ve ahí los grupos que ya salieron de clases).
+ */
 @Composable
 fun NotificacionesXml(
     sesion: Sesion,
     onRegresar: () -> Unit,
     modifier: Modifier = Modifier,
+    extrasDeHoy: List<Notificacion> = emptyList(),
 ) {
     val scope = rememberCoroutineScope()
-    var recarga by remember { mutableIntStateOf(0) }
-    val avisos by produceState(emptyList<Pair<String, NotificacionDoc>>(), sesion.uid, recarga) {
-        value = cargar { CetisRepositorio.notificaciones(sesion.uid) }.o(emptyList())
-    }
+    val flujo = remember(sesion.uid) { CetisRepositorio.escucharNotificaciones(sesion.uid) }
+    // Si falla (sin internet), se ve como "No hay notificaciones de hoy".
+    val avisos = flujo.collectAsState(initial = null).value?.getOrNull().orEmpty()
     val (deHoy, anteriores) = avisos.partition { Formatos.esHoy(it.second.fecha) }
     PantallaXml(R.layout.comun_notificaciones, modifier) { vista ->
         VistasComunes.llenarNotificaciones(
             vista,
-            deHoy.map { notificacion(it.second) },
+            extrasDeHoy + deHoy.map { notificacion(it.second) },
             anteriores.map { notificacion(it.second) },
         )
         vista.alTocar(R.id.btn_regresar, onRegresar)
         vista.alTocar(R.id.txt_marcar_leidas) {
             scope.launch {
                 cargar { CetisRepositorio.marcarLeidas(sesion.uid, avisos.filter { !it.second.leida }.map { it.first }) }
-                recarga++
             }
         }
     }
@@ -241,11 +249,15 @@ val CHIPS_DE_DIAS = listOf(
 /** NotificacionDoc (Firestore) → Notificacion (lo que dibuja la vista). */
 private fun notificacion(doc: NotificacionDoc) = Notificacion(
     tipo = when (doc.tipo) {
-        "entrada" -> TipoNotificacion.Entrada
-        "salida" -> TipoNotificacion.Salida
-        "anuncio" -> TipoNotificacion.Anuncio
-        "recordatorio" -> TipoNotificacion.Recordatorio
-        "credencial" -> TipoNotificacion.Credencial
+        TipoAviso.ENTRADA -> TipoNotificacion.Entrada
+        TipoAviso.SALIDA -> TipoNotificacion.Salida
+        TipoAviso.ANUNCIO -> TipoNotificacion.Anuncio
+        TipoAviso.RECORDATORIO -> TipoNotificacion.Recordatorio
+        TipoAviso.CREDENCIAL -> TipoNotificacion.Credencial
+        TipoAviso.ALERTA -> TipoNotificacion.Alerta
+        TipoAviso.ESTATUS -> TipoNotificacion.Estatus
+        TipoAviso.ESTADO -> TipoNotificacion.Estado
+        TipoAviso.SALIDA_GRUPO -> TipoNotificacion.SalidaDeGrupo
         else -> TipoNotificacion.Aviso
     },
     titulo = doc.titulo,

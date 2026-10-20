@@ -24,14 +24,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.cetisasiste.R
+import com.example.cetisasiste.datos.Avisos
 import com.example.cetisasiste.datos.CetisRepositorio
 import com.example.cetisasiste.datos.Escaneo
 import com.example.cetisasiste.datos.Formatos
 import com.example.cetisasiste.datos.Medio
 import com.example.cetisasiste.datos.NoControl
-import com.example.cetisasiste.datos.NotificacionDoc
 import com.example.cetisasiste.datos.RegistroDoc
 import com.example.cetisasiste.datos.Sesion
+import com.example.cetisasiste.datos.TipoAviso
 import com.example.cetisasiste.datos.TipoRegistro
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.alTocar
@@ -88,8 +89,9 @@ class EstadoDelEscaneo {
     }
 
     /**
-     * Busca al alumno, decide la alerta y guarda el registro (y el aviso a sus padres si no hubo
-     * alerta). Devuelve true si se guardó; si no, deja un mensaje de error.
+     * Busca al alumno, decide la alerta y guarda el registro, con el aviso a sus padres (si no
+     * hubo alerta, o si la alerta es de las que el plantel pide avisar: Avisos.alPadrePorEscaneo).
+     * Devuelve true si se guardó; si no, deja un mensaje de error.
      */
     suspend fun registrar(contexto: Context, sesion: Sesion, noControl: String, medio: String): Boolean {
         guardando = true
@@ -98,6 +100,7 @@ class EstadoDelEscaneo {
         ultimoEn = SystemClock.elapsedRealtime()
         return try {
             val datos = CetisRepositorio.datosDelEscaneo(noControl, tipo)
+            val configuracion = CetisRepositorio.configuracion()
             val alumno = datos.alumno
             val alerta = Escaneo.alerta(datos)
             val ahora = Timestamp.now()
@@ -115,21 +118,35 @@ class EstadoDelEscaneo {
                 registradoPorNombre = sesion.usuario.nombre.trim(),
                 alerta = alerta,
             )
-            // Al padre solo se le avisa de las entradas y salidas sin alerta.
-            val avisar = alerta == null && alumno != null && alumno.padres.any { it.isNotBlank() }
-            val aviso = if (!avisar) null else NotificacionDoc(
+            // Al padre se le avisa de las entradas y salidas sin alerta y de las alertas que pida el plantel.
+            val avisar = alumno != null && Avisos.destinatarios(alumno).isNotEmpty() &&
+                Avisos.alPadrePorEscaneo(alerta, configuracion)
+            val aviso = if (!avisar) null else if (alerta == null) Avisos.nuevo(
                 tipo = tipo,
                 titulo = contexto.getString(if (entrada) R.string.prefecto_entrada_registrada else R.string.prefecto_salida_registrada),
                 mensaje = contexto.getString(
                     if (entrada) R.string.prefecto_aviso_entrada_mensaje else R.string.prefecto_aviso_salida_mensaje,
                     nombre, Formatos.hora(ahora),
                 ),
-                fecha = ahora,
-                leida = false,
                 alumnoId = noControl,
+                creadaPor = sesion.uid,
+                ahora = ahora,
+            ) else Avisos.nuevo(
+                tipo = TipoAviso.ALERTA,
+                titulo = contexto.getString(PrefectoVistas.tituloDeAlerta(alerta)),
+                mensaje = contexto.getString(
+                    if (entrada) R.string.prefecto_aviso_alerta_entrada else R.string.prefecto_aviso_alerta_salida,
+                    nombre, Formatos.hora(ahora), contexto.getString(PrefectoVistas.tituloDeAlerta(alerta)),
+                ),
+                alumnoId = noControl,
+                creadaPor = sesion.uid,
+                ahora = ahora,
             )
             CetisRepositorio.registrarEscaneo(registro, alumno, aviso)
-            resultado = ResultadoEscaneo(noControl, alumno, alumno?.grupo?.trim().orEmpty(), tipo, alerta, ahora, avisar)
+            resultado = ResultadoEscaneo(
+                noControl, alumno, alumno?.grupo?.trim().orEmpty(), tipo, alerta, ahora, avisar,
+                castigo = Escaneo.castigoVigente(datos.estatus, ahora.toDate()),
+            )
             mensaje = null
             true
         } catch (e: Exception) {

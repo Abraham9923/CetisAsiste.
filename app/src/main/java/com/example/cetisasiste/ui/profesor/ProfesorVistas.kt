@@ -124,8 +124,10 @@ object ProfesorVistas {
         tipoElegido: String?,
         guardando: Boolean,
         @StringRes mensaje: Int?,
+        seAvisaraAlPadre: Boolean,
     ) {
         vista.texto(R.id.txt_nombre, alumno?.nombre?.trim().orEmpty())
+        vista.mostrar(R.id.txt_aviso_padre, seAvisaraAlPadre)
         vista.texto(
             R.id.txt_detalle,
             listOf(alumno?.noControl.orEmpty(), vista.context.getString(R.string.comun_grupo_titulo, nombreGrupo))
@@ -182,8 +184,9 @@ object ProfesorVistas {
         else -> EstadoVisible.Activo
     }
 
+    /** "Falta", "Reporte"… (también lo usa el aviso al padre). */
     @StringRes
-    private fun nombreDeEstatus(tipo: String): Int = when (tipo) {
+    fun nombreDeEstatus(tipo: String): Int = when (tipo) {
         TipoEstatus.FALTA -> R.string.estatus_falta
         TipoEstatus.REPORTE -> R.string.estatus_reporte
         TipoEstatus.LLAMADA_ATENCION -> R.string.estatus_llamada_atencion

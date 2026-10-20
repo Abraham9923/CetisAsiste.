@@ -153,6 +153,17 @@
                         </LinearLayout>
                     </LinearLayout>
 
+                    <!-- Por qué saltó la alerta ("Control Escolar lo desactivó por pago."); solo con alerta -->
+                    <TextView
+                        android:id="@+id/txt_motivo"
+                        style="@style/Cetis.Texto.Cuerpo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/cetis_space_12"
+                        android:visibility="gone"
+                        tools:text="{alerta.motivo}"
+                        tools:visibility="visible" />
+
                     <!-- "Se avisó a su padre…" (verde) o "La alerta quedó guardada…" (rojo) -->
                     <TextView
                         android:id="@+id/txt_aviso"

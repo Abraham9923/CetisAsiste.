@@ -25,6 +25,15 @@
       ]
     },
     {
+      "collectionGroup": "registros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fecha", "order": "ASCENDING" },
+        { "fieldPath": "alerta", "order": "ASCENDING" },
+        { "fieldPath": "fechaHora", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "salidasDeGrupo",
       "queryScope": "COLLECTION",
       "fields": [

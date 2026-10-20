@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.Collator
 import java.util.Date
@@ -190,6 +192,42 @@ object CetisRepositorio {
         awaitClose { registro.remove() }
     }
 
+    /** Escucha una consulta: avisa con la lista completa (id y documento) cada vez que cambia. */
+    private fun <T : Any> escucharLista(consulta: Query, clase: Class<T>): Flow<Result<List<Pair<String, T>>>> = callbackFlow {
+        val registro = consulta.addSnapshotListener { lista, error ->
+            if (error != null) {
+                trySend(Result.failure(error))
+                close()
+            } else {
+                trySend(Result.success(lista?.documents.orEmpty().mapNotNull { doc -> doc.toObject(clase)?.let { doc.id to it } }))
+            }
+        }
+        awaitClose { registro.remove() }
+    }
+
+    /**
+     * Como [escucharLista], pero dentro del semestre en curso: primero lee
+     * configuracion/plantel.periodoActual y luego escucha la consulta que arma [consulta] con
+     * periodos/{periodoActual}. Sin semestre en curso, avisa con una lista vacía.
+     */
+    private fun <T : Any> escucharEnElSemestre(
+        clase: Class<T>,
+        consulta: (periodo: DocumentReference) -> Query,
+    ): Flow<Result<List<Pair<String, T>>>> = flow {
+        val periodo = try {
+            periodoActual()
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            emit(Result.failure(e))
+            return@flow
+        }
+        if (periodo.isBlank()) {
+            emit(Result.success(emptyList()))
+            return@flow
+        }
+        emitAll(escucharLista(consulta(db.collection(Colecciones.PERIODOS).document(periodo)), clase))
+    }
+
     // ---------- Consultas ----------
 
     /** alumnos/{noControl}, o null si no existe o no hay permiso. */
@@ -233,10 +271,23 @@ object CetisRepositorio {
             .get().await()
             .toObjects(EventoDoc::class.java)
 
-    /** Ajustes del plantel (configuracion/plantel). */
-    suspend fun configuracion(): ConfiguracionDoc =
-        db.collection(Colecciones.CONFIGURACION).document("plantel").get().await()
+    /**
+     * Ajustes del plantel (configuracion/plantel). Se guardan [VIGENCIA_CONFIGURACION_MS] en
+     * memoria: el prefecto los necesita en cada escaneo y así no se leen cada vez (cada lectura
+     * cuenta en el límite diario del plan Spark).
+     */
+    suspend fun configuracion(): ConfiguracionDoc {
+        val guardada = configuracionGuardada
+        if (guardada != null && System.currentTimeMillis() - guardada.first < VIGENCIA_CONFIGURACION_MS) return guardada.second
+        val leida = db.collection(Colecciones.CONFIGURACION).document("plantel").get().await()
             .toObject(ConfiguracionDoc::class.java) ?: ConfiguracionDoc()
+        configuracionGuardada = System.currentTimeMillis() to leida
+        return leida
+    }
+
+    @Volatile
+    private var configuracionGuardada: Pair<Long, ConfiguracionDoc>? = null
+    private const val VIGENCIA_CONFIGURACION_MS = 5L * 60 * 1000
 
     /** Semestre en curso (configuracion/plantel.periodoActual), por ejemplo "2026-2027-1". */
     suspend fun periodoActual(): String = configuracion().periodoActual
@@ -262,21 +313,30 @@ object CetisRepositorio {
     /** Cuántos registros se piden a la vez (cada uno cuenta como una lectura). */
     const val POR_PAGINA = 20L
 
-    /** Avisos personales de la cuenta, del más nuevo al más viejo. */
-    suspend fun notificaciones(uid: String, limite: Long = 50): List<Pair<String, NotificacionDoc>> =
-        db.collection(Colecciones.USUARIOS).document(uid)
-            .collection(Colecciones.NOTIFICACIONES)
-            .orderBy("fecha", Query.Direction.DESCENDING)
-            .limit(limite)
-            .get().await()
-            .documents.mapNotNull { doc -> doc.toObject(NotificacionDoc::class.java)?.let { doc.id to it } }
+    private fun buzon(uid: String) =
+        db.collection(Colecciones.USUARIOS).document(uid).collection(Colecciones.NOTIFICACIONES)
+
+    /**
+     * Avisos personales de la cuenta (su buzón), del más nuevo al más viejo, en tiempo real:
+     * un aviso nuevo aparece sin salir de la pantalla. Solo se escucha mientras la pantalla de
+     * Notificaciones está abierta.
+     */
+    fun escucharNotificaciones(uid: String, limite: Long = 50): Flow<Result<List<Pair<String, NotificacionDoc>>>> =
+        escucharLista(buzon(uid).orderBy("fecha", Query.Direction.DESCENDING).limit(limite), NotificacionDoc::class.java)
+
+    /**
+     * Cuántos avisos sin leer tiene la cuenta (para la campana), en tiempo real. Cuenta hasta
+     * Avisos.MAXIMO_SIN_LEER: así cada cambio cuesta pocas lecturas.
+     */
+    fun escucharSinLeer(uid: String): Flow<Result<Int>> =
+        escucharLista(buzon(uid).whereEqualTo("leida", false).limit(Avisos.MAXIMO_SIN_LEER), NotificacionDoc::class.java)
+            .map { resultado -> resultado.map { it.size } }
 
     /** Marca como leídas las notificaciones indicadas (solo cambia el campo `leida`). */
     suspend fun marcarLeidas(uid: String, ids: List<String>) {
         if (ids.isEmpty()) return
         val lote = db.batch()
-        val coleccion = db.collection(Colecciones.USUARIOS).document(uid).collection(Colecciones.NOTIFICACIONES)
-        ids.forEach { lote.update(coleccion.document(it), "leida", true) }
+        ids.forEach { lote.update(buzon(uid).document(it), "leida", true) }
         lote.commit().await()
     }
 
@@ -333,13 +393,15 @@ object CetisRepositorio {
     }
 
     /**
-     * Guarda un estatus nuevo del alumno. Las reglas solo dejan al profesor de su grupo poner
-     * falta, reporte, llamada de atención o castigo.
+     * Guarda un estatus nuevo del alumno y, si se da [aviso], se lo manda a cada uno de
+     * [padres], todo de una vez (se guarda todo o nada). Las reglas solo dejan al profesor de su
+     * grupo poner falta, reporte, llamada de atención o castigo, y avisar solo a sus padres.
      */
-    suspend fun agregarEstatus(noControl: String, estatus: EstatusDoc) {
-        db.collection(Colecciones.ALUMNOS).document(noControl)
-            .collection(Colecciones.ESTATUS)
-            .add(estatus).await()
+    suspend fun agregarEstatus(noControl: String, estatus: EstatusDoc, aviso: NotificacionDoc? = null, padres: List<String> = emptyList()) {
+        val lote = db.batch()
+        lote.set(db.collection(Colecciones.ALUMNOS).document(noControl).collection(Colecciones.ESTATUS).document(), estatus)
+        if (aviso != null) padres.forEach { lote.set(buzon(it).document(), aviso) }
+        lote.commit().await()
     }
 
     /** Grupos que ya salieron hoy (salidasDeGrupo del semestre en curso), del más reciente al más viejo. */
@@ -358,34 +420,43 @@ object CetisRepositorio {
      * Igual que [salidasDeGrupoDeHoy], pero en tiempo real: avisa cada vez que un profesor da
      * salida a un grupo. Lo usa el Inicio del prefecto.
      */
-    fun escucharSalidasDeHoy(): Flow<Result<List<SalidaDeGrupoDoc>>> = flow {
-        val periodo = try {
-            periodoActual()
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            emit(Result.failure(e))
-            return@flow
-        }
-        if (periodo.isBlank()) {
-            emit(Result.success(emptyList()))
-            return@flow
-        }
-        emitAll(callbackFlow {
-            val registro = db.collection(Colecciones.PERIODOS).document(periodo)
-                .collection(Colecciones.SALIDAS_DE_GRUPO)
+    fun escucharSalidasDeHoy(): Flow<Result<List<SalidaDeGrupoDoc>>> =
+        escucharEnElSemestre(SalidaDeGrupoDoc::class.java) { periodo ->
+            periodo.collection(Colecciones.SALIDAS_DE_GRUPO)
                 .whereEqualTo("fecha", Formatos.fechaDeHoy())
                 .orderBy("fechaHora", Query.Direction.DESCENDING)
-                .addSnapshotListener { lista, error ->
-                    if (error != null) {
-                        trySend(Result.failure(error))
-                        close()
-                    } else {
-                        trySend(Result.success(lista?.toObjects(SalidaDeGrupoDoc::class.java).orEmpty()))
-                    }
-                }
-            awaitClose { registro.remove() }
-        })
-    }
+        }.map { resultado -> resultado.map { lista -> lista.map { it.second } } }
+
+    /**
+     * Los últimos [limite] escaneos de hoy (con o sin alerta), del más nuevo al más viejo, en
+     * tiempo real. Lo usa el Inicio del prefecto ("Últimos escaneos").
+     */
+    fun escucharEscaneosDeHoy(limite: Long = 8): Flow<Result<List<RegistroDoc>>> =
+        escucharEnElSemestre(RegistroDoc::class.java) { periodo ->
+            periodo.collection(Colecciones.REGISTROS)
+                .whereEqualTo("fecha", Formatos.fechaDeHoy())
+                .orderBy("fechaHora", Query.Direction.DESCENDING)
+                .limit(limite)
+        }.map { resultado -> resultado.map { lista -> lista.map { it.second } } }
+
+    /**
+     * Los escaneos de hoy que tuvieron alerta, del más nuevo al más viejo, en tiempo real. Lo
+     * usa la pantalla "Alertas de hoy" del prefecto. Necesita el índice registros (fecha,
+     * alerta, fechaHora) de firebase/firestore.indexes.json.
+     */
+    fun escucharAlertasDeHoy(limite: Long = 100): Flow<Result<List<RegistroDoc>>> =
+        escucharEnElSemestre(RegistroDoc::class.java) { periodo ->
+            periodo.collection(Colecciones.REGISTROS)
+                .whereEqualTo("fecha", Formatos.fechaDeHoy())
+                .whereIn("alerta", TODAS_LAS_ALERTAS)
+                .orderBy("fechaHora", Query.Direction.DESCENDING)
+                .limit(limite)
+        }.map { resultado -> resultado.map { lista -> lista.map { it.second } } }
+
+    private val TODAS_LAS_ALERTAS = listOf(
+        Alerta.NO_DADO_DE_ALTA, Alerta.INACTIVO, Alerta.YA_INGRESO,
+        Alerta.NO_HA_INGRESADO, Alerta.CASTIGO, Alerta.SALIDA_FUERA_DE_HORARIO,
+    )
 
     /**
      * El profesor libera a su grupo. Las reglas exigen que dé clase en ese grupo y que
@@ -414,7 +485,8 @@ object CetisRepositorio {
      * Guarda un escaneo de una sola vez (se guarda todo o nada):
      *   - el registro en periodos/{semestre}/registros, siempre, aunque haya alerta;
      *   - si no hubo alerta, la `ubicacion` y el `ultimoRegistro` del alumno;
-     *   - si se da [aviso], una notificación para cada padre o tutor del alumno.
+     *   - si se da [aviso], una notificación para cada padre o tutor del alumno (sin alerta,
+     *     siempre; con alerta, si el plantel lo pide: Avisos.alPadrePorEscaneo).
      * Las reglas solo dejan hacerlo al prefecto, con su propio uid en `registradoPor`.
      */
     suspend fun registrarEscaneo(registro: RegistroDoc, alumno: AlumnoDoc?, aviso: NotificacionDoc?) {
@@ -435,14 +507,7 @@ object CetisRepositorio {
                 ),
             )
         }
-        if (alumno != null && aviso != null) {
-            alumno.padres.filter { it.isNotBlank() }.forEach { padre ->
-                lote.set(
-                    db.collection(Colecciones.USUARIOS).document(padre).collection(Colecciones.NOTIFICACIONES).document(),
-                    aviso,
-                )
-            }
-        }
+        if (aviso != null) Avisos.destinatarios(alumno).forEach { padre -> lote.set(buzon(padre).document(), aviso) }
         lote.commit().await()
     }
 

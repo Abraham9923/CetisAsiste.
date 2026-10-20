@@ -111,17 +111,22 @@ Código: `ui/prefecto/PrefectoApp.kt`, `ui/prefecto/PrefectoVistas.kt` y, para e
 
 | Pantalla | Layout | Variables | Cómo se llega |
 |---|---|---|---|
-| Inicio | `prefecto_inicio.xml` | nombre, fecha de hoy, grupos que ya salieron hoy (**en tiempo real**) | Al entrar · pestaña |
+| Inicio | `prefecto_inicio.xml` | nombre, fecha de hoy, renglón "Alertas de hoy" con cuántas van, últimos 8 escaneos de hoy y grupos que ya salieron hoy (todo **en tiempo real**) | Al entrar · pestaña |
+| Alertas de hoy | `prefecto_alertas.xml` | cuántas alertas van hoy y una fila por alerta (alumno, hora, entrada o salida, alerta), **en tiempo real** | Menú ☰ · renglón "Alertas de hoy" del Inicio |
 | Escanear (Figma 77:500) | `prefecto_escaner.xml` | Entrada o Salida, mensaje ("Buscando al alumno…", "Ese código no es de CetisAsiste."), permiso de cámara | Menú ☰ · tarjeta "Escanear QR" del Inicio |
 | Capturar No. de control (Figma 89:859) | `prefecto_captura.xml` | Entrada o Salida, dígitos tecleados (14), error | "Escribir No. de control" del escáner · tarjeta del Inicio |
-| Resultado (Figma 77:501 y 77:502) | `prefecto_resultado.xml` | entrada o salida, alerta (o ninguna), hora, alumno (nombre, grupo, No. de control), si se avisó al padre | Después de escanear o capturar · "Escanear siguiente" regresa |
+| Resultado (Figma 77:501 y 77:502) | `prefecto_resultado.xml` | entrada o salida, alerta (o ninguna), **por qué saltó la alerta**, hora, alumno (nombre, grupo, No. de control), si se avisó al padre | Después de escanear o capturar · "Escanear siguiente" regresa |
 | Horarios de grupos | `prefecto_horarios.xml` | turno elegido y grupos del semestre | Pestaña · Inicio |
 | Horario de un grupo | `comun_horario.xml` | grupo elegido, día, clases | Tocar un grupo |
 | Calendario | `comun_calendario.xml` | mes y eventos | Pestaña · Inicio |
 | Perfil | `comun_perfil_personal.xml` | nombre, usuario, correo | Pestaña |
-| Notificaciones | `comun_notificaciones.xml` | avisos | Campana de Inicio |
+| Notificaciones | `comun_notificaciones.xml` | grupos que ya salieron hoy ("Grupo 102 ya salió de clases") y sus avisos | Campana de Inicio · menú ☰ |
 | Cambiar contraseña | `comun_cambiar_contrasena.xml` | — | Perfil · sola al entrar si es obligatoria |
 
+- **Alertas (ADR-010):** "Alertas de hoy" junta todos los escaneos de hoy con alerta. El
+  resultado de cada escaneo dice por qué saltó ("Control Escolar lo desactivó por pago",
+  "Castigo: … (lo registró …)"…). Las alertas `inactivo` y `salida_fuera_de_horario` también
+  se le avisan al padre (lo decide `configuracion/plantel.avisarAlPadreAlertas`).
 - **Escaneo** (ADR-009): el QR del alumno lleva `CETIS61:` + su No. de control. Al leerlo (o al
   teclear los 14 dígitos) la app busca al alumno, decide si hay alerta (`datos/Escaneo.kt`) y
   guarda el registro; si no hubo alerta, cambia su ubicación y avisa a sus padres dentro de la
@@ -146,7 +151,7 @@ Código: `ui/profesor/ProfesorApp.kt` y `ui/profesor/ProfesorVistas.kt`.
 | Grupo (lista de alumnos) | `profesor_grupo.xml` + `profesor_item_alumno.xml` | grupo, si ya salió hoy, alumnos inscritos con su estado | Tocar un grupo |
 | Horario del grupo | `comun_horario.xml` | grupo, día, clases | Grupo |
 | Perfil del alumno | `profesor_alumno.xml` | datos del alumno, su estado y sus estatus | Tocar un alumno |
-| Cambiar estatus | `profesor_cambiar_estatus.xml` | alumno; tipo elegido; descripción | Perfil del alumno |
+| Cambiar estatus | `profesor_cambiar_estatus.xml` | alumno; tipo elegido; descripción; aviso "Su padre o tutor recibirá un aviso…" si el tipo se avisa | Perfil del alumno |
 | Dar salida al grupo | `profesor_dar_salida.xml` | grupo, fecha, última clase de hoy | Grupo |
 | Boletín de noticias | `profesor_boletin.xml` + `alumno_item_anuncio.xml` | anuncios dirigidos a `profesor` | Pestaña |
 | Perfil | `comun_perfil_personal.xml` | nombre, usuario, correo | Pestaña |
@@ -158,7 +163,7 @@ Código: `ui/profesor/ProfesorApp.kt` y `ui/profesor/ProfesorVistas.kt`.
 
 | Acción | Dónde se guarda | Qué revisa la app antes |
 |---|---|---|
-| Cambiar estatus | `alumnos/{No. de control}/estatus/{id}` con `tipo` (falta, reporte, llamada_atencion o castigo), `descripcion`, `fecha`, `asignadoPor` y `asignadoPorNombre` | Que haya tipo y descripción |
+| Cambiar estatus | `alumnos/{No. de control}/estatus/{id}` con `tipo` (falta, reporte, llamada_atencion o castigo), `descripcion`, `fecha`, `asignadoPor` y `asignadoPorNombre`; **en el mismo lote**, un aviso para cada padre si el tipo está en `configuracion/plantel.avisarAlPadreEstatus` (ADR-010) | Que haya tipo y descripción |
 | Dar salida al grupo | `periodos/{semestre}/salidasDeGrupo/{id}` con `grupoId`, `grupo`, `fecha`, `fechaHora`, `autorizadaPor`, `autorizadaPorNombre` y `materia` (la última clase de hoy) | Que el grupo no haya salido ya hoy (si ya salió, el botón se apaga y se ve el aviso verde) |
 
 Estado del alumno (etiqueta de color): **Inactivo por pago** (rojo) si `activoPorPago` es
@@ -175,7 +180,7 @@ Código: `ui/comun/PantallasComunes.kt` (cada pantalla pide sus datos) y
 | Vista | Quién la usa | Qué hace |
 |---|---|---|
 | `comun_calendario.xml` | Padre, prefecto | Mes con los días con evento y la lista de eventos; las flechas cambian de mes |
-| `comun_notificaciones.xml` | Padre, prefecto, profesor | Avisos de hoy y anteriores; "Marcar todas como leídas" |
+| `comun_notificaciones.xml` | Todos (también el alumno) | Avisos de hoy y anteriores, **en tiempo real**; "Marcar todas como leídas" (solo si hay sin leer). Ícono por tipo: entrada, salida, alerta (rojo), estatus, estado, anuncio… |
 | `comun_horario.xml` | Padre, prefecto, profesor | Horario de un grupo con chips de lunes a viernes (mismos ids que `alumno_horario.xml`) |
 | `comun_perfil_personal.xml` | Prefecto, profesor | Nombre, rol, usuario y correo; Cambiar contraseña; Cerrar sesión |
 | `comun_cambiar_contrasena.xml` | Todos (también el alumno) | Contraseña actual, nueva y repetida |

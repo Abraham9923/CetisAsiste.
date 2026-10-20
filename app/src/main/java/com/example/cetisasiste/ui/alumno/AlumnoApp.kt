@@ -32,6 +32,7 @@ import com.example.cetisasiste.ui.comun.alTocar
 import com.example.cetisasiste.ui.comun.alumnoDeLaSesionEnVivo
 import com.example.cetisasiste.ui.comun.cargar
 import com.example.cetisasiste.ui.comun.nombreDeGrupoEnVivo
+import com.example.cetisasiste.ui.comun.sinLeerEnVivo
 
 /** Pantallas del alumno. Son las vistas XML de res/layout/alumno_*.xml. */
 enum class AlumnoPantalla(@param:LayoutRes val layout: Int) {
@@ -76,6 +77,8 @@ fun AlumnoApp(
         pila = if (p == AlumnoPantalla.Inicio) listOf(p) else listOf(AlumnoPantalla.Inicio, p)
     }
     BackHandler(enabled = pila.size > 1) { regresar() }
+    // Avisos sin leer (campana y menú ☰), en tiempo real.
+    val sinLeer = sinLeerEnVivo(sesion.uid)
 
     // Ficha del alumno, en tiempo real: si cambia en Firestore, la vista se vuelve a llenar.
     val doc = when (val estado = alumnoDeLaSesionEnVivo(sesion)) {
@@ -117,6 +120,7 @@ fun AlumnoApp(
         when (pantalla) {
             AlumnoPantalla.Inicio -> {
                 AlumnoVistas.llenarInicio(vista, alumno)
+                VistasComunes.marcarCampana(vista, sinLeer)
                 vista.alTocar(R.id.btn_notificaciones) { abrir(AlumnoPantalla.Notificaciones) }
                 vista.alTocar(R.id.card_qr) { abrir(AlumnoPantalla.CodigoQr) }
                 vista.alTocar(R.id.card_credencial) { abrir(AlumnoPantalla.Credencial) }
@@ -155,6 +159,7 @@ fun AlumnoApp(
                 vista, alumno.nombre, rol, PESTANAS, pantalla, ::pestana,
                 onNotificaciones = { abrir(AlumnoPantalla.Notificaciones) },
                 onCerrarSesion = onCerrarSesion,
+                sinLeer = sinLeer,
             )
         }
     }

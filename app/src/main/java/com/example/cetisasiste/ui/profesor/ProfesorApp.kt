@@ -18,13 +18,16 @@ import com.example.cetisasiste.AlumnoVistas
 import com.example.cetisasiste.Anuncio
 import com.example.cetisasiste.R
 import com.example.cetisasiste.datos.AlumnoDoc
+import com.example.cetisasiste.datos.Avisos
 import com.example.cetisasiste.datos.CetisRepositorio
+import com.example.cetisasiste.datos.ConfiguracionDoc
 import com.example.cetisasiste.datos.ClaseDoc
 import com.example.cetisasiste.datos.EstatusDoc
 import com.example.cetisasiste.datos.Formatos
 import com.example.cetisasiste.datos.GrupoDoc
 import com.example.cetisasiste.datos.SalidaDeGrupoDoc
 import com.example.cetisasiste.datos.Sesion
+import com.example.cetisasiste.datos.TipoAviso
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
 import com.example.cetisasiste.ui.comun.Carga
 import com.example.cetisasiste.ui.comun.HorarioXml
@@ -38,6 +41,7 @@ import com.example.cetisasiste.ui.comun.avisar
 import com.example.cetisasiste.ui.comun.cargar
 import com.example.cetisasiste.ui.comun.mostrar
 import com.example.cetisasiste.ui.comun.o
+import com.example.cetisasiste.ui.comun.sinLeerEnVivo
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 
@@ -83,6 +87,8 @@ fun ProfesorApp(
         pila = if (p == ProfesorPantalla.Inicio) listOf(p) else listOf(ProfesorPantalla.Inicio, p)
     }
     BackHandler(enabled = pila.size > 1) { regresar() }
+    // Avisos sin leer (campana y menú ☰), en tiempo real.
+    val sinLeer = sinLeerEnVivo(sesion.uid)
 
     val scope = rememberCoroutineScope()
     val usuario = sesion.usuario
@@ -106,6 +112,7 @@ fun ProfesorApp(
             vista, usuario.nombre.trim(), rol, PESTANAS, p, ::pestana,
             onNotificaciones = { abrir(ProfesorPantalla.Notificaciones) },
             onCerrarSesion = onCerrarSesion,
+            sinLeer = sinLeer,
         )
 
     when (val pantalla = pila.last()) {
@@ -119,6 +126,7 @@ fun ProfesorApp(
                     abrir(ProfesorPantalla.Grupo)
                 }
                 vista.alTocar(R.id.btn_notificaciones) { abrir(ProfesorPantalla.Notificaciones) }
+                VistasComunes.marcarCampana(vista, sinLeer)
                 conectarMenu(vista, pantalla)
             }
         }
@@ -182,8 +190,17 @@ fun ProfesorApp(
             var tipo by rememberSaveable { mutableStateOf<String?>(null) }
             var guardando by remember { mutableStateOf(false) }
             var mensaje by remember { mutableStateOf<Int?>(null) }
+            // Qué estatus se le avisan al padre (configuracion/plantel). Sin configuración, no se avisa.
+            val configuracion by produceState<ConfiguracionDoc?>(null) {
+                value = cargar { CetisRepositorio.configuracion() }.o(null)
+            }
+            val padres = Avisos.destinatarios(alumno)
+            fun seAvisa(t: String?): Boolean {
+                val c = configuracion ?: return false
+                return t != null && padres.isNotEmpty() && Avisos.alPadrePorEstatus(t, c)
+            }
             PantallaXml(R.layout.profesor_cambiar_estatus, modifier) { vista ->
-                ProfesorVistas.llenarCambiarEstatus(vista, alumno, nombreGrupo, tipo, guardando, mensaje)
+                ProfesorVistas.llenarCambiarEstatus(vista, alumno, nombreGrupo, tipo, guardando, mensaje, seAvisa(tipo))
                 ProfesorVistas.CHIPS_DE_ESTATUS.forEach { (id, t) -> vista.alTocar(id) { tipo = t } }
                 vista.alTocar(R.id.btn_regresar) { regresar() }
                 vista.alTocar(R.id.btn_guardar) {
@@ -197,15 +214,28 @@ fun ProfesorApp(
                     if (elegido == null || mensaje != null) return@alTocar
                     guardando = true
                     scope.launch {
+                        val ahora = Timestamp.now()
                         val nuevo = EstatusDoc(
                             tipo = elegido,
                             descripcion = descripcion,
-                            fecha = Timestamp.now(),
+                            fecha = ahora,
                             vigenteHasta = null,
                             asignadoPor = sesion.uid,
                             asignadoPorNombre = usuario.nombre.trim(),
                         )
-                        val resultado = cargar { CetisRepositorio.agregarEstatus(alumnoElegido, nuevo) }
+                        val nombreTipo = vista.context.getString(ProfesorVistas.nombreDeEstatus(elegido))
+                        val aviso = if (!seAvisa(elegido)) null else Avisos.nuevo(
+                            tipo = TipoAviso.ESTATUS,
+                            titulo = vista.context.getString(R.string.profesor_aviso_estatus_titulo, nombreTipo),
+                            mensaje = vista.context.getString(
+                                R.string.profesor_aviso_estatus_mensaje,
+                                nombreTipo.lowercase(), alumno?.nombre?.trim().orEmpty(), usuario.nombre.trim(), descripcion,
+                            ),
+                            alumnoId = alumnoElegido,
+                            creadaPor = sesion.uid,
+                            ahora = ahora,
+                        )
+                        val resultado = cargar { CetisRepositorio.agregarEstatus(alumnoElegido, nuevo, aviso, padres) }
                         guardando = false
                         if (resultado is Carga.Listo) {
                             vista.avisar(R.string.profesor_estatus_guardado)

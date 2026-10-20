@@ -518,4 +518,17 @@
         <item name="android:maxLines">1</item>
         <item name="android:textColor">@color/cetis_status_success</item>
     </style>
+
+    <!-- Contador rojo de avisos sin leer ("3", "9+"): menú ☰ y alertas de hoy del prefecto -->
+    <style name="Cetis.Contador" parent="Cetis.Texto.SubtituloTarjeta">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:background">@drawable/shape_contador</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:minWidth">20dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:textColor">@color/cetis_text_on_brand</item>
+    </style>
 </resources>

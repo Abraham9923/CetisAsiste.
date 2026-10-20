@@ -11,6 +11,65 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ---
 
+## 20 de octubre de 2026
+
+### 20-01. Notificaciones, alertas y avisos para padres y prefectos (ADR-010)
+
+- **Pedido del usuario:** "encárgate de la gestión del sistema de notificaciones, alertas y
+  avisos, tanto para los padres como las alertas para los prefectos".
+- **Qué se hizo:**
+  - **Un solo buzón** por cuenta (`usuarios/{uid}/notificaciones`) para todos los avisos.
+    Nuevo `datos/Avisos.kt` (a quién se avisa y cómo se arma el aviso, sin Firebase) y
+    `TipoAviso` en `Modelos.kt`. Cada aviso trae ahora `creadaPor` y `venceEn` (+60 días).
+  - **Padre:** además de cada entrada y salida, recibe un aviso cuando el profesor pone falta,
+    reporte, llamada de atención o castigo (con la descripción), y cuando al escanear a su
+    hijo hay alerta de "inactivo" o "salida fuera de horario". El plantel lo cambia con
+    `configuracion/plantel.avisarAlPadreEstatus` y `avisarAlPadreAlertas` (si no existen, se
+    usa lo de por omisión). Antes, con alerta no se le avisaba (ADR-009 punto 6).
+  - **Campana en vivo (los cuatro roles):** el punto rojo sale **solo** si hay avisos sin leer
+    (antes salía siempre; nuevo ícono `ic_bell` sin punto); el menú ☰ muestra cuántos ("3",
+    "9+") con el nuevo estilo `Cetis.Contador`. La pantalla Notificaciones se escucha en
+    tiempo real; "Marcar todas como leídas" solo sale si hay algo sin leer. Íconos por tipo
+    (alerta en rojo, estatus, estado, grupo que salió).
+  - **Prefecto:** en el Inicio, "Últimos escaneos" (8, en vivo, en rojo los que tuvieron
+    alerta) y el renglón "Alertas de hoy" con cuántas van; pantalla nueva **Alertas de hoy**
+    (`prefecto_alertas.xml`, también en el menú ☰); el resultado del escaneo dice **por qué**
+    saltó la alerta; en Notificaciones ve los grupos que salieron hoy.
+  - **Profesor:** "Cambiar estatus" avisa si el padre recibirá el aviso; el estatus y los
+    avisos se guardan en un mismo lote.
+  - **Reglas:** el buzón acepta solo avisos con la forma correcta y firmados; prefecto y
+    Enfermería solo avisan a los padres del alumno, el profesor solo a los de sus grupos.
+    Estatus (`asignadoPor`) y cambios de estado (`por`) también deben ir firmados.
+  - **Pruebas de las reglas** con el emulador: `firebase/pruebas-reglas/` (21 pruebas; 6 fallan
+    con las reglas anteriores). `firebase/firebase.json` ahora configura el emulador.
+  - **Índice nuevo:** `registros` (`fecha`, `alerta`, `fechaHora`) para "Alertas de hoy".
+  - **Menos lecturas:** `configuracion/plantel` se guarda 5 minutos en memoria (antes se leía
+    dos veces en cada escaneo).
+- **Archivos:** `datos/Avisos.kt` (nuevo), `datos/Modelos.kt`, `datos/CetisRepositorio.kt`,
+  `datos/Escaneo.kt` (`castigoVigente`), `ui/comun/Carga.kt` (`sinLeerEnVivo`),
+  `ui/comun/PantallasComunes.kt`, `ui/comun/VistasComunes.kt` (`marcarCampana`, contador del
+  menú), `ui/comun/VariablesComunes.kt`, `ui/alumno/AlumnoApp.kt`, `ui/padres/PadresApp.kt`,
+  `ui/prefecto/PrefectoApp.kt`, `ui/prefecto/PrefectoVistas.kt`,
+  `ui/prefecto/EscaneoPrefecto.kt`, `ui/profesor/ProfesorApp.kt`,
+  `ui/profesor/ProfesorVistas.kt`; `res/layout/prefecto_alertas.xml` (nuevo),
+  `prefecto_inicio.xml`, `prefecto_resultado.xml`, `profesor_cambiar_estatus.xml`,
+  `comun_menu.xml`; `res/drawable/ic_bell.xml` y `shape_contador.xml` (nuevos);
+  `strings_prefecto.xml`, `strings_profesor.xml`, `strings_comun.xml`, `styles_cetis.xml`;
+  `app/src/test/.../AvisosTest.kt` (nuevo); `firebase/firestore.rules`,
+  `firebase/firestore.indexes.json`, `firebase/firebase.json`, `firebase/pruebas-reglas/`
+  (nuevo). Documentos: ADR-010 (nuevo), BASE_DE_DATOS.md (§4.1, §4.8, §6, §7, §10),
+  MANUAL_TECNICO.md, VISTAS_POR_ROL.md, PENDIENTES.md.
+- **Cómo se comprobó:** en la sesión en la nube (Linux, con el SDK de Android 37):
+  `gradlew :app:assembleDebug` compila; `:app:testDebugUnitTest` pasa las **30 pruebas** (20
+  de `EscaneoTest`, 9 de `AvisosTest` y la de ejemplo); `:app:lintDebug` sin errores. Las
+  reglas pasan sus **21 pruebas** en el emulador de Firestore. **No se probó en el teléfono**
+  (no hay teléfono en la nube): lo prueba el usuario (PENDIENTES §10, "Avisos").
+- **Falta (lo hace el usuario en la consola):** publicar las reglas, crear el índice e
+  instalar la app nueva al mismo tiempo (PENDIENTES §1, punto 4). Los `.docx` no se generaron
+  (en la nube no hay Word): correr `md_a_word.ps1` con cada `.md` cambiado.
+
+---
+
 ## 19 de octubre de 2026
 
 ### 19-35. No. de control de 14 dígitos, QR con el No. de control y escaneo del prefecto (ADR-009)
