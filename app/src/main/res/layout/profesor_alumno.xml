@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Perfil del alumno visto por el profesor: sus datos, su estado (StatusChip de Figma),
+     el botón para cambiar su estatus y la lista de estatus que ya tiene.
+     Usa el diseño de "Perfil - Alumno" (Figma 79:1148).
+     Variables: alumno.nombre, alumno.grupo, alumno.noControl, alumno.turno, alumno.correo,
+     su estado y la lista de estatus (un comun_item_lista por estatus). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/profesor_titulo_alumno" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <!-- ProfileHeader -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_tarjeta"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/cetis_space_16">
+
+                    <ImageView
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:contentDescription="@string/alumno_foto_descripcion"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/img_avatar_72" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/cetis_space_16"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_nombre"
+                            style="@style/Cetis.Texto.TituloNombre"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:text="{alumno.nombre}" />
+
+                        <TextView
+                            android:id="@+id/txt_rol_grupo"
+                            style="@style/Cetis.Texto.Cuerpo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/cetis_text_secondary"
+                            tools:text="{alumno.rol} · Grupo {alumno.grupo}" />
+
+                        <!-- StatusChip (76:538) -->
+                        <LinearLayout
+                            android:id="@+id/chip_estado"
+                            style="@style/Cetis.Estatus"
+                            android:layout_marginTop="6dp">
+
+                            <View
+                                android:id="@+id/punto_estado"
+                                style="@style/Cetis.Estatus.Punto" />
+
+                            <TextView
+                                android:id="@+id/txt_estado"
+                                style="@style/Cetis.Estatus.Texto"
+                                tools:text="{alumno.estado}" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Info -->
+                <LinearLayout style="@style/Cetis.Tarjeta">
+
+                    <LinearLayout
+                        style="@style/Cetis.Campo.Renglon"
+                        android:layout_marginTop="0dp">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_no_control" />
+
+                        <TextView
+                            android:id="@+id/txt_no_control"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.noControl}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_turno" />
+
+                        <TextView
+                            android:id="@+id/txt_turno"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.turno}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_correo" />
+
+                        <TextView
+                            android:id="@+id/txt_correo"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.correo}" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opcion_cambiar_estatus"
+                    style="@style/Cetis.Opcion"
+                    android:layout_marginTop="@dimen/cetis_space_16">
+
+                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_edit" />
+                    </FrameLayout>
+
+                    <TextView
+                        style="@style/Cetis.Opcion.Texto"
+                        android:text="@string/profesor_opcion_cambiar_estatus" />
+
+                    <ImageView style="@style/Cetis.Opcion.Flecha" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Cetis.Subtitulo"
+                    android:layout_marginTop="@dimen/cetis_space_20"
+                    android:text="@string/profesor_seccion_estatus" />
+
+                <LinearLayout
+                    android:id="@+id/lista_estatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txt_vacio"
+                    style="@style/Cetis.Texto.Vacio"
+                    android:text="@string/profesor_estatus_vacio"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

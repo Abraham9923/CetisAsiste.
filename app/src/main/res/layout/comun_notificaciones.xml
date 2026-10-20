@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notificaciones separadas en "Hoy" y "Anteriores" (frame "Notificaciones" de Figma).
+     La usan el padre, el prefecto y el profesor (se abre con la campana de Inicio).
+     Variables: listas de notificaciones de hoy y anteriores. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/notificaciones_title" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Cetis.Texto.Seccion"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/notificaciones_today" />
+
+                    <TextView
+                        android:id="@+id/txt_marcar_leidas"
+                        style="@style/Cetis.Texto.SubtituloTarjeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="4dp"
+                        android:text="@string/comun_marcar_leidas"
+                        android:textColor="@color/cetis_brand_accent" />
+                </LinearLayout>
+
+                <!-- Un comun_item_notificacion por aviso -->
+                <LinearLayout
+                    android:id="@+id/lista_hoy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txt_vacio_hoy"
+                    style="@style/Cetis.Texto.Vacio"
+                    android:text="@string/vacio_notificaciones"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_anteriores"
+                    style="@style/Cetis.Subtitulo"
+                    android:layout_marginTop="@dimen/cetis_space_20"
+                    android:text="@string/notificaciones_earlier" />
+
+                <LinearLayout
+                    android:id="@+id/lista_anteriores"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

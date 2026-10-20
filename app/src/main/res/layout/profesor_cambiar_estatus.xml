@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cambiar estatus: el profesor registra una falta, un reporte, una llamada de atención o un
+     castigo (son los cuatro que le permiten las reglas de Firestore). Se guarda en
+     alumnos/{No. de control}/estatus. Variables: alumno.nombre y su No. de control y grupo. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/profesor_titulo_cambiar_estatus" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <!-- A quién se le pone el estatus -->
+                <LinearLayout style="@style/Cetis.Tarjeta">
+
+                    <TextView
+                        android:id="@+id/txt_nombre"
+                        style="@style/Cetis.Texto.TituloTarjeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="{alumno.nombre}" />
+
+                    <TextView
+                        android:id="@+id/txt_detalle"
+                        style="@style/Cetis.Texto.SubtituloTarjeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        tools:text="{alumno.noControl} · Grupo {alumno.grupo}" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Cetis.Campo.Titulo"
+                    android:text="@string/profesor_estatus_tipo" />
+
+                <!-- Tipos: el elegido va en guinda (lo marca el código) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_8"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chip_falta"
+                        style="@style/Cetis.Chip"
+                        android:layout_marginEnd="@dimen/cetis_space_8"
+                        android:text="@string/estatus_falta" />
+
+                    <TextView
+                        android:id="@+id/chip_reporte"
+                        style="@style/Cetis.Chip"
+                        android:text="@string/estatus_reporte" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_8"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chip_llamada_atencion"
+                        style="@style/Cetis.Chip"
+                        android:layout_marginEnd="@dimen/cetis_space_8"
+                        android:text="@string/estatus_llamada_atencion" />
+
+                    <TextView
+                        android:id="@+id/chip_castigo"
+                        style="@style/Cetis.Chip"
+                        android:text="@string/estatus_castigo" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Cetis.Campo.Titulo"
+                    android:text="@string/profesor_estatus_descripcion" />
+
+                <EditText
+                    android:id="@+id/edit_descripcion"
+                    style="@style/Cetis.Texto.Cuerpo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/shape_input"
+                    android:gravity="top|start"
+                    android:hint="@string/profesor_estatus_descripcion_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLength="300"
+                    android:minHeight="110dp"
+                    android:padding="14dp"
+                    android:textColorHint="@color/cetis_text_secondary" />
+
+                <TextView
+                    android:id="@+id/txt_mensaje"
+                    style="@style/Cetis.Texto.CuerpoChico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:textColor="@color/cetis_status_danger"
+                    android:visibility="gone"
+                    tools:text="{mensaje}"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/btn_guardar"
+                    style="@style/Cetis.Boton"
+                    android:text="@string/profesor_estatus_guardar" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

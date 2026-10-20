@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Perfil" del padre (antes PerfilScreen.kt en Compose): los datos del hijo y las
+     opciones de la cuenta. Pestaña: el botón ☰ abre el menú del rol.
+     Los ids son los de alumno_perfil.xml, así se llena con AlumnoVistas.llenarPerfil.
+     Variables: alumno.nombre, alumno.rol, alumno.grupo, alumno.noControl, alumno.correo -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_menu"
+                    style="@style/Cetis.BarraSuperior.Menu" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/nav_perfil" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <!-- ProfileHeader -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_tarjeta"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/cetis_space_16">
+
+                    <ImageView
+                        android:id="@+id/img_foto"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:contentDescription="@string/alumno_foto_descripcion"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/img_avatar_72" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/cetis_space_16"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_nombre"
+                            style="@style/Cetis.Texto.TituloNombre"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:text="{alumno.nombre}" />
+
+                        <TextView
+                            android:id="@+id/txt_rol_grupo"
+                            style="@style/Cetis.Texto.Cuerpo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/cetis_text_secondary"
+                            tools:text="{alumno.rol} · Grupo {alumno.grupo}" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Info -->
+                <LinearLayout style="@style/Cetis.Tarjeta">
+
+                    <LinearLayout
+                        style="@style/Cetis.Campo.Renglon"
+                        android:layout_marginTop="0dp">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_no_control" />
+
+                        <TextView
+                            android:id="@+id/txt_no_control"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.noControl}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_grupo" />
+
+                        <TextView
+                            android:id="@+id/txt_grupo"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.grupo}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_correo" />
+
+                        <TextView
+                            android:id="@+id/txt_correo"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{alumno.correo}" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Options -->
+                <LinearLayout
+                    android:id="@+id/opcion_credencial"
+                    style="@style/Cetis.Opcion"
+                    android:layout_marginTop="@dimen/cetis_space_16">
+
+                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_id_card" />
+                    </FrameLayout>
+
+                    <TextView
+                        style="@style/Cetis.Opcion.Texto"
+                        android:text="@string/perfil_option_credencial" />
+
+                    <ImageView style="@style/Cetis.Opcion.Flecha" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opcion_entradas"
+                    style="@style/Cetis.Opcion">
+
+                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_inbox" />
+                    </FrameLayout>
+
+                    <TextView
+                        style="@style/Cetis.Opcion.Texto"
+                        android:text="@string/perfil_option_entradas" />
+
+                    <ImageView style="@style/Cetis.Opcion.Flecha" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opcion_contrasena"
+                    style="@style/Cetis.Opcion">
+
+                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_lock" />
+                    </FrameLayout>
+
+                    <TextView
+                        style="@style/Cetis.Opcion.Texto"
+                        android:text="@string/perfil_option_password" />
+
+                    <ImageView style="@style/Cetis.Opcion.Flecha" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opcion_cerrar_sesion"
+                    style="@style/Cetis.Opcion">
+
+                    <FrameLayout
+                        style="@style/Cetis.Opcion.Circulo"
+                        android:background="@drawable/shape_circulo_accent">
+
+                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_log_out" />
+                    </FrameLayout>
+
+                    <TextView
+                        style="@style/Cetis.Opcion.Texto"
+                        android:text="@string/perfil_option_logout" />
+
+                    <ImageView style="@style/Cetis.Opcion.Flecha" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

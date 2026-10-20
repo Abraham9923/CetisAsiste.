@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: componente "Clase" (una fila del horario)
+     Variables: clase.materia, clase.horario, clase.detalle -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_tarjeta"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/cetis_space_12">
+
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/shape_circulo_brand">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_clock" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_materia"
+            style="@style/Cetis.Texto.Cuerpo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="{clase.materia}" />
+
+        <TextView
+            android:id="@+id/txt_detalle"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="{clase.horario} · {clase.detalle}" />
+    </LinearLayout>
+</LinearLayout>

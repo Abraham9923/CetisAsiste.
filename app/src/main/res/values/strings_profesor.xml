@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos FIJOS de las vistas del profesor (profesor_*.xml).
+     Se armaron con el estilo del alumno y las piezas de "Componentes". Su diseño en Figma
+     (página "Profesor") se encontró después: ver docs/referencias/FIGMA.md. -->
+<resources>
+    <string name="profesor_rol">Profesor</string>
+
+    <!-- Inicio -->
+    <plurals name="profesor_numero_grupos">
+        <item quantity="one">%d grupo este semestre</item>
+        <item quantity="other">%d grupos este semestre</item>
+    </plurals>
+    <string name="profesor_seccion_grupos">Mis grupos</string>
+    <string name="profesor_grupos_vacio">No tienes grupos asignados este semestre. Acude a Control Escolar.</string>
+
+    <!-- Grupo -->
+    <string name="profesor_opcion_dar_salida">Dar salida al grupo</string>
+    <string name="profesor_opcion_horario">Horario del grupo</string>
+    <!-- %d = cuántos alumnos. Ej.: "Alumnos (38)" -->
+    <string name="profesor_seccion_alumnos">Alumnos (%d)</string>
+    <string name="profesor_alumnos_vacio">Este grupo todavía no tiene alumnos inscritos.</string>
+    <!-- %1$s = hora, %2$s = quién la dio. Ej.: "El grupo salió hoy a las 11:40 am (autorizó Pedro Pozo)." -->
+    <string name="profesor_salida_hecha">El grupo salió hoy a las %1$s (autorizó %2$s).</string>
+
+    <!-- Perfil del alumno -->
+    <string name="profesor_titulo_alumno">Perfil del alumno</string>
+    <string name="profesor_opcion_cambiar_estatus">Cambiar estatus</string>
+    <string name="profesor_seccion_estatus">Estatus registrados</string>
+    <string name="profesor_estatus_vacio">Este alumno no tiene estatus registrados.</string>
+
+    <!-- Cambiar estatus -->
+    <string name="profesor_titulo_cambiar_estatus">Cambiar estatus</string>
+    <string name="profesor_estatus_tipo">Tipo de estatus</string>
+    <string name="profesor_estatus_descripcion">Descripción</string>
+    <string name="profesor_estatus_descripcion_hint">Ejemplo: no entregó la práctica de Química</string>
+    <string name="profesor_estatus_guardar">Guardar estatus</string>
+    <string name="profesor_estatus_guardado">Se guardó el estatus.</string>
+    <string name="profesor_estatus_error_tipo">Elige el tipo de estatus.</string>
+    <string name="profesor_estatus_error_descripcion">Escribe una descripción.</string>
+
+    <!-- Dar salida al grupo -->
+    <string name="profesor_titulo_dar_salida">Dar salida al grupo</string>
+    <string name="profesor_salida_ultima_clase">Última clase</string>
+    <string name="profesor_salida_horario">Horario</string>
+    <!-- %1$s = nombre del grupo -->
+    <string name="profesor_salida_explicacion">Al confirmar, el prefecto verá en su Inicio que el grupo %1$s ya puede salir.</string>
+    <string name="profesor_salida_confirmar">Dar salida</string>
+    <string name="profesor_salida_sin_clases">Hoy no hay clases registradas para este grupo.</string>
+    <string name="profesor_salida_guardada">Se dio salida al grupo.</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Encabezado de un grupo de renglones, por ejemplo el día en Entradas y salidas
+     ("Hoy · lunes 19 de octubre"). Variable: el texto. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/txt_encabezado"
+    style="@style/Cetis.Subtitulo"
+    android:layout_marginTop="@dimen/cetis_space_20"
+    tools:text="{dia.fecha}" />

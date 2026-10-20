@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Una opción del menú lateral (comun_menu.xml): círculo guinda con el ícono y el nombre de
+     la pantalla. La de la pantalla abierta lleva fondo de tarjeta (lo pone el código).
+     Variables: icono y texto de la opción. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Menu.Opcion"
+    tools:background="@drawable/shape_tarjeta">
+
+    <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+        <ImageView
+            android:id="@+id/img_icono"
+            style="@style/Cetis.Opcion.Icono"
+            tools:src="@drawable/ic_home" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/txt_texto"
+        style="@style/Cetis.Menu.Texto"
+        tools:text="{opcion.texto}" />
+</LinearLayout>

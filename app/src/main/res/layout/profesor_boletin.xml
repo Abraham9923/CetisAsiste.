@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Boletín de noticias del profesor. Mismo diseño que "Boletin - Alumno" (Figma 79:1218).
+     Pestaña: el botón ☰ abre el menú del rol. Las tarjetas son alumno_item_anuncio.xml.
+     Variable: lista de anuncios dirigidos a "profesor". -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_menu"
+                    style="@style/Cetis.BarraSuperior.Menu" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/alumno_titulo_boletin" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/txt_vacio"
+            style="@style/Cetis.Texto.Vacio"
+            android:text="@string/vacio_anuncios"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/lista_anuncios"
+            style="@style/Cetis.Pantalla.Lista"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            tools:listitem="@layout/alumno_item_anuncio" />
+    </LinearLayout>
+</FrameLayout>

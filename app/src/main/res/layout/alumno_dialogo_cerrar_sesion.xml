@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: componente "LogoutDialog" (124:2023) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="296dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_blanco_lg"
+    android:elevation="12dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="28dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp">
+
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/shape_circulo_brand">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_log_out" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Cetis.Texto.Banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_12"
+        android:accessibilityHeading="true"
+        android:gravity="center"
+        android:text="@string/alumno_cerrar_sesion_titulo" />
+
+    <TextView
+        style="@style/Cetis.Texto.CuerpoChico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_12"
+        android:gravity="center"
+        android:text="@string/alumno_cerrar_sesion_mensaje" />
+
+    <!-- Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancelar"
+            style="@style/Cetis.Texto.TituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_boton_dialogo_borde"
+            android:clipToOutline="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:stateListAnimator="@null"
+            android:text="@string/alumno_cerrar_sesion_cancelar"
+            android:textAllCaps="false"
+            android:textColor="@color/cetis_brand_800" />
+
+        <Button
+            android:id="@+id/btn_confirmar"
+            style="@style/Cetis.Texto.TituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_weight="1"
+            android:background="@drawable/shape_boton_dialogo"
+            android:clipToOutline="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:stateListAnimator="@null"
+            android:text="@string/alumno_cerrar_sesion_confirmar"
+            android:textAllCaps="false"
+            android:textColor="@color/cetis_text_on_brand" />
+    </LinearLayout>
+</LinearLayout>

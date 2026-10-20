@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tarjeta del resultado con alerta (Figma 77:502): blanca con borde rojo -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_surface_white" />
+    <stroke android:width="2dp" android:color="@color/cetis_status_danger" />
+    <corners android:radius="@dimen/cetis_radius_lg" />
+</shape>

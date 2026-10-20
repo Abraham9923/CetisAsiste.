@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Menú lateral de las pantallas principales de cada rol (lo abre el botón ☰ de la barra
+     superior; reemplaza a la barra inferior, ADR-007). Arriba, el nombre y el rol de quien
+     inició sesión; en medio, una opción por pantalla principal (comun_item_menu.xml) y
+     "Notificaciones"; hasta abajo, "Cerrar sesión".
+     No trae datos: lo pone encima de la pantalla y lo llena VistasComunes.mostrarMenu.
+     Variables: persona.nombre, persona.rol y la lista de opciones del rol. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menu"
+    android:layout_width="@dimen/cetis_menu_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@drawable/shape_menu"
+    android:clickable="true"
+    android:clipToOutline="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    tools:targetApi="31">
+
+    <!-- Encabezado guinda (mismo color y adorno que la barra superior). El código le suma
+         arriba el alto de la barra de estado (hora y batería), que cambia en cada teléfono. -->
+    <FrameLayout
+        android:id="@+id/encabezado_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cetis_brand_800"
+        android:paddingTop="@dimen/cetis_space_20">
+
+        <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/cetis_space_20"
+            android:paddingEnd="@dimen/cetis_space_20"
+            android:paddingBottom="@dimen/cetis_space_20">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_avatar_64" />
+
+            <TextView
+                android:id="@+id/txt_nombre"
+                style="@style/Cetis.Texto.TituloNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/cetis_space_12"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/cetis_text_on_brand"
+                tools:text="{persona.nombre}" />
+
+            <TextView
+                android:id="@+id/txt_rol"
+                style="@style/Cetis.Texto.Cuerpo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:textColor="@color/cetis_text_on_brand_muted"
+                tools:text="{persona.rol}" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/cetis_space_12">
+
+            <!-- Opciones del rol: las agrega el código, una por pantalla principal -->
+            <LinearLayout
+                android:id="@+id/lista_opciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Notificaciones: la misma pantalla que abre la campana de Inicio -->
+            <LinearLayout
+                android:id="@+id/opcion_notificaciones"
+                style="@style/Cetis.Menu.Opcion"
+                android:contentDescription="@string/alumno_notificaciones">
+
+                <FrameLayout style="@style/Cetis.Opcion.Circulo">
+
+                    <ImageView
+                        style="@style/Cetis.Opcion.Icono"
+                        android:src="@drawable/ic_bell_badge" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/Cetis.Menu.Texto"
+                    android:importantForAccessibility="no"
+                    android:text="@string/alumno_notificaciones" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Hasta abajo: cerrar sesión (pregunta antes, con el mismo diálogo que Perfil) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/cetis_space_20"
+        android:layout_marginEnd="@dimen/cetis_space_20"
+        android:background="@color/cetis_surface_pill" />
+
+    <LinearLayout
+        android:id="@+id/opcion_cerrar_sesion"
+        style="@style/Cetis.Menu.Opcion"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        android:layout_marginEnd="@dimen/cetis_space_12"
+        android:contentDescription="@string/perfil_option_logout">
+
+        <FrameLayout
+            style="@style/Cetis.Opcion.Circulo"
+            android:background="@drawable/shape_circulo_accent">
+
+            <ImageView
+                style="@style/Cetis.Opcion.Icono"
+                android:src="@drawable/ic_log_out" />
+        </FrameLayout>
+
+        <TextView
+            style="@style/Cetis.Menu.Texto"
+            android:importantForAccessibility="no"
+            android:text="@string/perfil_option_logout" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_plantel"
+        style="@style/Cetis.Texto.SubtituloTarjeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/cetis_space_20"
+        android:text="@string/school_name" />
+</LinearLayout>

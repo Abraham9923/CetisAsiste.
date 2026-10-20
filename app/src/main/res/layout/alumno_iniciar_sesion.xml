@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Iniciar sesion - Alumno" (124:1876)
+     Solo la vista: el No. de control y la contraseña las escribe la persona;
+     no se valida nada aquí. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cetis_surface_background"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Hero -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_hero_login"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:layout_width="160dp"
+                android:layout_height="300dp"
+                android:layout_gravity="end|top"
+                android:importantForAccessibility="no"
+                android:scaleType="fitStart"
+                android:src="@drawable/bg_login_accent" />
+
+            <!-- 76 dp = zona de la barra de estado (28) + espacio del diseño (48) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="76dp"
+                android:paddingBottom="32dp">
+
+                <FrameLayout
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/shape_icono_app">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_log_in_brand_36" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/Cetis.Texto.NombreApp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:accessibilityHeading="true"
+                    android:text="@string/app_name" />
+
+                <TextView
+                    style="@style/Cetis.Texto.Cuerpo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/login_hero_subtitle"
+                    android:textColor="@color/cetis_text_on_brand_muted" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Form -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingTop="28dp"
+            android:paddingEnd="32dp">
+
+            <!-- Campo/No. de control -->
+            <TextView
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/edit_no_control"
+                android:text="@string/field_no_control" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/shape_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_user_field" />
+
+                <EditText
+                    android:id="@+id/edit_no_control"
+                    style="@style/Cetis.Texto.Cuerpo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/cetis_space_12"
+                    android:layout_weight="1"
+                    android:autofillHints="username"
+                    android:background="@null"
+                    android:hint="@string/login_no_control_placeholder"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColorHint="@color/cetis_text_secondary" />
+            </LinearLayout>
+
+            <!-- Campo/Contraseña -->
+            <TextView
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/cetis_space_16"
+                android:labelFor="@+id/edit_contrasena"
+                android:text="@string/password_label" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/shape_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lock_field" />
+
+                <EditText
+                    android:id="@+id/edit_contrasena"
+                    style="@style/Cetis.Texto.Cuerpo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/cetis_space_12"
+                    android:layout_marginEnd="@dimen/cetis_space_12"
+                    android:layout_weight="1"
+                    android:autofillHints="password"
+                    android:background="@null"
+                    android:hint="@string/login_password_placeholder"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textColorHint="@color/cetis_text_secondary" />
+
+                <ImageButton
+                    android:id="@+id/btn_mostrar_contrasena"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="-2dp"
+                    android:layout_marginEnd="-14dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/login_toggle_password"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_eye_field" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_olvidaste_contrasena"
+                style="@style/Cetis.Texto.SubtituloTarjeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/cetis_space_16"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="end"
+                android:text="@string/alumno_olvidaste_contrasena"
+                android:textColor="@color/cetis_brand_accent" />
+
+            <Button
+                android:id="@+id/btn_iniciar_sesion"
+                style="@style/Cetis.Texto.Seccion"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/cetis_space_16"
+                android:background="@drawable/shape_boton_primario"
+                android:clipToOutline="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:stateListAnimator="@null"
+                android:text="@string/login_submit"
+                android:textAllCaps="false"
+                android:textColor="@color/cetis_text_on_brand" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
+
+        <ImageView
+            android:layout_width="140dp"
+            android:layout_height="48.43dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="28dp"
+            android:contentDescription="@string/school_logo_description"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_cetis61" />
+    </LinearLayout>
+</ScrollView>

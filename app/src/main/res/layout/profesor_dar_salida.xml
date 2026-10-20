@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dar salida al grupo: el profesor libera al grupo en la última clase del turno.
+     Se guarda en periodos/{semestre}/salidasDeGrupo y el prefecto lo ve en su Inicio.
+     Variables: grupo, fecha de hoy y la última clase del día (materia y horas). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/profesor_titulo_dar_salida" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <LinearLayout style="@style/Cetis.Tarjeta">
+
+                    <LinearLayout
+                        style="@style/Cetis.Campo.Renglon"
+                        android:layout_marginTop="0dp">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_grupo" />
+
+                        <TextView
+                            android:id="@+id/txt_grupo"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{grupo.nombre}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/field_fecha" />
+
+                        <TextView
+                            android:id="@+id/txt_fecha"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{hoy}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/profesor_salida_ultima_clase" />
+
+                        <TextView
+                            android:id="@+id/txt_materia"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{clase.materia}" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+
+                        <TextView
+                            style="@style/Cetis.Campo.Etiqueta.Renglon"
+                            android:text="@string/profesor_salida_horario" />
+
+                        <TextView
+                            android:id="@+id/txt_horario"
+                            style="@style/Cetis.Campo.Valor.Renglon"
+                            tools:text="{clase.horario}" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_explicacion"
+                    style="@style/Cetis.Texto.CuerpoChico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    tools:text="@string/profesor_salida_explicacion" />
+
+                <!-- Aviso verde si el grupo ya salió hoy -->
+                <LinearLayout
+                    android:id="@+id/aviso_salida"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_aviso_exito"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/cetis_space_12"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/shape_circulo_exito">
+
+                        <ImageView
+                            style="@style/Cetis.Circulo.Icono"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_check_circle" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/txt_aviso_salida"
+                        style="@style/Cetis.Texto.CuerpoChico"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/cetis_space_12"
+                        android:layout_weight="1"
+                        android:textColor="@color/cetis_brand_900"
+                        tools:text="{salida.hora} · {salida.profesor}" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_mensaje"
+                    style="@style/Cetis.Texto.CuerpoChico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:textColor="@color/cetis_status_danger"
+                    android:visibility="gone"
+                    tools:text="{mensaje}"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/btn_dar_salida"
+                    style="@style/Cetis.Boton"
+                    android:text="@string/profesor_salida_confirmar" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

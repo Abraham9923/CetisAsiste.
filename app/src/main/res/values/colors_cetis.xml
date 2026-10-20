@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Colores del diseño de Figma (CetisAsiste). Se comparten entre todos los usuarios. -->
+<resources>
+    <color name="cetis_brand_800">#5A1E24</color>
+    <color name="cetis_brand_900">#461419</color>
+    <color name="cetis_brand_accent">#7B4331</color>
+    <color name="cetis_surface_background">#F7F5F4</color>
+    <color name="cetis_surface_card">#EDE5E1</color>
+    <color name="cetis_surface_pill">#E4D5D2</color>
+    <color name="cetis_surface_white">#FFFFFF</color>
+    <color name="cetis_text_on_brand">#FFFFFF</color>
+    <color name="cetis_text_on_brand_muted">#D9BFBA</color>
+    <color name="cetis_text_secondary">#6F5B5B</color>
+    <!-- rgba(20, 8, 10, 0.6) -->
+    <color name="cetis_overlay">#9914080A</color>
+    <!-- Estatus (Figma, página Componentes: StatusChip y AlertBanner) -->
+    <color name="cetis_status_success">#2F8F55</color>
+    <color name="cetis_status_success_bg">#E2F2E7</color>
+    <color name="cetis_status_danger">#C93B3B</color>
+    <color name="cetis_status_danger_bg">#FBE3E3</color>
+    <!-- Fondo oscuro del escáner (Figma "Escaner - Prefecto" 77:500) -->
+    <color name="cetis_escaner_fondo">#241619</color>
+</resources>

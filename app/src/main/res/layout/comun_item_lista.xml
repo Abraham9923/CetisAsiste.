@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Renglón de lista: ícono en un círculo, título y detalle ("ListItemCard" de Figma).
+     Se usa en entradas y salidas, eventos, grupos, salidas de grupo y estatus.
+     Variables: renglon.titulo, renglon.detalle. El ícono, el color del círculo y la flecha
+     (solo en los renglones que se pueden tocar) los pone el código. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/cetis_space_8"
+    android:background="@drawable/shape_tarjeta"
+    android:clipToOutline="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/cetis_space_12">
+
+    <FrameLayout
+        android:id="@+id/circulo"
+        style="@style/Cetis.Circulo">
+
+        <ImageView
+            android:id="@+id/img_icono"
+            style="@style/Cetis.Circulo.Icono"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            tools:src="@drawable/ic_calendar_event" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_titulo"
+            style="@style/Cetis.Texto.Cuerpo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="{renglon.titulo}" />
+
+        <TextView
+            android:id="@+id/txt_detalle"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="{renglon.detalle}" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_flecha"
+        style="@style/Cetis.Opcion.Flecha"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>

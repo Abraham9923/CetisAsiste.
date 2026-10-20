@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos FIJOS de las vistas de alumno (Figma, página "Alumno").
+     Los datos de cada persona NO van aquí: llegan por variables (ver AlumnoVariables.kt). -->
+<resources>
+    <!-- Iniciar sesión (los demás textos ya existen en strings.xml: login_*) -->
+    <string name="alumno_olvidaste_contrasena"><u>¿Olvidaste tu contraseña?</u></string>
+
+    <!-- Barra inferior -->
+    <string name="alumno_nav_boletin">Boletín</string>
+    <string name="alumno_nav_horario">Horario</string>
+
+    <!-- Inicio -->
+    <string name="alumno_notificaciones">Notificaciones</string>
+    <string name="alumno_inicio_qr_titulo">Código QR</string>
+    <string name="alumno_inicio_qr_subtitulo">Muéstralo al entrar y salir</string>
+    <string name="alumno_inicio_credencial_titulo">Credencial digital</string>
+    <string name="alumno_inicio_horario_titulo">Horario</string>
+    <string name="alumno_inicio_boletin_titulo">Boletín de noticias</string>
+    <string name="alumno_inicio_boletin_subtitulo">Avisos del plantel</string>
+    <string name="alumno_marca_agua_numero" translatable="false">61</string>
+
+    <!-- Títulos de la barra superior -->
+    <string name="alumno_titulo_horario">Mi horario</string>
+    <string name="alumno_titulo_perfil">Perfil</string>
+    <string name="alumno_titulo_codigo_qr">Código QR</string>
+    <string name="alumno_titulo_credencial">Credencial digital</string>
+    <string name="alumno_titulo_boletin">Boletín de noticias</string>
+
+    <!-- Horario: días y formatos -->
+    <string name="alumno_dia_lunes_corto">L</string>
+    <string name="alumno_dia_martes_corto">M</string>
+    <string name="alumno_dia_miercoles_corto">Mi</string>
+    <string name="alumno_dia_jueves_corto">J</string>
+    <string name="alumno_dia_viernes_corto">V</string>
+    <!-- %1$s = grupo, %2$s = nombre del día. Ej.: "Grupo 102 · miércoles" -->
+    <string name="alumno_horario_encabezado">Grupo %1$s · %2$s</string>
+    <!-- %1$s = horario de la clase, %2$s = detalle. Ej.: "7:00 – 7:50 am · Profesor asignado" -->
+    <string name="alumno_clase_detalle">%1$s · %2$s</string>
+
+    <!-- Perfil -->
+    <string name="alumno_perfil_aviso">Tus datos solo los puede cambiar Control Escolar.</string>
+    <string name="alumno_perfil_opcion_qr">Mi código QR</string>
+
+    <!-- Diálogo cerrar sesión -->
+    <string name="alumno_cerrar_sesion_titulo">¿Cerrar sesión?</string>
+    <string name="alumno_cerrar_sesion_mensaje">Tendrás que volver a iniciar sesión para usar CetisAsiste.</string>
+    <string name="alumno_cerrar_sesion_cancelar">Cancelar</string>
+    <string name="alumno_cerrar_sesion_confirmar">Cerrar sesión</string>
+
+    <!-- Descripciones para lectores de pantalla -->
+    <string name="alumno_foto_descripcion">Foto del alumno</string>
+</resources>

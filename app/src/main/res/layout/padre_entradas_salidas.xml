@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Entradas y salidas" del padre (antes EntradasSalidasScreen.kt en Compose).
+     Historial del semestre agrupado por día. El código agrega, por cada día, un
+     comun_item_encabezado y un comun_item_lista por registro. "Ver más" trae los siguientes 20.
+     Variables: nombre del hijo y lista de días con sus registros. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/entradas_title" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <LinearLayout
+                    android:id="@+id/lista_dias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txt_vacio"
+                    style="@style/Cetis.Texto.Vacio"
+                    android:text="@string/vacio_registros"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_ver_mas"
+                    style="@style/Cetis.Texto.Enlace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:gravity="center"
+                    android:paddingTop="@dimen/cetis_space_8"
+                    android:paddingBottom="@dimen/cetis_space_8"
+                    android:text="@string/comun_ver_mas"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

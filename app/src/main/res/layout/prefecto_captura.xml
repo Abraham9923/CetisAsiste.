@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Captura por matricula - Prefecto" (89:859), con "No. de control".
+     Para cuando el QR no se puede leer: el prefecto teclea los 14 dígitos del No. de control.
+     El teclado es propio (KeypadKey de "Componentes"); no abre el teclado del teléfono.
+     Los números de las teclas van escritos aquí (no se traducen), por eso tools:ignore.
+     Variables: tipo (entrada o salida), los dígitos tecleados y el mensaje de error. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla"
+    tools:ignore="HardcodedText">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/prefecto_titulo_captura" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <LinearLayout style="@style/Cetis.Segmento">
+
+                    <TextView
+                        android:id="@+id/opcion_entrada"
+                        style="@style/Cetis.Segmento.Opcion"
+                        android:text="@string/prefecto_entrada"
+                        tools:background="@drawable/shape_chip_activo"
+                        tools:textColor="@color/cetis_text_on_brand" />
+
+                    <TextView
+                        android:id="@+id/opcion_salida"
+                        style="@style/Cetis.Segmento.Opcion"
+                        android:text="@string/prefecto_salida" />
+                </LinearLayout>
+
+                <!-- Lo que se ha tecleado -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_input_activo"
+                    android:orientation="vertical"
+                    android:padding="@dimen/cetis_space_16">
+
+                    <TextView
+                        style="@style/Cetis.Texto.SubtituloTarjeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/prefecto_no_control_alumno" />
+
+                    <TextView
+                        android:id="@+id/txt_tecleado"
+                        style="@style/Cetis.Texto"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="@dimen/cetis_space_4"
+                        android:fontFamily="@font/plus_jakarta_sans_medium"
+                        android:gravity="center_vertical"
+                        android:letterSpacing="0.06"
+                        android:maxLines="1"
+                        android:textSize="24sp"
+                        tools:text="{noControl}" />
+
+                    <!-- Ayuda; si falta algo, aquí sale el error en rojo -->
+                    <TextView
+                        android:id="@+id/txt_ayuda"
+                        style="@style/Cetis.Texto.SubtituloTarjeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/cetis_space_4"
+                        android:text="@string/prefecto_captura_ayuda" />
+                </LinearLayout>
+
+                <!-- Teclado -->
+                <LinearLayout
+                    style="@style/Cetis.FilaDeTeclas"
+                    android:layout_marginTop="@dimen/cetis_space_16">
+
+                    <TextView android:id="@+id/tecla_1" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="1" />
+                    <TextView android:id="@+id/tecla_2" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="2" />
+                    <TextView android:id="@+id/tecla_3" style="@style/Cetis.Tecla" android:text="3" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Cetis.FilaDeTeclas">
+
+                    <TextView android:id="@+id/tecla_4" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="4" />
+                    <TextView android:id="@+id/tecla_5" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="5" />
+                    <TextView android:id="@+id/tecla_6" style="@style/Cetis.Tecla" android:text="6" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Cetis.FilaDeTeclas">
+
+                    <TextView android:id="@+id/tecla_7" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="7" />
+                    <TextView android:id="@+id/tecla_8" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="8" />
+                    <TextView android:id="@+id/tecla_9" style="@style/Cetis.Tecla" android:text="9" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Cetis.FilaDeTeclas">
+
+                    <TextView
+                        android:id="@+id/tecla_borrar"
+                        style="@style/Cetis.Tecla.Accion"
+                        android:layout_marginEnd="@dimen/cetis_space_8"
+                        android:text="@string/prefecto_borrar" />
+
+                    <TextView android:id="@+id/tecla_0" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="0" />
+
+                    <TextView
+                        android:id="@+id/tecla_limpiar"
+                        style="@style/Cetis.Tecla.Accion"
+                        android:text="@string/prefecto_limpiar" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_registrar"
+                    style="@style/Cetis.Boton"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:text="@string/prefecto_registrar_entrada" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

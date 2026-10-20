@@ -1,0 +1,8 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Figma: icon/edit (76:520) -->
+    <path android:pathData="M17.5 10.5L8 20H4V16L13.5 6.5M17.5 10.5L19 9C19.5304 8.46957 19.8284 7.75015 19.8284 7C19.8284 6.24985 19.5304 5.53043 19 5C18.4696 4.46957 17.7501 4.17157 17 4.17157C16.2499 4.17157 15.5304 4.46957 15 5L13.5 6.5M17.5 10.5L13.5 6.5" android:strokeColor="#FFFFFF" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>

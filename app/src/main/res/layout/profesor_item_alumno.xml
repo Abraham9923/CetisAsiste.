@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: componente "StudentRow" (76:541), página "Componentes"
+     Variables: alumno.iniciales, alumno.nombre, alumno.noControl y su estado
+     (Activo en verde; Inactivo por pago o por salud en rojo). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/cetis_space_8"
+    android:background="@drawable/shape_tarjeta"
+    android:clickable="true"
+    android:clipToOutline="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/cetis_space_12">
+
+    <!-- Initials (76:542) -->
+    <TextView
+        android:id="@+id/txt_iniciales"
+        style="@style/Cetis.Texto.TituloTarjeta"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/shape_circulo_iniciales"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        tools:text="JP" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:layout_marginEnd="@dimen/cetis_space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_nombre"
+            style="@style/Cetis.Texto.TituloTarjeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="{alumno.nombre}" />
+
+        <TextView
+            android:id="@+id/txt_detalle"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="{alumno.noControl}" />
+
+        <!-- StatusChip (76:538) -->
+        <LinearLayout
+            android:id="@+id/chip_estado"
+            style="@style/Cetis.Estatus"
+            android:layout_marginTop="4dp">
+
+            <View
+                android:id="@+id/punto_estado"
+                style="@style/Cetis.Estatus.Punto" />
+
+            <TextView
+                android:id="@+id/txt_estado"
+                style="@style/Cetis.Estatus.Texto"
+                tools:text="{alumno.estado}" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView style="@style/Cetis.Opcion.Flecha" />
+</LinearLayout>

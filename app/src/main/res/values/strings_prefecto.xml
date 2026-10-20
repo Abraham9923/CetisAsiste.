@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos FIJOS de las vistas del prefecto (prefecto_*.xml).
+     Inicio y Horarios se armaron con el estilo del alumno; el escáner, la captura y el
+     resultado siguen su diseño en Figma (página "Prefecto"): ver docs/referencias/FIGMA.md. -->
+<resources>
+    <string name="prefecto_rol">Prefecto</string>
+
+    <!-- Menú ☰ -->
+    <string name="prefecto_nav_horarios">Horarios</string>
+    <string name="prefecto_nav_escanear">Escanear</string>
+
+    <!-- Inicio -->
+    <string name="prefecto_acceso_escanear">Escanear QR</string>
+    <string name="prefecto_acceso_no_control">Capturar No. de control</string>
+    <string name="prefecto_acceso_escanear_sub">Entradas y salidas</string>
+    <string name="prefecto_acceso_no_control_sub">Si el QR no se lee</string>
+    <string name="prefecto_acceso_horarios">Horarios</string>
+    <string name="prefecto_acceso_horarios_sub">De todos los grupos</string>
+    <string name="prefecto_acceso_calendario">Calendario</string>
+    <string name="prefecto_acceso_calendario_sub">Eventos del plantel</string>
+    <string name="prefecto_seccion_salidas">Salidas de hoy</string>
+    <string name="prefecto_salidas_vacio">Ningún grupo ha salido hoy.</string>
+    <!-- %1$s = nombre del grupo. Ej.: "Grupo 102 puede salir" -->
+    <string name="prefecto_salida_titulo">Grupo %1$s puede salir</string>
+
+    <!-- Horarios de todos los grupos -->
+    <string name="prefecto_titulo_horarios">Horarios de grupos</string>
+    <string name="prefecto_grupos_vacio">No hay grupos dados de alta en este turno.</string>
+
+    <!-- Escáner (Figma 77:500) -->
+    <string name="prefecto_titulo_escanear">Escanear</string>
+    <string name="prefecto_entrada">Entrada</string>
+    <string name="prefecto_salida">Salida</string>
+    <string name="prefecto_apunta_camara">Apunta la cámara al código QR del alumno</string>
+    <!-- %1$s = Entrada o Salida -->
+    <string name="prefecto_registrando">Registrando: %1$s</string>
+    <string name="prefecto_escribir_no_control">Escribir No. de control</string>
+    <string name="prefecto_permiso_camara">Para escanear, permite que CetisAsiste use la cámara. También puedes escribir el No. de control.</string>
+    <string name="prefecto_dar_permiso">Permitir la cámara</string>
+    <string name="prefecto_qr_ajeno">Ese código no es de CetisAsiste.</string>
+    <string name="prefecto_buscando">Buscando al alumno…</string>
+
+    <!-- Captura por No. de control (Figma 89:859) -->
+    <string name="prefecto_titulo_captura">Capturar No. de control</string>
+    <string name="prefecto_no_control_alumno">No. de control del alumno</string>
+    <string name="prefecto_captura_ayuda">Teclea los 14 dígitos y toca Registrar</string>
+    <string name="prefecto_borrar">Borrar</string>
+    <string name="prefecto_limpiar">Limpiar</string>
+    <string name="prefecto_registrar_entrada">Registrar entrada</string>
+    <string name="prefecto_registrar_salida">Registrar salida</string>
+
+    <!-- Resultado (Figma 77:501 y 77:502) -->
+    <string name="prefecto_titulo_resultado">Resultado</string>
+    <string name="prefecto_entrada_registrada">Entrada registrada</string>
+    <string name="prefecto_salida_registrada">Salida registrada</string>
+    <!-- %1$s = hora, %2$s = Entrada o Salida. Ej.: "Hoy · 7:12 am · Entrada" -->
+    <string name="prefecto_resultado_cuando">Hoy · %1$s · %2$s</string>
+    <!-- %1$s = grupo. Ej.: "Grupo 102 · No. de control" -->
+    <string name="prefecto_resultado_grupo">Grupo %1$s · No. de control</string>
+    <string name="prefecto_resultado_sin_alumno">No hay ningún alumno con este No. de control</string>
+    <string name="prefecto_aviso_padre_entrada">Se avisó a su padre o tutor que ingresó al plantel.</string>
+    <string name="prefecto_aviso_padre_salida">Se avisó a su padre o tutor que salió del plantel.</string>
+    <string name="prefecto_sin_padre">No tiene padre o tutor registrado para avisarle.</string>
+    <string name="prefecto_alerta_guardada">La alerta quedó guardada en el registro del alumno.</string>
+    <string name="prefecto_escanear_siguiente">Escanear siguiente</string>
+    <string name="prefecto_guardando">Guardando…</string>
+
+    <!-- Las seis alertas (docs/BASE_DE_DATOS.md §5.3): título y etiqueta corta -->
+    <string name="prefecto_alerta_no_dado_de_alta">Alumno no dado de alta</string>
+    <string name="prefecto_alerta_inactivo">Alumno inactivo</string>
+    <string name="prefecto_alerta_ya_ingreso">El alumno ya ingresó</string>
+    <string name="prefecto_alerta_no_ha_ingresado">El alumno no ha ingresado</string>
+    <string name="prefecto_alerta_castigo">Alumno con castigo disciplinario</string>
+    <string name="prefecto_alerta_salida_fuera">Salida fuera de horario</string>
+    <string name="prefecto_etiqueta_ya_ingreso">Ya tiene entrada hoy</string>
+    <string name="prefecto_etiqueta_no_ha_ingresado">Sin entrada registrada</string>
+    <string name="prefecto_etiqueta_castigo">Castigo disciplinario</string>
+    <string name="prefecto_etiqueta_salida_fuera">Sin salida autorizada</string>
+
+    <!-- Aviso al padre (usuarios/{uid}/notificaciones). %1$s = nombre del alumno, %2$s = hora -->
+    <string name="prefecto_aviso_entrada_mensaje">%1$s entró al plantel a las %2$s.</string>
+    <string name="prefecto_aviso_salida_mensaje">%1$s salió del plantel a las %2$s.</string>
+</resources>

@@ -1,0 +1,117 @@
+<resources>
+    <string name="app_name">CetisAsiste</string>
+    <string name="profile_name">Juan Pérez García</string>
+    <string name="profile_group">Grupo: 4°A - Programación</string>
+    <string name="profile_school">CETIS 61</string>
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="login_subtitle">Sistema de Control de Asistencia CETIS 61</string>
+    <string name="matricula_label">No. de control</string>
+    <string name="password_label">Contraseña</string>
+    <string name="login_button">Ingresar</string>
+    <string name="register_title">Crear Cuenta</string>
+    <string name="register_subtitle">Regístrate con tu No. de control y contraseña</string>
+    <string name="register_button">Registrarse</string>
+    <string name="have_account">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="no_account">¿No tienes cuenta? Regístrate</string>
+    <string name="important_info_title">Información importante</string>
+    <string name="important_info_body">Aquí puede haber más información, como próximas clases, avisos, etc.</string>
+    <string name="quick_access_title">Accesos rápidos</string>
+    <string name="ingresos_egresos">Ingresos y egresos</string>
+    <string name="tablero_anuncios">Tablero de anuncios</string>
+    <string name="nav_ingresos">Ingresos</string>
+    <string name="nav_anuncios">Anuncios</string>
+    <string name="nav_calendario">Calendario</string>
+    <string name="nav_perfil">Perfil</string>
+
+    <!-- Pantallas del apartado de padres (diseño de Figma) -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="action_back">Regresar</string>
+    <string name="action_menu">Menú</string>
+    <string name="school_name">CETis 61 · Cd. Juárez</string>
+    <string name="school_logo_description">Logotipo del CETis 61</string>
+    <string name="role_and_group">%1$s · Grupo %2$s</string>
+    <string name="field_grupo">Grupo</string>
+    <string name="field_no_control">No. de control</string>
+    <string name="field_vigencia">Vigencia</string>
+    <string name="field_correo">Correo</string>
+
+    <string name="splash_tagline">Control de entradas y salidas</string>
+
+    <string name="login_hero_subtitle">Inicia sesión para continuar</string>
+    <string name="login_no_control_placeholder">Ingresa tu No. de control o usuario</string>
+    <string name="login_password_placeholder">••••••••</string>
+    <string name="login_toggle_password">Mostrar u ocultar la contraseña</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_submit">Iniciar sesión</string>
+
+    <string name="home_banner_title">Información Importante</string>
+    <string name="home_banner_body">Aquí podremos encontrar las notificaciones más recientes o los eventos recientes del apartado de anuncios</string>
+    <string name="home_quick_access">Accesos Rápidos</string>
+    <string name="home_qr_title">Código QR de identificación</string>
+    <string name="home_qr_subtitle">Escanea tu código</string>
+    <string name="home_credencial_subtitle">Tu credencial en formato digital</string>
+    <string name="home_entradas_subtitle">Registro de entradas y salidas</string>
+    <string name="home_horario_subtitle">Consulta tus horarios de clase</string>
+
+    <string name="qr_title">Código QR</string>
+    <string name="qr_caption">Código para acceso al plantel</string>
+    <string name="qr_image_description">Código QR de acceso</string>
+
+    <string name="credencial_title">Credencial digital</string>
+    <string name="credencial_band_label">CREDENCIAL DIGITAL</string>
+
+    <string name="entradas_title">Entradas y salidas</string>
+    <string name="entradas_entrada">Entrada</string>
+    <string name="entradas_salida">Salida</string>
+    <string name="entradas_entrada_message">%1$s ingresó a las %2$s</string>
+    <string name="entradas_salida_message">%1$s salió a las %2$s</string>
+
+    <string name="horario_title">Horario</string>
+
+    <string name="calendario_previous_month">Mes anterior</string>
+    <string name="calendario_next_month">Mes siguiente</string>
+    <string name="calendario_upcoming">Próximos eventos</string>
+    <string-array name="calendario_weekdays">
+        <item>L</item>
+        <item>M</item>
+        <item>M</item>
+        <item>J</item>
+        <item>V</item>
+        <item>S</item>
+        <item>D</item>
+    </string-array>
+
+    <string name="perfil_option_credencial">Mi credencial digital</string>
+    <string name="perfil_option_entradas">Mis entradas y salidas</string>
+    <string name="perfil_option_password">Cambiar contraseña</string>
+    <string name="perfil_option_logout">Cerrar sesión</string>
+
+    <string name="notificaciones_title">Notificaciones</string>
+    <string name="notificaciones_today">Hoy</string>
+    <string name="notificaciones_earlier">Anteriores</string>
+    <string name="notificaciones_mark_all_read">Marcar todas como leídas</string>
+
+    <!-- Inicio de sesión con Firebase Authentication y datos reales de Firestore -->
+    <string name="login_usuario_label">No. de control o usuario</string>
+    <string name="login_cargando">Entrando…</string>
+    <string name="login_error_campos">Escribe tu No. de control o usuario y tu contraseña.</string>
+    <string name="login_error_datos">No. de control, usuario o contraseña incorrectos.</string>
+    <string name="login_error_no_control">El No. de control tiene 14 dígitos.</string>
+    <string name="login_error_no_registrada">Tu cuenta todavía no está dada de alta. Acude a Control Escolar.</string>
+    <string name="login_error_desactivada">Tu cuenta está desactivada. Acude a Control Escolar.</string>
+    <string name="login_error_conexion">No hay conexión a internet. Inténtalo de nuevo.</string>
+    <string name="login_error_intentos">Demasiados intentos. Espera unos minutos.</string>
+    <string name="login_error_desconocido">No se pudo iniciar sesión. Inténtalo de nuevo.</string>
+    <string name="cargando_datos">Cargando…</string>
+    <string name="error_cargar_datos">No se pudieron cargar los datos. Revisa tu conexión.</string>
+    <string name="sin_alumno_vinculado">Tu cuenta no tiene un alumno vinculado. Acude a Control Escolar.</string>
+    <string name="rol_sin_pantallas">Hola, %1$s. Las pantallas de %2$s todavía no están en la app.</string>
+    <string name="rol_solo_web">Hola, %1$s. El perfil de %2$s se usa desde la web, que todavía no está lista.</string>
+    <string name="vacio_anuncios">Todavía no hay anuncios.</string>
+    <string name="vacio_registros">Todavía no hay entradas ni salidas registradas.</string>
+    <string name="vacio_notificaciones">No hay notificaciones de hoy.</string>
+    <string name="vacio_eventos">No hay eventos este mes.</string>
+    <string name="vacio_clases">No hay clases registradas para este día.</string>
+    <string name="alumno_clase_ultima">Última clase del turno</string>
+    <string name="ver_mas">Ver más</string>
+</resources>

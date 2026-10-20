@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cambiar contraseña. La usan todos los roles (Perfil → "Cambiar contraseña").
+     Si la cuenta tiene debeCambiarContrasena = true o su contraseña ya venció, la app la
+     muestra sola al entrar: entonces no hay flecha de regresar, solo "Cerrar sesión".
+     Los campos usan el diseño de "TextField" (Figma 32:423). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/perfil_option_password" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <!-- Solo cuando el cambio es obligatorio -->
+                <TextView
+                    android:id="@+id/txt_obligatoria"
+                    style="@style/Cetis.Texto.Cuerpo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_aviso_peligro"
+                    android:padding="@dimen/cetis_space_12"
+                    android:text="@string/comun_contrasena_obligatoria"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    style="@style/Cetis.Texto.CuerpoChico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:text="@string/comun_contrasena_ayuda" />
+
+                <TextView
+                    style="@style/Cetis.Campo.Titulo"
+                    android:labelFor="@+id/edit_actual"
+                    android:text="@string/comun_contrasena_actual" />
+
+                <LinearLayout style="@style/Cetis.Campo.Caja">
+
+                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
+
+                    <EditText
+                        android:id="@+id/edit_actual"
+                        style="@style/Cetis.Campo.Edicion"
+                        android:autofillHints="password"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Cetis.Campo.Titulo"
+                    android:labelFor="@+id/edit_nueva"
+                    android:text="@string/comun_contrasena_nueva" />
+
+                <LinearLayout style="@style/Cetis.Campo.Caja">
+
+                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
+
+                    <EditText
+                        android:id="@+id/edit_nueva"
+                        style="@style/Cetis.Campo.Edicion"
+                        android:autofillHints="newPassword"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Cetis.Campo.Titulo"
+                    android:labelFor="@+id/edit_repetir"
+                    android:text="@string/comun_contrasena_repetir" />
+
+                <LinearLayout style="@style/Cetis.Campo.Caja">
+
+                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
+
+                    <EditText
+                        android:id="@+id/edit_repetir"
+                        style="@style/Cetis.Campo.Edicion"
+                        android:autofillHints="newPassword"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword" />
+                </LinearLayout>
+
+                <!-- Mensaje de error, en rojo (lo pone el código) -->
+                <TextView
+                    android:id="@+id/txt_mensaje"
+                    style="@style/Cetis.Texto.CuerpoChico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:textColor="@color/cetis_status_danger"
+                    android:visibility="gone"
+                    tools:text="{mensaje}"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/btn_guardar"
+                    style="@style/Cetis.Boton"
+                    android:text="@string/comun_contrasena_guardar" />
+
+                <!-- Solo cuando el cambio es obligatorio -->
+                <TextView
+                    android:id="@+id/txt_cerrar_sesion"
+                    style="@style/Cetis.Texto.SubtituloTarjeta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="@dimen/cetis_space_8"
+                    android:text="@string/comun_cerrar_sesion_enlace"
+                    android:textColor="@color/cetis_brand_accent"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

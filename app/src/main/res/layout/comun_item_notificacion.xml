@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: componente "NotificationItem" (32:399)
+     Variables: notificacion.titulo, notificacion.hora, notificacion.texto.
+     Si no se ha leído, el fondo es más oscuro y sale el punto rojo (lo hace el código). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/cetis_space_8"
+    android:background="@drawable/shape_tarjeta"
+    android:gravity="top"
+    android:orientation="horizontal"
+    android:padding="@dimen/cetis_space_12">
+
+    <FrameLayout
+        android:id="@+id/circulo"
+        style="@style/Cetis.Circulo">
+
+        <ImageView
+            android:id="@+id/img_icono"
+            style="@style/Cetis.Circulo.Icono"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            tools:src="@drawable/ic_log_in" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txt_titulo"
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="{notificacion.titulo}" />
+
+            <TextView
+                android:id="@+id/txt_hora"
+                style="@style/Cetis.Texto.SubtituloTarjeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/cetis_space_8"
+                android:maxLines="1"
+                tools:text="{notificacion.hora}" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_texto"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="{notificacion.texto}" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_sin_leer"
+        android:layout_width="8dp"
+        android:layout_height="14dp"
+        android:layout_marginStart="@dimen/cetis_space_12"
+        android:importantForAccessibility="no"
+        android:src="@drawable/img_unread_dot" />
+</LinearLayout>

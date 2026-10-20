@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inicio del prefecto. No hay Figma de este rol: usa el diseño de "Inicio - Alumno"
+     (encabezado, tarjeta de perfil, Accesos Rápidos) y las piezas de "Componentes".
+     Pestaña: el botón ☰ abre el menú del rol.
+     Variables: personal.nombre, la fecha de hoy y la lista de grupos que ya salieron hoy. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <!-- Header (como Figma 79:1300) -->
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="@dimen/cetis_space_16"
+                android:paddingEnd="@dimen/cetis_space_16">
+
+                <ImageButton
+                    android:id="@+id/btn_menu"
+                    style="@style/Cetis.BarraSuperior.Menu"
+                    android:layout_gravity="start|center_vertical" />
+
+                <TextView
+                    style="@style/Cetis.Texto.Banner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:accessibilityHeading="true"
+                    android:text="@string/app_name"
+                    android:textColor="@color/cetis_text_on_brand" />
+
+                <ImageButton
+                    android:id="@+id/btn_notificaciones"
+                    style="@style/Cetis.BarraSuperior.Campana"
+                    android:layout_gravity="end|center_vertical" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+
+            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+
+                <!-- ProfileCard · variables: personal.nombre, rol y la fecha de hoy -->
+                <FrameLayout
+                    android:id="@+id/tarjeta_perfil"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_tarjeta"
+                    android:clipToOutline="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="@dimen/cetis_space_16"
+                        android:paddingEnd="@dimen/cetis_space_16">
+
+                        <ImageView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/img_avatar_64" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/cetis_space_16"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/txt_nombre"
+                                style="@style/Cetis.Texto.TituloNombre"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                tools:text="{personal.nombre}" />
+
+                            <TextView
+                                style="@style/Cetis.Texto.Cuerpo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="@string/prefecto_rol" />
+
+                            <TextView
+                                android:id="@+id/txt_fecha"
+                                style="@style/Cetis.Texto.Cuerpo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                tools:text="{hoy}" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="84dp"
+                        android:layout_height="84dp"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/img_watermark_gear_card" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="54dp"
+                        android:layout_marginEnd="19dp"
+                        android:alpha="0.09"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:importantForAccessibility="no"
+                        android:text="@string/alumno_marca_agua_numero"
+                        android:textColor="@color/cetis_brand_800"
+                        android:textSize="40sp" />
+                </FrameLayout>
+
+                <!-- SectionLabel -->
+                <LinearLayout style="@style/Cetis.Seccion">
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+
+                    <TextView
+                        style="@style/Cetis.Seccion.Pildora"
+                        android:text="@string/home_quick_access" />
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+                </LinearLayout>
+
+                <!-- QuickAccessGrid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:orientation="horizontal">
+
+                    <!-- Escanear: abre el escáner (prefecto_escaner.xml) -->
+                    <FrameLayout
+                        android:id="@+id/card_escanear"
+                        style="@style/Cetis.Acceso"
+                        android:layout_marginEnd="@dimen/cetis_space_12">
+
+                        <LinearLayout style="@style/Cetis.Acceso.Contenido">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout style="@style/Cetis.Circulo">
+
+                                    <ImageView style="@style/Cetis.Circulo.Icono" android:src="@drawable/ic_scan" />
+                                </FrameLayout>
+
+                                <ImageView style="@style/Cetis.Acceso.Flecha" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Titulo"
+                                android:text="@string/prefecto_acceso_escanear" />
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Subtitulo"
+                                android:text="@string/prefecto_acceso_escanear_sub" />
+                        </LinearLayout>
+
+                        <ImageView style="@style/Cetis.Acceso.Esquina" />
+                    </FrameLayout>
+
+                    <!-- Captura por No. de control (prefecto_captura.xml) -->
+                    <FrameLayout
+                        android:id="@+id/card_no_control"
+                        style="@style/Cetis.Acceso">
+
+                        <LinearLayout style="@style/Cetis.Acceso.Contenido">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout style="@style/Cetis.Circulo">
+
+                                    <ImageView style="@style/Cetis.Circulo.Icono" android:src="@drawable/ic_id_card" />
+                                </FrameLayout>
+
+                                <ImageView style="@style/Cetis.Acceso.Flecha" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Titulo"
+                                android:text="@string/prefecto_acceso_no_control" />
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Subtitulo"
+                                android:text="@string/prefecto_acceso_no_control_sub" />
+                        </LinearLayout>
+
+                        <ImageView style="@style/Cetis.Acceso.Esquina" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:id="@+id/card_horarios"
+                        style="@style/Cetis.Acceso"
+                        android:layout_marginEnd="@dimen/cetis_space_12">
+
+                        <LinearLayout style="@style/Cetis.Acceso.Contenido">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout style="@style/Cetis.Circulo">
+
+                                    <ImageView style="@style/Cetis.Circulo.Icono" android:src="@drawable/ic_clock" />
+                                </FrameLayout>
+
+                                <ImageView style="@style/Cetis.Acceso.Flecha" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Titulo"
+                                android:text="@string/prefecto_acceso_horarios" />
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Subtitulo"
+                                android:text="@string/prefecto_acceso_horarios_sub" />
+                        </LinearLayout>
+
+                        <ImageView style="@style/Cetis.Acceso.Esquina" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/card_calendario"
+                        style="@style/Cetis.Acceso">
+
+                        <LinearLayout style="@style/Cetis.Acceso.Contenido">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout style="@style/Cetis.Circulo">
+
+                                    <ImageView style="@style/Cetis.Circulo.Icono" android:src="@drawable/ic_calendar" />
+                                </FrameLayout>
+
+                                <ImageView style="@style/Cetis.Acceso.Flecha" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Titulo"
+                                android:text="@string/prefecto_acceso_calendario" />
+
+                            <TextView
+                                style="@style/Cetis.Acceso.Subtitulo"
+                                android:text="@string/prefecto_acceso_calendario_sub" />
+                        </LinearLayout>
+
+                        <ImageView style="@style/Cetis.Acceso.Esquina" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- Salidas de grupo de hoy (periodos/{semestre}/salidasDeGrupo) -->
+                <LinearLayout style="@style/Cetis.Seccion">
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+
+                    <TextView
+                        style="@style/Cetis.Seccion.Pildora"
+                        android:text="@string/prefecto_seccion_salidas" />
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+                </LinearLayout>
+
+                <!-- Un comun_item_lista por grupo que ya salió -->
+                <LinearLayout
+                    android:id="@+id/lista_salidas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_8"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txt_vacio_salidas"
+                    style="@style/Cetis.Texto.Vacio"
+                    android:text="@string/prefecto_salidas_vacio"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

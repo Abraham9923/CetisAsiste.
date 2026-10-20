@@ -1,0 +1,203 @@
+rules_version = '2';
+
+// Reglas de seguridad de CetisAsiste (Cloud Firestore).
+// Explicación completa: docs/BASE_DE_DATOS.md, sección "Reglas de seguridad".
+//
+// Idea general:
+//   - Nadie entra sin iniciar sesión (Firebase Authentication).
+//   - Lo que puede hacer cada persona depende del campo "rol" de su documento
+//     en usuarios/{uid}. Si su cuenta tiene activo = false, no puede hacer nada.
+//   - Mientras no haya Cloud Functions (plan Spark), las apps escriben directo
+//     y estas reglas limitan quién escribe qué. Ver ADR-002.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Funciones de ayuda ----------
+
+    function conSesion() {
+      return request.auth != null;
+    }
+
+    function miUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function tengoCuentaActiva() {
+      return conSesion()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
+        && miUsuario().activo == true;
+    }
+
+    function soy(rol) {
+      return tengoCuentaActiva() && miUsuario().rol == rol;
+    }
+
+    function soyAlguno(roles) {
+      return tengoCuentaActiva() && miUsuario().rol in roles;
+    }
+
+    // Personal que trabaja con todos los alumnos del plantel.
+    function soyPersonalGeneral() {
+      return soyAlguno(['prefecto', 'enfermeria', 'control_escolar']);
+    }
+
+    // ¿El profesor que pregunta da clase en ese grupo?
+    function doyClaseEn(grupoId) {
+      return soy('profesor') && grupoId in miUsuario().grupos;
+    }
+
+    // ¿El alumno con ese No. de control es la persona que pregunta o su hijo?
+    function esMioOMiHijo(noControl) {
+      return (soy('alumno') && miUsuario().noControl == noControl)
+        || (soy('padre') && noControl in miUsuario().hijos);
+    }
+
+    function datosDelAlumno(noControl) {
+      return get(/databases/$(database)/documents/alumnos/$(noControl)).data;
+    }
+
+    // ¿El cambio solo toca estos campos?
+    function soloCambia(campos) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+    }
+
+    // ---------- usuarios ----------
+    // Una cuenta por persona. El id del documento es el uid de Authentication.
+    match /usuarios/{uid} {
+      allow read: if (conSesion() && request.auth.uid == uid) || soy('control_escolar');
+
+      // La propia persona solo cambia sus avisos push y la fecha de su contraseña.
+      allow update: if conSesion() && request.auth.uid == uid
+        && soloCambia(['tokensFcm', 'debeCambiarContrasena', 'contrasenaVence', 'actualizadoEn']);
+
+      allow create, update, delete: if soy('control_escolar');
+
+      // Avisos personales de cada cuenta.
+      match /notificaciones/{notificacionId} {
+        allow read, delete: if conSesion() && request.auth.uid == uid;
+        allow update: if conSesion() && request.auth.uid == uid && soloCambia(['leida']);
+        // Por ahora las crea el personal desde su app; después, Cloud Functions.
+        allow create: if soyAlguno(['prefecto', 'profesor', 'enfermeria', 'control_escolar']);
+      }
+    }
+
+    // ---------- alumnos ----------
+    // El id del documento es el No. de control.
+    match /alumnos/{noControl} {
+      allow read: if soyPersonalGeneral()
+        || esMioOMiHijo(noControl)
+        || (soy('profesor') && resource.data.grupoId in miUsuario().grupos);
+
+      allow create, delete: if soy('control_escolar');
+      allow update: if soy('control_escolar')
+        // Enfermería: solo el estado por salud.
+        || (soy('enfermeria') && soloCambia(['activoPorSalud', 'actualizadoEn']))
+        // Prefecto: dónde está el alumno, después de un escaneo.
+        || (soy('prefecto') && soloCambia(['ubicacion', 'ultimoRegistro', 'actualizadoEn']));
+
+      // Estatus: castigos, faltas, reportes, pases de salud, prácticas…
+      match /estatus/{estatusId} {
+        allow read: if soyPersonalGeneral() || doyClaseEn(datosDelAlumno(noControl).grupoId);
+        allow create: if soy('control_escolar')
+          || (soy('enfermeria') && request.resource.data.tipo == 'pase_salud')
+          || (doyClaseEn(datosDelAlumno(noControl).grupoId)
+              && request.resource.data.tipo in ['falta', 'reporte', 'llamada_atencion', 'castigo']);
+        allow update, delete: if soy('control_escolar');
+      }
+
+      // Historial de activaciones por pago y por salud.
+      match /cambiosDeEstado/{cambioId} {
+        allow read: if soyAlguno(['enfermeria', 'control_escolar']);
+        allow create: if (soy('control_escolar') && request.resource.data.campo == 'pago')
+          || (soy('enfermeria') && request.resource.data.campo == 'salud');
+        allow update, delete: if false;
+      }
+
+      // Historial escolar: un documento por semestre cursado (id = periodoId).
+      match /inscripciones/{periodoId} {
+        allow read: if soyPersonalGeneral() || esMioOMiHijo(noControl);
+        allow write: if soy('control_escolar');
+      }
+
+      // Datos personales delicados, separados de la ficha para que no los vea cualquiera:
+      //   privado/datos → CURP, domicilio, teléfonos, tutores (solo Control Escolar)
+      //   privado/salud → tipo de sangre, alergias, contacto de emergencia (y Enfermería)
+      match /privado/{documento} {
+        allow read: if soy('control_escolar') || (documento == 'salud' && soy('enfermeria'));
+        allow write: if soy('control_escolar') || (documento == 'salud' && soy('enfermeria'));
+      }
+    }
+
+    // ---------- periodos escolares (semestres) ----------
+    // Cada semestre tiene su propia lista de entradas, salidas y salidas de grupo:
+    // al empezar un semestre nuevo, la lista empieza desde cero y las anteriores se conservan.
+    match /periodos/{periodoId} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+
+      // Registros de entrada y salida del semestre. Bitácora: nadie la edita ni la borra.
+      match /registros/{registroId} {
+        allow read: if soyPersonalGeneral()
+          || esMioOMiHijo(resource.data.alumnoId)
+          || (soy('profesor') && resource.data.grupoId in miUsuario().grupos);
+        allow create: if soy('prefecto') && request.resource.data.registradoPor == request.auth.uid;
+        allow update, delete: if false;
+      }
+
+      // Salidas de grupo del semestre (el profesor libera al grupo).
+      match /salidasDeGrupo/{salidaId} {
+        allow read: if soyAlguno(['prefecto', 'profesor', 'control_escolar']);
+        allow create: if doyClaseEn(request.resource.data.grupoId)
+          && request.resource.data.autorizadaPor == request.auth.uid;
+        allow update, delete: if soy('control_escolar');
+      }
+    }
+
+    // ---------- catálogo de especialidades (por ahora vacío) ----------
+    match /especialidades/{especialidadId} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+    }
+
+    // ---------- grupos y horarios ----------
+    // Id: {periodoId}_{nombre}, por ejemplo 2026-2027-1_102.
+    // Nombres: matutino del x00 al x49 (101, 102…), vespertino del x50 en adelante (151, 152…).
+    match /grupos/{grupoId} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+
+      // Un documento por día (lunes … viernes) con la lista de clases.
+      match /horario/{dia} {
+        allow read: if tengoCuentaActiva();
+        allow write: if soy('control_escolar');
+      }
+    }
+
+    // ---------- boletín y calendario ----------
+    match /anuncios/{anuncioId} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+    }
+
+    match /eventos/{eventoId} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+    }
+
+    // ---------- perfiles de usuario (un documento por rol) ----------
+    // Basta con tener sesión para leerlos: la app los consulta justo después de iniciar sesión.
+    match /roles/{rol} {
+      allow read: if conSesion();
+      allow write: if soy('control_escolar');
+    }
+
+    // ---------- configuración del plantel ----------
+    match /configuracion/{documento} {
+      allow read: if tengoCuentaActiva();
+      allow write: if soy('control_escolar');
+    }
+
+    // Todo lo demás (por ejemplo, colecciones viejas) queda cerrado.
+  }
+}

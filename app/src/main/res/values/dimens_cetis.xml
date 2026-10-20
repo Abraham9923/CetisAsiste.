@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Espacios y radios del diseño de Figma. Se comparten entre todos los usuarios. -->
+<resources>
+    <dimen name="cetis_space_4">4dp</dimen>
+    <dimen name="cetis_space_8">8dp</dimen>
+    <dimen name="cetis_space_12">12dp</dimen>
+    <dimen name="cetis_space_16">16dp</dimen>
+    <dimen name="cetis_space_20">20dp</dimen>
+    <dimen name="cetis_radius_md">14dp</dimen>
+    <dimen name="cetis_radius_lg">20dp</dimen>
+
+    <!-- Márgenes de pantalla -->
+    <dimen name="cetis_screen_margin">12dp</dimen>
+    <!-- Alto de la barra superior completa (incluye la zona de la barra de estado) -->
+    <dimen name="cetis_app_bar_height">80dp</dimen>
+    <!-- Zona reservada para la hora / batería que dibuja Android -->
+    <dimen name="cetis_status_bar_space">28dp</dimen>
+    <!-- Ancho del menú lateral (comun_menu.xml) -->
+    <dimen name="cetis_menu_width">288dp</dimen>
+</resources>

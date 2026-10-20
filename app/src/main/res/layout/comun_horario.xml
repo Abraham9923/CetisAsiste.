@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Horario de un grupo, con la flecha para regresar. Mismo diseño que "Horario - Alumno"
+     (Figma 79:1147). La usan el padre (horario de su hijo), el prefecto (cualquier grupo) y
+     el profesor (sus grupos). Los ids son los de alumno_horario.xml, así se llena con
+     AlumnoVistas.llenarHorario. Variables: grupo, día elegido y la lista de clases. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla">
+
+    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+
+        <FrameLayout style="@style/Cetis.BarraSuperior">
+
+            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+
+            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+
+                <ImageButton
+                    android:id="@+id/btn_regresar"
+                    style="@style/Cetis.BarraSuperior.Regresar" />
+
+                <!-- "Horario" o "Grupo 102" (lo pone el código) -->
+                <TextView
+                    android:id="@+id/txt_titulo"
+                    style="@style/Cetis.BarraSuperior.Titulo"
+                    android:text="@string/horario_title" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Days (79:1449) · el día activo viene de la variable horario.dia -->
+        <LinearLayout
+            android:id="@+id/dias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chip_lunes"
+                style="@style/Cetis.Chip"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/alumno_dia_lunes_corto" />
+
+            <TextView
+                android:id="@+id/chip_martes"
+                style="@style/Cetis.Chip"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/alumno_dia_martes_corto" />
+
+            <TextView
+                android:id="@+id/chip_miercoles"
+                style="@style/Cetis.Chip"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/alumno_dia_miercoles_corto"
+                tools:background="@drawable/shape_chip_activo"
+                tools:textColor="@color/cetis_text_on_brand" />
+
+            <TextView
+                android:id="@+id/chip_jueves"
+                style="@style/Cetis.Chip"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/alumno_dia_jueves_corto" />
+
+            <TextView
+                android:id="@+id/chip_viernes"
+                style="@style/Cetis.Chip"
+                android:text="@string/alumno_dia_viernes_corto" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_encabezado"
+            style="@style/Cetis.Subtitulo"
+            tools:text="Grupo {horario.grupo} · {horario.dia}" />
+
+        <TextView
+            android:id="@+id/txt_vacio"
+            style="@style/Cetis.Texto.Vacio"
+            android:text="@string/vacio_clases"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/lista_clases"
+            style="@style/Cetis.Pantalla.Lista"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:dividerHeight="@dimen/cetis_space_8"
+            tools:listitem="@layout/alumno_item_clase" />
+    </LinearLayout>
+</FrameLayout>

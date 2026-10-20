@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Estilos de texto de Figma (mismo nombre que en el archivo de diseño). -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Raíces de las familias de estilos -->
+    <style name="Cetis" />
+    <style name="Cetis.Campo" />
+    <style name="Cetis.Menu" />
+
+    <style name="Cetis.Texto">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">@color/cetis_brand_900</item>
+    </style>
+
+    <!-- Brand/AppName · Bold 32 / 38 -->
+    <style name="Cetis.Texto.NombreApp">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_bold</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">38sp</item>
+        <item name="android:textColor">@color/cetis_text_on_brand</item>
+    </style>
+
+    <!-- Title/Name · SemiBold 18 / 24 -->
+    <style name="Cetis.Texto.TituloNombre">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_semibold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">24sp</item>
+    </style>
+
+    <!-- Heading/Banner · SemiBold 17 / 22 -->
+    <style name="Cetis.Texto.Banner">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_semibold</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">22sp</item>
+    </style>
+
+    <!-- Heading/Section · SemiBold 15 / 20 -->
+    <style name="Cetis.Texto.Seccion">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_semibold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">20sp</item>
+    </style>
+
+    <!-- Body/Default · Regular 14 / 20 -->
+    <style name="Cetis.Texto.Cuerpo">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">20sp</item>
+    </style>
+
+    <!-- Body/Small · Regular 13 / 19 -->
+    <style name="Cetis.Texto.CuerpoChico">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_regular</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">19sp</item>
+        <item name="android:textColor">@color/cetis_text_secondary</item>
+    </style>
+
+    <!-- Card/Title · SemiBold 13.5 / 18 -->
+    <style name="Cetis.Texto.TituloTarjeta">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_semibold</item>
+        <item name="android:textSize">13.5sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">18sp</item>
+    </style>
+
+    <!-- Card/Subtitle · Regular 11.5 / 15 -->
+    <style name="Cetis.Texto.SubtituloTarjeta">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_regular</item>
+        <item name="android:textSize">11.5sp</item>
+        <item name="android:lineHeight" tools:targetApi="28">15sp</item>
+        <item name="android:textColor">@color/cetis_text_secondary</item>
+    </style>
+
+    <!-- Fila "Etiqueta ........ valor" (Perfil, Credencial) -->
+    <style name="Cetis.Campo.Etiqueta" parent="Cetis.Texto.SubtituloTarjeta" />
+    <style name="Cetis.Campo.Valor" parent="Cetis.Texto.TituloTarjeta" />
+
+    <!--
+        Piezas que se repiten en las vistas de padre, prefecto y profesor (y en las comunes).
+        Son las mismas medidas de las vistas del alumno, escritas una sola vez para que cada
+        pantalla quede corta y fácil de leer. Si cambias algo aquí, cambia en todas.
+    -->
+
+    <!-- Esqueleto de pantalla: fondo, columna con 12 dp a los lados y zona con scroll -->
+    <style name="Cetis.Pantalla">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/cetis_surface_background</item>
+    </style>
+    <style name="Cetis.Pantalla.Columna">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@null</item>
+        <item name="android:paddingStart">@dimen/cetis_screen_margin</item>
+        <item name="android:paddingEnd">@dimen/cetis_screen_margin</item>
+    </style>
+    <style name="Cetis.Pantalla.Scroll" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:paddingBottom">@dimen/cetis_space_16</item>
+        <item name="android:scrollbars">none</item>
+    </style>
+    <!-- Contenido dentro del scroll (lo que va debajo de la barra superior) -->
+    <style name="Cetis.Pantalla.Contenido" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="Cetis.Pantalla.Lista" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:divider">@android:color/transparent</item>
+        <item name="android:dividerHeight">@dimen/cetis_space_12</item>
+        <item name="android:listSelector">@android:color/transparent</item>
+        <item name="android:paddingBottom">@dimen/cetis_space_16</item>
+        <item name="android:scrollbars">none</item>
+    </style>
+
+    <!-- Barra superior (AppBar de Figma 16:103) -->
+    <style name="Cetis.BarraSuperior">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/cetis_app_bar_height</item>
+        <item name="android:background">@drawable/shape_header</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+    </style>
+    <style name="Cetis.BarraSuperior.Adorno" parent="Cetis">
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:layout_gravity">end</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:src">@drawable/bg_header_accent</item>
+    </style>
+    <!-- Renglón de abajo de la barra (arriba quedan la hora y la batería que dibuja Android) -->
+    <style name="Cetis.BarraSuperior.Fila" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_gravity">bottom</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">@dimen/cetis_space_16</item>
+        <item name="android:paddingEnd">@dimen/cetis_space_16</item>
+    </style>
+    <style name="Cetis.BarraSuperior.Regresar" parent="Cetis">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginStart">-6dp</item>
+        <item name="android:layout_marginEnd">2dp</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:contentDescription">@string/action_back</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:src">@drawable/ic_arrow_left</item>
+    </style>
+    <style name="Cetis.BarraSuperior.Titulo" parent="Cetis.Texto.TituloNombre">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:accessibilityHeading" tools:targetApi="28">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/cetis_text_on_brand</item>
+    </style>
+    <!-- Botón ☰ de las pantallas de pestaña: abre el menú del rol (comun_menu.xml, ADR-007) -->
+    <style name="Cetis.BarraSuperior.Menu" parent="Cetis">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginStart">-11dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:contentDescription">@string/action_menu</item>
+        <item name="android:padding">11dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:src">@drawable/ic_menu</item>
+    </style>
+    <!-- Campana de notificaciones (encabezado de Inicio) -->
+    <style name="Cetis.BarraSuperior.Campana" parent="Cetis">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginEnd">-11dp</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:contentDescription">@string/alumno_notificaciones</item>
+        <item name="android:padding">11dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:src">@drawable/ic_bell_badge</item>
+    </style>
+
+    <!-- Título de sección: línea · píldora · línea (SectionLabel de Figma 79:1332) -->
+    <style name="Cetis.Seccion">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="Cetis.Seccion.Linea" parent="Cetis">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@color/cetis_brand_800</item>
+    </style>
+    <style name="Cetis.Seccion.Pildora" parent="Cetis.Texto.Seccion">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/cetis_space_12</item>
+        <item name="android:layout_marginEnd">@dimen/cetis_space_12</item>
+        <item name="android:accessibilityHeading" tools:targetApi="28">true</item>
+        <item name="android:background">@drawable/shape_pill</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingTop">7dp</item>
+        <item name="android:paddingEnd">22dp</item>
+        <item name="android:paddingBottom">7dp</item>
+    </style>
+    <!-- Subtítulo simple arriba de una lista ("Próximos eventos", "Hoy") -->
+    <style name="Cetis.Subtitulo" parent="Cetis.Texto.Seccion">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+        <item name="android:accessibilityHeading" tools:targetApi="28">true</item>
+    </style>
+
+    <!-- Tarjeta de acceso rápido de 128 dp (QuickAccessCard de Figma 3:13) -->
+    <style name="Cetis.Acceso">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">128dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/shape_tarjeta</item>
+        <item name="android:clickable">true</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+    <style name="Cetis.Acceso.Contenido" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/cetis_space_12</item>
+    </style>
+    <style name="Cetis.Circulo">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/shape_circulo_brand</item>
+    </style>
+    <style name="Cetis.Circulo.Icono">
+        <item name="android:layout_width">22dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@null</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="Cetis.Acceso.Flecha" parent="Cetis">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_gravity">end|top</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:src">@drawable/ic_chevron_right_dark</item>
+    </style>
+    <style name="Cetis.Acceso.Titulo" parent="Cetis.Texto.TituloTarjeta">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_8</item>
+    </style>
+    <style name="Cetis.Acceso.Subtitulo" parent="Cetis.Texto.SubtituloTarjeta">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+    </style>
+    <style name="Cetis.Acceso.Esquina" parent="Cetis">
+        <item name="android:layout_width">34dp</item>
+        <item name="android:layout_height">34dp</item>
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:src">@drawable/img_corner_accent_right</item>
+    </style>
+
+    <!-- Renglón de opción: círculo + texto + flecha (componente "Opcion" de Figma) -->
+    <style name="Cetis.Opcion">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_8</item>
+        <item name="android:background">@drawable/shape_tarjeta</item>
+        <item name="android:clickable">true</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:padding">@dimen/cetis_space_12</item>
+    </style>
+    <style name="Cetis.Opcion.Circulo" parent="Cetis">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:background">@drawable/shape_circulo_brand</item>
+    </style>
+    <style name="Cetis.Opcion.Icono" parent="Cetis.Circulo.Icono">
+        <item name="android:layout_width">18dp</item>
+        <item name="android:layout_height">18dp</item>
+    </style>
+    <style name="Cetis.Opcion.Texto" parent="Cetis.Texto.TituloTarjeta">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">@dimen/cetis_space_12</item>
+        <item name="android:layout_marginEnd">@dimen/cetis_space_12</item>
+    </style>
+    <style name="Cetis.Opcion.Flecha" parent="Cetis">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:src">@drawable/ic_chevron_right_dark</item>
+    </style>
+
+    <!-- Menú lateral (comun_menu.xml): una opción por cada pantalla principal del rol.
+         La opción de la pantalla abierta lleva fondo de tarjeta (lo pone el código). -->
+    <style name="Cetis.Menu.Opcion">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_4</item>
+        <item name="android:background">@null</item>
+        <item name="android:clickable">true</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">@dimen/cetis_space_12</item>
+        <item name="android:paddingEnd">@dimen/cetis_space_12</item>
+    </style>
+    <style name="Cetis.Menu.Texto" parent="Cetis.Texto.Seccion">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">@dimen/cetis_space_12</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Escáner del prefecto: selector Entrada / Salida (Figma 77:500 y 89:859). La opción
+         elegida va en guinda con letra blanca (lo pone el código). -->
+    <style name="Cetis.Segmento">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+        <item name="android:background">@drawable/shape_segmento</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:padding">4dp</item>
+    </style>
+    <style name="Cetis.Segmento.Opcion" parent="Cetis.Texto.Seccion">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Teclado numérico de la captura (KeypadKey de Figma "Componentes") -->
+    <style name="Cetis.Tecla" parent="Cetis.Texto">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/shape_input</item>
+        <item name="android:clickable">true</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans_medium</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="Cetis.Tecla.Accion">
+        <item name="android:background">@drawable/shape_tarjeta</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans_semibold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="Cetis.FilaDeTeclas" parent="Cetis">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_8</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!-- Tarjeta sencilla (fondo surface/card, 16 dp por dentro) -->
+    <style name="Cetis.Tarjeta">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+        <item name="android:background">@drawable/shape_tarjeta</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/cetis_space_16</item>
+    </style>
+    <!-- Renglón "Etiqueta ........ valor" dentro de una tarjeta -->
+    <style name="Cetis.Campo.Renglon">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_8</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="Cetis.Campo.Etiqueta.Renglon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="Cetis.Campo.Valor.Renglon">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">@dimen/cetis_space_12</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Chips (días del horario, turnos, tipos de estatus) -->
+    <style name="Cetis.Chip" parent="Cetis.Texto.TituloTarjeta">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/shape_chip</item>
+        <item name="android:clickable">true</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <!-- Campo de texto (TextField de Figma 32:423) -->
+    <style name="Cetis.Campo.Titulo" parent="Cetis.Texto.TituloTarjeta">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+    </style>
+    <style name="Cetis.Campo.Caja">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:background">@drawable/shape_input</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+    </style>
+    <style name="Cetis.Campo.Icono">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="Cetis.Campo.Edicion" parent="Cetis.Texto.Cuerpo">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">@dimen/cetis_space_12</item>
+        <item name="android:background">@null</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColorHint">@color/cetis_text_secondary</item>
+    </style>
+
+    <!-- Botón guinda grande (PrimaryButton de Figma 32:433) -->
+    <style name="Cetis.Boton" parent="Cetis.Texto.Seccion">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">@dimen/cetis_space_16</item>
+        <item name="android:background">@drawable/shape_boton_primario</item>
+        <item name="android:clipToOutline" tools:targetApi="31">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/cetis_text_on_brand</item>
+    </style>
+
+    <!-- Texto gris centrado cuando una lista no tiene nada -->
+    <style name="Cetis.Texto.Vacio" parent="Cetis.Texto.Cuerpo">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingBottom">24dp</item>
+        <item name="android:textColor">@color/cetis_text_secondary</item>
+    </style>
+
+    <!-- Enlace subrayado en café ("Ver más", "Marcar todas como leídas") -->
+    <style name="Cetis.Texto.Enlace" parent="Cetis.Texto.TituloTarjeta">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:textColor">@color/cetis_brand_accent</item>
+    </style>
+
+    <!-- Etiqueta de estatus con punto de color (StatusChip de Figma 76:538) -->
+    <style name="Cetis.Estatus">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/shape_estatus_exito</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingBottom">3dp</item>
+    </style>
+    <style name="Cetis.Estatus.Punto" parent="Cetis">
+        <item name="android:layout_width">6dp</item>
+        <item name="android:layout_height">6dp</item>
+        <item name="android:background">@drawable/shape_punto_exito</item>
+    </style>
+    <style name="Cetis.Estatus.Texto" parent="Cetis.Texto.SubtituloTarjeta">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">6dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/cetis_status_success</item>
+    </style>
+</resources>

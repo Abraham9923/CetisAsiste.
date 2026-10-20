@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Inicio - Alumno (79:1146)" -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cetis_surface_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/cetis_screen_margin"
+        android:paddingEnd="@dimen/cetis_screen_margin">
+        <!-- Header (Figma 79:1300) -->
+        <FrameLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cetis_app_bar_height"
+            android:background="@drawable/shape_header"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:layout_width="110dp"
+                android:layout_height="80dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/bg_header_accent" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="@dimen/cetis_space_16"
+                android:paddingEnd="@dimen/cetis_space_16">
+
+                <ImageButton
+                    android:id="@+id/btn_menu"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="-11dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/action_menu"
+                    android:padding="11dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_menu" />
+
+                <TextView
+                    style="@style/Cetis.Texto.Banner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:accessibilityHeading="true"
+                    android:text="@string/app_name"
+                    android:textColor="@color/cetis_text_on_brand" />
+
+                <ImageButton
+                    android:id="@+id/btn_notificaciones"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="-11dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/alumno_notificaciones"
+                    android:padding="11dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_bell_badge" />
+            </FrameLayout>
+        </FrameLayout>
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/cetis_space_16"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- ProfileCard (79:1321) · variables: alumno.nombre, alumno.rol, alumno.grupo -->
+                <FrameLayout
+                    android:id="@+id/tarjeta_perfil"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:background="@drawable/shape_tarjeta"
+                    android:clipToOutline="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="@dimen/cetis_space_16"
+                        android:paddingEnd="@dimen/cetis_space_16">
+
+                        <ImageView
+                            android:id="@+id/img_foto"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:contentDescription="@string/alumno_foto_descripcion"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/img_avatar_64" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/cetis_space_16"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/txt_nombre"
+                                style="@style/Cetis.Texto.TituloNombre"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                tools:text="{alumno.nombre}" />
+
+                            <TextView
+                                android:id="@+id/txt_rol"
+                                style="@style/Cetis.Texto.Cuerpo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                tools:text="{alumno.rol}" />
+
+                            <TextView
+                                android:id="@+id/txt_grupo"
+                                style="@style/Cetis.Texto.Cuerpo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                tools:text="{alumno.grupo}" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Marca de agua: engrane + "61" -->
+                    <ImageView
+                        android:layout_width="84dp"
+                        android:layout_height="84dp"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/img_watermark_gear_card" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="54dp"
+                        android:layout_marginEnd="19dp"
+                        android:alpha="0.09"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:importantForAccessibility="no"
+                        android:text="@string/alumno_marca_agua_numero"
+                        android:textColor="@color/cetis_brand_800"
+                        android:textSize="40sp" />
+                </FrameLayout>
+
+                <!-- SectionLabel (79:1332) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/cetis_brand_800" />
+
+                    <TextView
+                        style="@style/Cetis.Texto.Seccion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/cetis_space_12"
+                        android:layout_marginEnd="@dimen/cetis_space_12"
+                        android:accessibilityHeading="true"
+                        android:background="@drawable/shape_pill"
+                        android:paddingStart="22dp"
+                        android:paddingTop="7dp"
+                        android:paddingEnd="22dp"
+                        android:paddingBottom="7dp"
+                        android:text="@string/home_quick_access" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/cetis_brand_800" />
+                </LinearLayout>
+
+                <!-- QuickAccessGrid (79:1337) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_16"
+                    android:orientation="horizontal">
+                    <FrameLayout
+                        android:id="@+id/card_qr"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/cetis_space_12"
+                        android:background="@drawable/shape_tarjeta"
+                        android:clickable="true"
+                        android:clipToOutline="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="@dimen/cetis_space_12">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/shape_circulo_brand">
+
+                                    <ImageView
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_gravity="center"
+                                        android:importantForAccessibility="no"
+                                        android:src="@drawable/ic_qr" />
+                                </FrameLayout>
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="end|top"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_chevron_right_dark" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Texto.TituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/cetis_space_8"
+                                android:text="@string/alumno_inicio_qr_titulo" />
+
+                            <TextView
+                                style="@style/Cetis.Texto.SubtituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/alumno_inicio_qr_subtitulo" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_gravity="bottom|end"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/img_corner_accent_right" />
+                    </FrameLayout>
+                    <FrameLayout
+                        android:id="@+id/card_credencial"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_tarjeta"
+                        android:clickable="true"
+                        android:clipToOutline="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="@dimen/cetis_space_12">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/shape_circulo_brand">
+
+                                    <ImageView
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_gravity="center"
+                                        android:importantForAccessibility="no"
+                                        android:src="@drawable/ic_id_card" />
+                                </FrameLayout>
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="end|top"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_chevron_right_dark" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Texto.TituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/cetis_space_8"
+                                android:text="@string/alumno_inicio_credencial_titulo" />
+
+                            <TextView
+                                style="@style/Cetis.Texto.SubtituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/home_credencial_subtitle" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_gravity="bottom|end"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/img_corner_accent_right" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cetis_space_12"
+                    android:orientation="horizontal">
+                    <FrameLayout
+                        android:id="@+id/card_horario"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/cetis_space_12"
+                        android:background="@drawable/shape_tarjeta"
+                        android:clickable="true"
+                        android:clipToOutline="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="@dimen/cetis_space_12">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/shape_circulo_brand">
+
+                                    <ImageView
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_gravity="center"
+                                        android:importantForAccessibility="no"
+                                        android:src="@drawable/ic_clock" />
+                                </FrameLayout>
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="end|top"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_chevron_right_dark" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Texto.TituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/cetis_space_8"
+                                android:text="@string/alumno_inicio_horario_titulo" />
+
+                            <TextView
+                                style="@style/Cetis.Texto.SubtituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/home_horario_subtitle" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_gravity="bottom|end"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/img_corner_accent_right" />
+                    </FrameLayout>
+                    <FrameLayout
+                        android:id="@+id/card_boletin"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_tarjeta"
+                        android:clickable="true"
+                        android:clipToOutline="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="@dimen/cetis_space_12">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/shape_circulo_brand">
+
+                                    <ImageView
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_gravity="center"
+                                        android:importantForAccessibility="no"
+                                        android:src="@drawable/ic_announcements" />
+                                </FrameLayout>
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_gravity="end|top"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_chevron_right_dark" />
+                            </FrameLayout>
+
+                            <TextView
+                                style="@style/Cetis.Texto.TituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/cetis_space_8"
+                                android:text="@string/alumno_inicio_boletin_titulo" />
+
+                            <TextView
+                                style="@style/Cetis.Texto.SubtituloTarjeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/alumno_inicio_boletin_subtitulo" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_gravity="bottom|end"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/img_corner_accent_right" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

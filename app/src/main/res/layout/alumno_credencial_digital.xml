@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Credencial digital - Alumno (79:1176)" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cetis_surface_background"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/cetis_screen_margin"
+    android:paddingEnd="@dimen/cetis_screen_margin">
+    <!-- AppBar (Figma 16:103) -->
+    <FrameLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        android:background="@drawable/shape_header"
+        android:clipToOutline="true">
+
+        <ImageView
+            android:layout_width="110dp"
+            android:layout_height="80dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/bg_header_accent" />
+
+        <!-- La hora y la batería las dibuja Android en la zona superior -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/cetis_space_16"
+            android:paddingEnd="@dimen/cetis_space_16">
+            <ImageButton
+                android:id="@+id/btn_regresar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="-6dp"
+                android:layout_marginEnd="2dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_back"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_arrow_left" />
+            <TextView
+                android:id="@+id/txt_titulo"
+                style="@style/Cetis.Texto.TituloNombre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:maxLines="1"
+                android:text="@string/alumno_titulo_credencial"
+                android:textColor="@color/cetis_text_on_brand" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/cetis_space_16"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- CredentialCard (79:1178) · variables: alumno.nombre, alumno.rol, alumno.grupo,
+                 alumno.noControl, alumno.vigencia -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/cetis_space_16"
+                android:layout_marginBottom="@dimen/cetis_space_16"
+                android:background="@drawable/shape_blanco_lg"
+                android:clipToOutline="true"
+                android:elevation="6dp"
+                android:orientation="vertical">
+
+                <!-- Band -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_credencial_banda"
+                    android:orientation="vertical"
+                    android:padding="@dimen/cetis_space_16">
+
+                    <TextView
+                        style="@style/Cetis.Texto.SubtituloTarjeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/credencial_band_label"
+                        android:textColor="@color/cetis_text_on_brand_muted" />
+
+                    <TextView
+                        style="@style/Cetis.Texto.Banner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/school_name"
+                        android:textColor="@color/cetis_text_on_brand" />
+                </LinearLayout>
+
+                <!-- Body -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="@dimen/cetis_space_20">
+
+                    <ImageView
+                        android:id="@+id/img_foto"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:contentDescription="@string/alumno_foto_descripcion"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/img_avatar_96" />
+
+                    <TextView
+                        android:id="@+id/txt_nombre"
+                        style="@style/Cetis.Texto.TituloNombre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/cetis_space_8"
+                        android:gravity="center"
+                        tools:text="{alumno.nombre}" />
+
+                    <TextView
+                        android:id="@+id/txt_rol"
+                        style="@style/Cetis.Texto.Cuerpo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/cetis_space_8"
+                        android:gravity="center"
+                        android:textColor="@color/cetis_text_secondary"
+                        tools:text="{alumno.rol}" />
+
+                    <!-- Fields -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/cetis_space_8"
+                        android:background="@drawable/shape_tarjeta"
+                        android:orientation="vertical"
+                        android:padding="@dimen/cetis_space_12">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Cetis.Campo.Etiqueta"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/field_grupo" />
+
+                            <TextView
+                                android:id="@+id/txt_grupo"
+                                style="@style/Cetis.Campo.Valor"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/cetis_space_12"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:gravity="end"
+                                android:maxLines="1"
+                                tools:text="{alumno.grupo}" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/cetis_space_8"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Cetis.Campo.Etiqueta"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/field_no_control" />
+
+                            <TextView
+                                android:id="@+id/txt_no_control"
+                                style="@style/Cetis.Campo.Valor"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/cetis_space_12"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:gravity="end"
+                                android:maxLines="1"
+                                tools:text="{alumno.noControl}" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/cetis_space_8"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Cetis.Campo.Etiqueta"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/field_vigencia" />
+
+                            <TextView
+                                android:id="@+id/txt_vigencia"
+                                style="@style/Cetis.Campo.Valor"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/cetis_space_12"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:gravity="end"
+                                android:maxLines="1"
+                                tools:text="{alumno.vigencia}" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Footer -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/cetis_space_12"
+                    android:paddingBottom="@dimen/cetis_space_12">
+
+                    <ImageView
+                        android:layout_width="150dp"
+                        android:layout_height="51.89dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/school_logo_description"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/logo_cetis61" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

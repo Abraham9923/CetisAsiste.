@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Una casilla del calendario: el número del día y, abajo, un punto si hay evento.
+     Hoy se pinta con círculo guinda y letra blanca; sábado y domingo, en gris (lo hace el código). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_weight="1"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txt_dia"
+        style="@style/Cetis.Texto.CuerpoChico"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:textColor="@color/cetis_brand_900"
+        tools:text="5" />
+
+    <ImageView
+        android:id="@+id/img_evento"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="2dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/img_event_dot"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+</LinearLayout>

@@ -1,0 +1,89 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "registros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "alumnoId", "order": "ASCENDING" },
+        { "fieldPath": "fechaHora", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "registros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "grupoId", "order": "ASCENDING" },
+        { "fieldPath": "fechaHora", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "registros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fecha", "order": "ASCENDING" },
+        { "fieldPath": "fechaHora", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "salidasDeGrupo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fecha", "order": "ASCENDING" },
+        { "fieldPath": "fechaHora", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "anuncios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "dirigidoA", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "alumnos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "grupoId", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "alumnos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "grupoId", "order": "ASCENDING" },
+        { "fieldPath": "apellidoPaterno", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "alumnos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "nombreBusqueda", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "alumnos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "turno", "order": "ASCENDING" },
+        { "fieldPath": "semestre", "order": "ASCENDING" },
+        { "fieldPath": "nombreBusqueda", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "grupos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "periodoId", "order": "ASCENDING" },
+        { "fieldPath": "turno", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

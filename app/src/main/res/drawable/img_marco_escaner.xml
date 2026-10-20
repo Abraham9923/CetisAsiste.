@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="250dp"
+    android:height="250dp"
+    android:viewportWidth="250"
+    android:viewportHeight="250">
+    <!-- Marco del escáner (Figma "Escaner - Prefecto" 77:500): cuatro esquinas blancas -->
+    <path
+        android:pathData="M2,50V22A20,20 0,0 1,22 2H50M200,2H228A20,20 0,0 1,248 22V50M248,200V228A20,20 0,0 1,228 248H200M50,248H22A20,20 0,0 1,2 228V200"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+</vector>

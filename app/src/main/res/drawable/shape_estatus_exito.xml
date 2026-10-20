@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- StatusChip (Figma 76:538), verde: alumno activo -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_status_success_bg" />
+    <corners android:radius="999dp" />
+</shape>

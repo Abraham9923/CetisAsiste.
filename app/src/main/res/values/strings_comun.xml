@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos FIJOS de las vistas que comparten varios roles (comun_*.xml): calendario,
+     notificaciones, horario de un grupo, perfil del personal y cambio de contraseña.
+     Los datos de cada persona NO van aquí: los pone el código. -->
+<resources>
+    <!-- Menú ☰ (comun_menu.xml): debajo del nombre va el rol de la persona -->
+    <string name="comun_rol_alumno">Alumno</string>
+    <string name="comun_rol_padre">Padre de familia</string>
+
+    <!-- Enlaces subrayados -->
+    <string name="comun_marcar_leidas"><u>Marcar todas como leídas</u></string>
+    <string name="comun_ver_mas"><u>Ver más</u></string>
+    <string name="comun_cerrar_sesion_enlace"><u>Cerrar sesión</u></string>
+
+    <!-- Campos de las tarjetas de datos -->
+    <string name="field_usuario">Usuario</string>
+    <string name="field_turno">Turno</string>
+    <string name="field_fecha">Fecha</string>
+
+    <!-- Horario de un grupo -->
+    <!-- %1$s = nombre del grupo. Ej.: "Grupo 102" -->
+    <string name="comun_grupo_titulo">Grupo %1$s</string>
+    <string name="turno_matutino">Matutino</string>
+    <string name="turno_vespertino">Vespertino</string>
+
+    <!-- Estado del alumno (etiqueta de color) -->
+    <string name="estado_activo">Activo</string>
+    <string name="estado_inactivo_pago">Inactivo por pago</string>
+    <string name="estado_inactivo_salud">Inactivo por salud</string>
+    <string name="estado_en_practicas">En prácticas</string>
+
+    <!-- Tipos de estatus (alumnos/{m}/estatus.tipo) -->
+    <string name="estatus_falta">Falta</string>
+    <string name="estatus_reporte">Reporte</string>
+    <string name="estatus_llamada_atencion">Llamada de atención</string>
+    <string name="estatus_castigo">Castigo</string>
+    <string name="estatus_pase_salud">Pase de salud</string>
+    <string name="estatus_alta_practicas">Alta para prácticas</string>
+
+    <!-- Cambiar contraseña (todos los roles) -->
+    <string name="comun_contrasena_actual">Contraseña actual</string>
+    <string name="comun_contrasena_nueva">Contraseña nueva</string>
+    <string name="comun_contrasena_repetir">Repite la contraseña nueva</string>
+    <string name="comun_contrasena_ayuda">Usa al menos 8 caracteres. La próxima vez que inicies sesión, entra con la contraseña nueva.</string>
+    <string name="comun_contrasena_obligatoria">Por seguridad, cambia tu contraseña antes de continuar.</string>
+    <string name="comun_contrasena_guardar">Guardar contraseña</string>
+    <string name="comun_contrasena_guardando">Guardando…</string>
+    <string name="comun_contrasena_lista">Tu contraseña se cambió.</string>
+    <string name="comun_contrasena_error_vacios">Llena los tres campos.</string>
+    <string name="comun_contrasena_error_corta">La contraseña nueva debe tener al menos 8 caracteres.</string>
+    <string name="comun_contrasena_error_no_coinciden">Las dos contraseñas nuevas no son iguales.</string>
+    <string name="comun_contrasena_error_igual">La contraseña nueva debe ser distinta de la actual.</string>
+    <string name="comun_contrasena_error_actual">La contraseña actual no es correcta.</string>
+    <string name="comun_contrasena_error_debil">Esa contraseña es muy fácil de adivinar. Elige otra.</string>
+    <string name="comun_contrasena_error_desconocido">No se pudo cambiar la contraseña. Inténtalo de nuevo.</string>
+
+    <!-- Avisos breves -->
+    <string name="comun_error_guardar">No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="comun_proximamente">Próximamente</string>
+</resources>

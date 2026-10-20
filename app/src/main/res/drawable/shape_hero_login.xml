@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Encabezado de "Iniciar sesión": brand/800 con esquinas inferiores de 28 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_brand_800" />
+    <corners
+        android:bottomLeftRadius="28dp"
+        android:bottomRightRadius="28dp"
+        android:topLeftRadius="0dp"
+        android:topRightRadius="0dp" />
+</shape>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo de tarjeta grande: surface/card, radio lg (20) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_surface_card" />
+    <corners android:radius="@dimen/cetis_radius_lg" />
+</shape>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cuadro blanco del ícono de la app (Iniciar sesión) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_text_on_brand" />
+    <corners android:radius="22dp" />
+</shape>
