@@ -38,6 +38,7 @@ import com.example.cetisasiste.ui.comun.alumnoDeLaSesionEnVivo
 import com.example.cetisasiste.ui.comun.cargar
 import com.example.cetisasiste.ui.comun.nombreDeGrupoEnVivo
 import com.example.cetisasiste.ui.comun.o
+import com.example.cetisasiste.ui.comun.sinLeerEnVivo
 import kotlinx.coroutines.launch
 
 /** Pantallas del padre (después de iniciar sesión). Las cuatro primeras están en el menú ☰. */
@@ -84,6 +85,8 @@ fun PadresApp(
         pila = if (p == PadrePantalla.Inicio) listOf(p) else listOf(PadrePantalla.Inicio, p)
     }
     BackHandler(enabled = pila.size > 1) { regresar() }
+    // Avisos sin leer (campana y menú ☰), en tiempo real.
+    val sinLeer = sinLeerEnVivo(sesion.uid)
 
     // Ficha del hijo, en tiempo real: si cambia en Firestore, la pantalla se actualiza sola.
     val doc = when (val estado = alumnoDeLaSesionEnVivo(sesion)) {
@@ -102,6 +105,7 @@ fun PadresApp(
             vista, sesion.usuario.nombre.trim(), rol, PESTANAS, p, ::pestana,
             onNotificaciones = { abrir(PadrePantalla.Notificaciones) },
             onCerrarSesion = onCerrarSesion,
+            sinLeer = sinLeer,
         )
 
     when (val pantalla = pila.last()) {
@@ -112,6 +116,7 @@ fun PadresApp(
             }
             PantallaXml(R.layout.padre_inicio, modifier) { vista ->
                 PadresVistas.llenarInicio(vista, alumno, destacado)
+                VistasComunes.marcarCampana(vista, sinLeer)
                 vista.alTocar(R.id.btn_notificaciones) { abrir(PadrePantalla.Notificaciones) }
                 vista.alTocar(R.id.banner_importante) { pestana(PadrePantalla.Anuncios) }
                 vista.alTocar(R.id.card_qr) { abrir(PadrePantalla.CodigoQr) }

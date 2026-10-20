@@ -139,7 +139,7 @@ fun CetisApp(modifier: Modifier = Modifier) {
         Rol.ALUMNO -> AlumnoApp(sesion = actual, onCerrarSesion = ::cerrarSesion, modifier = modifier)
         Rol.PREFECTO -> PrefectoApp(sesion = actual, onCerrarSesion = ::cerrarSesion, modifier = modifier)
         Rol.PROFESOR -> ProfesorApp(sesion = actual, onCerrarSesion = ::cerrarSesion, modifier = modifier)
-        // Enfermería y Control Escolar se usan desde la web (todavía no existe).
+        // Enfermería y Control Escolar se usan desde la web (carpeta web/, ADR-011).
         else -> RolSinPantallas(sesion = actual, onCerrarSesion = ::cerrarSesion, modifier = modifier)
     }
 }

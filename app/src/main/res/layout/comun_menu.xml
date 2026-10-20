@@ -103,6 +103,16 @@
                     style="@style/Cetis.Menu.Texto"
                     android:importantForAccessibility="no"
                     android:text="@string/alumno_notificaciones" />
+
+                <!-- Cuántos avisos sin leer hay ("3", "9+"); se oculta si no hay (lo pone el código) -->
+                <TextView
+                    android:id="@+id/txt_sin_leer"
+                    style="@style/Cetis.Contador"
+                    android:layout_marginEnd="@dimen/cetis_space_12"
+                    android:importantForAccessibility="no"
+                    android:visibility="gone"
+                    tools:text="3"
+                    tools:visibility="visible" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

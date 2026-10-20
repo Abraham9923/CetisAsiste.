@@ -31,8 +31,8 @@ data class DiaDeRegistros(
     val registros: List<Registro>,
 )
 
-/** [Aviso] es cualquier otro tipo (alerta, salida de grupo, estatus…). */
-enum class TipoNotificacion { Entrada, Salida, Anuncio, Recordatorio, Credencial, Aviso }
+/** Cómo se dibuja cada aviso (ícono y color). [Aviso] es cualquier tipo que la app no conozca. */
+enum class TipoNotificacion { Entrada, Salida, Anuncio, Recordatorio, Credencial, Alerta, Estatus, Estado, SalidaDeGrupo, Aviso }
 
 data class Notificacion(
     val tipo: TipoNotificacion,

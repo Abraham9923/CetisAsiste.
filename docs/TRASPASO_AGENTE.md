@@ -1,6 +1,6 @@
 # Traspaso — Estado de CetisAsiste para el siguiente agente
 
-**Fecha:** 19 de octubre de 2026
+**Fecha:** 19 de octubre de 2026 (actualizado el 20 de octubre: avisos, revisión de la arquitectura y web)
 **Para quién:** el siguiente agente (o persona) que continúe el proyecto.
 **Léelo primero.** Resume qué es la app, qué se le hizo, cómo está hoy, qué se quiere lograr y
 qué reglas de trabajo hay que respetar. El detalle está en los documentos que se enlazan.
@@ -38,19 +38,20 @@ página, lista de pantallas y diferencias con la app: [referencias/FIGMA.md](ref
 
 ---
 
-## 2. Cómo está hoy (19 de octubre de 2026)
+## 2. Cómo está hoy (20 de octubre de 2026)
 
 | Parte | Estado |
 |---|---|
-| Base de datos (Cloud Firestore) | **Lista** con la estructura por semestres, reglas por rol y 10 índices. Vacía de datos reales; solo hay datos de prueba |
+| Base de datos (Cloud Firestore) | **Lista** con la estructura por semestres, reglas por rol (con 21 pruebas en `firebase/pruebas-reglas`) y 11 índices. Vacía de datos reales; solo hay datos de prueba. **Las reglas del 19 y 20 oct no están publicadas** (PENDIENTES §1) |
 | Inicio de sesión | **Funciona** con Firebase Authentication (No. de control o usuario → correo interno) |
 | Pantallas de **alumno** (vistas XML) | **Funcionan** con datos reales |
 | Pantallas de **padre** (vistas XML desde el 19 oct; antes Compose) | **Hechas** con datos reales. Falta probarlas en el teléfono con `padre.prueba` |
 | Pantallas de **prefecto** (vistas XML) | **Hechas**, con escáner QR, captura por No. de control, resultado y alertas (ADR-009). Falta probarlas con `prefecto.prueba` |
 | Pantallas de **profesor** (vistas XML) | **Hechas**; guarda estatus y salidas de grupo. Falta probarlas con `profesor.prueba` |
 | Cambiar contraseña (todos) | **Hecha**; obligatoria al entrar si `debeCambiarContrasena = true` o venció |
-| Enfermería y Control Escolar | Previstos **solo en web** (no existe). En Android ven un aviso |
-| Escaneo de QR y alertas | **Hecho** (ADR-009). El aviso al padre es **dentro de la app**; el aviso **push** no existe (necesita Blaze) |
+| Enfermería y Control Escolar | **Web, primera versión hecha** (ADR-011, carpeta `web/`), probada con el emulador; **falta publicarla**. En Android ven un aviso |
+| Escaneo de QR y alertas | **Hecho** (ADR-009); el prefecto ve "Últimos escaneos" y "Alertas de hoy" (ADR-010) |
+| Avisos (notificaciones) | **Hechos** (ADR-010): un buzón por cuenta; el padre recibe entradas, salidas, estatus y algunas alertas; campana en vivo. Son **dentro de la app**: el **push** no existe (necesita Blaze) |
 | Plan de Firebase | **Spark (gratis)**: sin Cloud Functions y con límites diarios que **no alcanzan** para 2,500 alumnos |
 
 ---
@@ -99,6 +100,13 @@ Detalle completo, paso por paso: [BITACORA.md](BITACORA.md) (entradas 19-01 a 19
 14. **No. de control y escaneo (ADR-009):** `matricula` pasó a `noControl` (14 dígitos) en
     todo; el QR lleva `CETIS61:` + el No. de control; el prefecto escanea, captura y ve el
     resultado con alertas. **Faltan** publicar las reglas y volver a crear al alumno de prueba.
+15. **Avisos (ADR-010, 20 oct):** buzón único `usuarios/{uid}/notificaciones` y `datos/Avisos.kt`;
+    el padre recibe estatus del profesor y alertas (según `configuracion/plantel`); campana con
+    punto rojo solo si hay sin leer; "Alertas de hoy" del prefecto; reglas del buzón más
+    estrictas con pruebas en el emulador.
+16. **Revisión de la arquitectura (20 oct):** [ARQUITECTURA.md](ARQUITECTURA.md), qué mejorar
+    por prioridad (escaneo sin señal, hora del servidor, App Check, script de administración…).
+17. **Web (ADR-011, 20 oct):** carpeta `web/` para Control Escolar y Enfermería.
 
 ---
 
@@ -119,6 +127,11 @@ Detalle completo, paso por paso: [BITACORA.md](BITACORA.md) (entradas 19-01 a 19
 | `ui/prefecto/` y `ui/profesor/` | `*App.kt` (navegación y datos) y `*Vistas.kt` (llenan los XML) de cada rol |
 | `ui/alumno/AlumnoApp.kt` | Navegación del alumno sobre `res/layout/alumno_*.xml` |
 | `AlumnoVariables.kt` / `AlumnoVistas.kt` | Datos que necesitan las vistas XML del alumno y cómo se colocan |
+| `datos/Avisos.kt` y `datos/Escaneo.kt` | A quién se avisa y qué alerta toca al escanear (sin Firebase, con pruebas) |
+
+**La web** (`web/`, ver [web/README.md](../web/README.md)): `js/datos.js` es el único archivo
+que habla con Firebase; `js/avisos.js` repite `Avisos.kt` (**si cambias uno, cambia el otro**);
+una pantalla por archivo en `js/pantallas/`.
 
 Otros: `firebase/firestore.rules` y `firestore.indexes.json` (**copias** de lo publicado en la
 consola), `firebase/roles.json` (copia de los perfiles), `docs/herramientas/md_a_word.ps1`
@@ -199,7 +212,12 @@ Las contraseñas **solo las tiene el usuario**. No las pidas.
     de la consola.
   - **Cuidado:** "Start collection" aparece también en el documento abierto; revisa siempre
     la ruta ("Parent path") antes de guardar.
-- **No es un repositorio git:** no hay historial para deshacer. Cuidado al borrar archivos.
+- **Ya está en GitHub** (`Abraham9923/cetisasistevv2`, desde el 20 de octubre): hay historial
+  para deshacer. Los agentes en la nube trabajan en ramas `claude/…`.
+- **En una sesión en la nube** (Linux, sin teléfono ni Word): se puede compilar con el SDK de
+  Android, correr las pruebas de la app, las de las reglas y la web con los emuladores
+  (ver `firebase/pruebas-reglas/README.md` y `web/README.md`). Los `.docx` no se pueden
+  generar ahí: anótalo en la bitácora para correr `md_a_word.ps1` después.
 
 ---
 
@@ -217,11 +235,13 @@ por ahí.
 | Documento | Para qué |
 |---|---|
 | [PENDIENTES.md](PENDIENTES.md) | Todo lo que falta, junto y sin repetir, con quién tiene que actuar |
+| [ARQUITECTURA.md](ARQUITECTURA.md) | Revisión de todo el sistema y qué mejorar, por prioridad (20 oct) |
+| [web/README.md](../web/README.md) | Cómo usar, probar y publicar la web |
 | [referencias/PANTALLAS_POR_ROL.md](referencias/PANTALLAS_POR_ROL.md) | El documento de roles del usuario: pantallas, alertas, estatus, preguntas abiertas, UML y arquitectura |
 | [referencias/FIGMA.md](referencias/FIGMA.md) | Enlace del Figma, qué páginas tiene y qué falta |
 | [BASE_DE_DATOS.md](BASE_DE_DATOS.md) | Cada colección, campo, regla e índice; recetas para dar de alta datos |
 | [BITACORA.md](BITACORA.md) | Todo lo que se hizo, en orden, con archivos y cómo se comprobó |
-| [adr/](adr/) | Decisiones: ADR-001 barra inferior (reemplazado) · 002 reglas sin Cloud Functions · 003 inicio de sesión · 004 modelo de datos · 005 estructura por semestres · 006 vistas XML para todos los roles · **007 menú ☰** · **008 mejoras a la estructura (propuesta)** |
+| [adr/](adr/) | Decisiones: ADR-001 barra inferior (reemplazado) · 002 reglas sin Cloud Functions · 003 inicio de sesión · 004 modelo de datos · 005 estructura por semestres · 006 vistas XML para todos los roles · 007 menú ☰ · 008 mejoras a la estructura (propuesta) · 009 No. de control y escaneo · **010 notificaciones, alertas y avisos** · **011 web de Control Escolar y Enfermería** |
 | [MANUAL_TECNICO.md](MANUAL_TECNICO.md) | Dónde está cada cosa del código y cómo cambiarla |
 | [DECISIONES.md](DECISIONES.md) | El porqué de las pantallas (sección K: vistas XML) |
 | [VISTAS_ALUMNO.md](VISTAS_ALUMNO.md) | Las vistas XML del alumno |

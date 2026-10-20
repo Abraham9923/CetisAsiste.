@@ -280,6 +280,37 @@
                     </FrameLayout>
                 </LinearLayout>
 
+                <!-- Últimos escaneos de hoy, en tiempo real (periodos/{semestre}/registros, ADR-010).
+                     Arriba, el renglón "Alertas de hoy" con cuántas van; al tocarlo se abre
+                     prefecto_alertas.xml. Debajo, un comun_item_lista por escaneo (rojo si tuvo alerta). -->
+                <LinearLayout style="@style/Cetis.Seccion">
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+
+                    <TextView
+                        style="@style/Cetis.Seccion.Pildora"
+                        android:text="@string/prefecto_seccion_escaneos" />
+
+                    <View style="@style/Cetis.Seccion.Linea" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/fila_alertas"
+                    layout="@layout/comun_item_lista" />
+
+                <LinearLayout
+                    android:id="@+id/lista_escaneos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txt_vacio_escaneos"
+                    style="@style/Cetis.Texto.Vacio"
+                    android:text="@string/prefecto_escaneos_vacio"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
                 <!-- Salidas de grupo de hoy (periodos/{semestre}/salidasDeGrupo) -->
                 <LinearLayout style="@style/Cetis.Seccion">
 

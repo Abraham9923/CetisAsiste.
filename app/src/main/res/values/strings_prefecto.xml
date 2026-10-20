@@ -22,6 +22,31 @@
     <string name="prefecto_salidas_vacio">Ningún grupo ha salido hoy.</string>
     <!-- %1$s = nombre del grupo. Ej.: "Grupo 102 puede salir" -->
     <string name="prefecto_salida_titulo">Grupo %1$s puede salir</string>
+    <string name="prefecto_seccion_escaneos">Últimos escaneos</string>
+    <string name="prefecto_escaneos_vacio">Todavía no hay escaneos hoy.</string>
+    <string name="prefecto_alertas_fila">Alertas de hoy</string>
+    <!-- %1$d = cuántas alertas van hoy -->
+    <plurals name="prefecto_alertas_cuantas">
+        <item quantity="one">%1$d alerta · toca para verla</item>
+        <item quantity="other">%1$d alertas · toca para verlas</item>
+    </plurals>
+    <string name="prefecto_alertas_ninguna">Sin alertas hoy</string>
+    <!-- Cuando no hay alumno con ese número. %1$s = lo que se tecleó o se leyó -->
+    <string name="prefecto_escaneo_sin_alumno">No. de control %1$s</string>
+
+    <!-- Alertas de hoy (prefecto_alertas.xml) -->
+    <string name="prefecto_nav_alertas">Alertas de hoy</string>
+    <string name="prefecto_titulo_alertas">Alertas de hoy</string>
+    <plurals name="prefecto_alertas_resumen">
+        <item quantity="one">%1$d alerta hoy. La lista se actualiza sola.</item>
+        <item quantity="other">%1$d alertas hoy. La lista se actualiza sola.</item>
+    </plurals>
+    <string name="prefecto_alertas_vacio">No ha habido alertas hoy.</string>
+
+    <!-- Notificaciones del prefecto: los grupos que ya salieron hoy. %1$s = grupo -->
+    <string name="prefecto_notificacion_salida_titulo">Grupo %1$s ya salió de clases</string>
+    <!-- %1$s = materia, %2$s = profesor -->
+    <string name="prefecto_notificacion_salida_texto">Le dio salida %2$s en %1$s.</string>
 
     <!-- Horarios de todos los grupos -->
     <string name="prefecto_titulo_horarios">Horarios de grupos</string>
@@ -62,6 +87,20 @@
     <string name="prefecto_aviso_padre_salida">Se avisó a su padre o tutor que salió del plantel.</string>
     <string name="prefecto_sin_padre">No tiene padre o tutor registrado para avisarle.</string>
     <string name="prefecto_alerta_guardada">La alerta quedó guardada en el registro del alumno.</string>
+    <string name="prefecto_alerta_guardada_y_aviso">La alerta quedó guardada y se le avisó a su padre o tutor.</string>
+
+    <!-- Por qué saltó cada alerta (txt_motivo del resultado) -->
+    <string name="prefecto_motivo_no_existe">Revisa el número: no hay ningún alumno con este No. de control.</string>
+    <string name="prefecto_motivo_baja">El alumno está dado de baja o ya egresó.</string>
+    <string name="prefecto_motivo_inactivo_pago">Control Escolar lo desactivó por pago.</string>
+    <string name="prefecto_motivo_inactivo_salud">Enfermería lo desactivó por salud.</string>
+    <!-- %1$s = cuándo entró ("7:05 am" o "Lun 19 oct") -->
+    <string name="prefecto_motivo_ya_ingreso">Su entrada ya está registrada (%1$s) y no tiene salida después.</string>
+    <string name="prefecto_motivo_no_ha_ingresado">No hay una entrada registrada antes de esta salida.</string>
+    <!-- %1$s = descripción del castigo, %2$s = quién lo puso -->
+    <string name="prefecto_motivo_castigo">Castigo: %1$s (lo registró %2$s).</string>
+    <string name="prefecto_motivo_castigo_sin_detalle">Tiene un castigo vigente.</string>
+    <string name="prefecto_motivo_salida_fuera">Su profesor todavía no da salida al grupo y no tiene pase de salud.</string>
     <string name="prefecto_escanear_siguiente">Escanear siguiente</string>
     <string name="prefecto_guardando">Guardando…</string>
 
@@ -80,4 +119,8 @@
     <!-- Aviso al padre (usuarios/{uid}/notificaciones). %1$s = nombre del alumno, %2$s = hora -->
     <string name="prefecto_aviso_entrada_mensaje">%1$s entró al plantel a las %2$s.</string>
     <string name="prefecto_aviso_salida_mensaje">%1$s salió del plantel a las %2$s.</string>
+    <!-- Aviso al padre de una alerta (si el plantel lo pide, ADR-010).
+         %1$s = nombre del alumno, %2$s = hora, %3$s = la alerta ("Salida fuera de horario") -->
+    <string name="prefecto_aviso_alerta_entrada">Al registrar la entrada de %1$s a las %2$s hubo una alerta: %3$s.</string>
+    <string name="prefecto_aviso_alerta_salida">Al registrar la salida de %1$s a las %2$s hubo una alerta: %3$s.</string>
 </resources>

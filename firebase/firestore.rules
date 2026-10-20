@@ -62,6 +62,26 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
     }
 
+    // ¿La cuenta uid es padre o tutor del alumno con ese No. de control?
+    function esPadreDe(uid, noControl) {
+      return uid in datosDelAlumno(noControl).padres;
+    }
+
+    // ¿El aviso nuevo tiene la forma correcta? (ADR-010; campos en docs/BASE_DE_DATOS.md §4.1)
+    // Sale sin leer, lo firma quien lo crea y su tipo es uno de los conocidos.
+    function avisoValido() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['tipo', 'titulo', 'mensaje', 'fecha', 'leida', 'alumnoId', 'creadaPor', 'venceEn'])
+        && d.tipo in ['entrada', 'salida', 'alerta', 'estatus', 'estado', 'anuncio', 'recordatorio', 'credencial', 'salida_grupo']
+        && d.titulo is string && d.titulo.size() > 0 && d.titulo.size() <= 120
+        && d.mensaje is string && d.mensaje.size() <= 500
+        && d.fecha is timestamp
+        && d.leida == false
+        && d.alumnoId is string
+        && d.creadaPor == request.auth.uid
+        && (!('venceEn' in d) || d.venceEn == null || d.venceEn is timestamp);
+    }
+
     // ---------- usuarios ----------
     // Una cuenta por persona. El id del documento es el uid de Authentication.
     match /usuarios/{uid} {
@@ -73,12 +93,21 @@ service cloud.firestore {
 
       allow create, update, delete: if soy('control_escolar');
 
-      // Avisos personales de cada cuenta.
+      // Avisos personales de cada cuenta (ADR-010). Por ahora los crea el personal desde su
+      // app o la web; cuando haya Cloud Functions, también los mandará como aviso push.
       match /notificaciones/{notificacionId} {
         allow read, delete: if conSesion() && request.auth.uid == uid;
         allow update: if conSesion() && request.auth.uid == uid && soloCambia(['leida']);
-        // Por ahora las crea el personal desde su app; después, Cloud Functions.
-        allow create: if soyAlguno(['prefecto', 'profesor', 'enfermeria', 'control_escolar']);
+        allow create: if avisoValido() && (
+          // Control Escolar puede avisar a cualquier cuenta.
+          soy('control_escolar')
+          // Prefecto (escaneo) y Enfermería (pase de salud, estado de salud): solo a los
+          // padres del alumno del que trata el aviso.
+          || (soyAlguno(['prefecto', 'enfermeria']) && esPadreDe(uid, request.resource.data.alumnoId))
+          // Profesor (estatus): solo a los padres de un alumno de sus grupos.
+          || (soy('profesor') && esPadreDe(uid, request.resource.data.alumnoId)
+              && doyClaseEn(datosDelAlumno(request.resource.data.alumnoId).grupoId))
+        );
       }
     }
 
@@ -99,18 +128,23 @@ service cloud.firestore {
       // Estatus: castigos, faltas, reportes, pases de salud, prácticas…
       match /estatus/{estatusId} {
         allow read: if soyPersonalGeneral() || doyClaseEn(datosDelAlumno(noControl).grupoId);
-        allow create: if soy('control_escolar')
+        // Quien lo pone queda anotado con su propio uid (asignadoPor).
+        allow create: if request.resource.data.asignadoPor == request.auth.uid && (
+          soy('control_escolar')
           || (soy('enfermeria') && request.resource.data.tipo == 'pase_salud')
           || (doyClaseEn(datosDelAlumno(noControl).grupoId)
-              && request.resource.data.tipo in ['falta', 'reporte', 'llamada_atencion', 'castigo']);
+              && request.resource.data.tipo in ['falta', 'reporte', 'llamada_atencion', 'castigo'])
+        );
         allow update, delete: if soy('control_escolar');
       }
 
       // Historial de activaciones por pago y por salud.
       match /cambiosDeEstado/{cambioId} {
         allow read: if soyAlguno(['enfermeria', 'control_escolar']);
-        allow create: if (soy('control_escolar') && request.resource.data.campo == 'pago')
-          || (soy('enfermeria') && request.resource.data.campo == 'salud');
+        allow create: if request.resource.data.por == request.auth.uid && (
+          (soy('control_escolar') && request.resource.data.campo == 'pago')
+          || (soy('enfermeria') && request.resource.data.campo == 'salud')
+        );
         allow update, delete: if false;
       }
 

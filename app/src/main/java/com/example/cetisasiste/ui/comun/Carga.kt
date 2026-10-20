@@ -48,6 +48,18 @@ fun alumnoDeLaSesionEnVivo(sesion: Sesion): Carga<AlumnoDoc?> {
     return estado
 }
 
+/**
+ * Cuántos avisos sin leer tiene la cuenta (para la campana y el menú ☰), en tiempo real. Si
+ * no se puede saber (sin internet), cuenta 0. Lo usa el *App.kt de cada rol una sola vez, para
+ * que todas sus pantallas compartan la misma escucha.
+ */
+@Composable
+fun sinLeerEnVivo(uid: String): Int {
+    val flujo = remember(uid) { CetisRepositorio.escucharSinLeer(uid) }
+    val resultado by flujo.collectAsState(initial = null)
+    return resultado?.getOrNull() ?: 0
+}
+
 /** Nombre del grupo (grupos/{grupoId}.nombre), escuchado en tiempo real; null mientras carga. */
 @Composable
 fun nombreDeGrupoEnVivo(grupoId: String): String? {

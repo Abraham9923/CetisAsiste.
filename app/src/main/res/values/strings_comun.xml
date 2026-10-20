@@ -9,6 +9,8 @@
 
     <!-- Enlaces subrayados -->
     <string name="comun_marcar_leidas"><u>Marcar todas como leídas</u></string>
+    <!-- Para el lector de pantalla. %1$s = "Notificaciones", %2$s = cuántas ("3", "9+") -->
+    <string name="comun_campana_sin_leer">%1$s, %2$s sin leer</string>
     <string name="comun_ver_mas"><u>Ver más</u></string>
     <string name="comun_cerrar_sesion_enlace"><u>Cerrar sesión</u></string>
 

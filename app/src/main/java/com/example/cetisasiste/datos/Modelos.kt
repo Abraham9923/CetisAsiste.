@@ -319,17 +319,43 @@ data class EventoDoc(
     var detalle: String = "",
 )
 
-/** usuarios/{uid}/notificaciones/{id} — avisos personales. */
+/**
+ * usuarios/{uid}/notificaciones/{id} — avisos personales (el "buzón" de cada cuenta, ADR-010).
+ * Las reglas exigen exactamente estos campos: no agregues uno sin cambiar también
+ * firebase/firestore.rules (función avisoValido). Se arman con Avisos.nuevo().
+ */
 data class NotificacionDoc(
-    /** entrada, salida, anuncio, recordatorio, credencial, alerta, salida_grupo o estatus. */
+    /** Ver TipoAviso: entrada, salida, alerta, estatus, estado, anuncio… */
     var tipo: String = "",
     var titulo: String = "",
     var mensaje: String = "",
     var fecha: Timestamp? = null,
     var leida: Boolean = false,
-    /** No. de control del alumno al que se refiere (si aplica). */
+    /** No. de control del alumno al que se refiere (vacío si no trata de un alumno). */
     var alumnoId: String = "",
+    /** uid de quien lo mandó. Las reglas exigen que sea el de la sesión. */
+    var creadaPor: String = "",
+    /** Desde cuándo se puede borrar (para limpiar la base; ver BASE_DE_DATOS §4.1). */
+    var venceEn: Timestamp? = null,
 )
+
+/** Valores del campo `tipo` de usuarios/{uid}/notificaciones (los mismos que aceptan las reglas). */
+object TipoAviso {
+    /** El alumno entró sin alerta (prefecto). */
+    const val ENTRADA = "entrada"
+    /** El alumno salió sin alerta (prefecto). */
+    const val SALIDA = "salida"
+    /** Al escanear al alumno hubo una alerta (prefecto). */
+    const val ALERTA = "alerta"
+    /** Le pusieron un estatus: falta, reporte, castigo… (profesor) o pase de salud (enfermería). */
+    const val ESTATUS = "estatus"
+    /** Lo activaron o desactivaron por pago (Control Escolar) o por salud (Enfermería). */
+    const val ESTADO = "estado"
+    const val ANUNCIO = "anuncio"
+    const val RECORDATORIO = "recordatorio"
+    const val CREDENCIAL = "credencial"
+    const val SALIDA_GRUPO = "salida_grupo"
+}
 
 /**
  * roles/{rol} — perfil de un tipo de usuario (alumno, padre, prefecto, profesor,
@@ -435,5 +461,15 @@ data class ConfiguracionDoc(
     var horaCierrePuerta: String = "",
     var diasVenceContrasena: Long = 90,
     var dominioCorreo: String = "",
+    /**
+     * Estatus que se le avisan al padre cuando el profesor los pone (ADR-010). Si el campo no
+     * existe en Firestore, se usa Avisos.ESTATUS_POR_OMISION; una lista vacía no avisa ninguno.
+     */
+    var avisarAlPadreEstatus: List<String> = Avisos.ESTATUS_POR_OMISION,
+    /**
+     * Alertas del escaneo que se le avisan al padre (ADR-010). Las entradas y salidas sin alerta
+     * siempre se avisan. Si el campo no existe, se usa Avisos.ALERTAS_POR_OMISION.
+     */
+    var avisarAlPadreAlertas: List<String> = Avisos.ALERTAS_POR_OMISION,
     var actualizadoEn: Timestamp? = null,
 )

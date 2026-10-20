@@ -21,21 +21,25 @@ import com.example.cetisasiste.datos.Turno
 import com.example.cetisasiste.ui.comun.CalendarioXml
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
 import com.example.cetisasiste.ui.comun.HorarioXml
+import com.example.cetisasiste.ui.comun.Notificacion
 import com.example.cetisasiste.ui.comun.NotificacionesXml
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.PerfilPersonalXml
 import com.example.cetisasiste.ui.comun.Pestana
+import com.example.cetisasiste.ui.comun.TipoNotificacion
 import com.example.cetisasiste.ui.comun.VistasComunes
 import com.example.cetisasiste.ui.comun.alTocar
 import com.example.cetisasiste.ui.comun.cargar
 import com.example.cetisasiste.ui.comun.o
+import com.example.cetisasiste.ui.comun.sinLeerEnVivo
 import com.google.firebase.Timestamp
 import java.util.Calendar
 
-/** Pantallas del prefecto. Las cinco primeras están en el menú ☰. */
+/** Pantallas del prefecto. Las seis primeras están en el menú ☰. */
 enum class PrefectoPantalla {
     Inicio,
     Escanear,
+    Alertas,
     Horarios,
     Calendario,
     Perfil,
@@ -50,6 +54,7 @@ enum class PrefectoPantalla {
 private val PESTANAS = listOf(
     Pestana(PrefectoPantalla.Inicio, R.drawable.ic_home, R.string.nav_inicio),
     Pestana(PrefectoPantalla.Escanear, R.drawable.ic_scan, R.string.prefecto_nav_escanear),
+    Pestana(PrefectoPantalla.Alertas, R.drawable.ic_warning, R.string.prefecto_nav_alertas),
     Pestana(PrefectoPantalla.Horarios, R.drawable.ic_clock, R.string.prefecto_nav_horarios),
     Pestana(PrefectoPantalla.Calendario, R.drawable.ic_calendar, R.string.nav_calendario),
     Pestana(PrefectoPantalla.Perfil, R.drawable.ic_profile, R.string.nav_perfil),
@@ -81,6 +86,17 @@ fun PrefectoApp(
     // Entrada o Salida, lo tecleado y el último resultado: lo comparten las pantallas del escaneo.
     val escaneo = remember { EstadoDelEscaneo() }
 
+    // En tiempo real, mientras la app está abierta (ADR-010):
+    //   - avisos sin leer (campana y menú ☰);
+    //   - alertas de hoy (el contador del Inicio y la pantalla Alertas de hoy);
+    //   - grupos que ya salieron hoy (Inicio y Notificaciones).
+    // Si una consulta falla (sin internet), se ve como si no hubiera nada.
+    val sinLeer = sinLeerEnVivo(sesion.uid)
+    val flujoAlertas = remember { CetisRepositorio.escucharAlertasDeHoy() }
+    val alertas = flujoAlertas.collectAsState(initial = null).value?.getOrDefault(emptyList())
+    val flujoSalidas = remember { CetisRepositorio.escucharSalidasDeHoy() }
+    val salidas = flujoSalidas.collectAsState(initial = null).value?.getOrDefault(emptyList())
+
     val rol = stringResource(R.string.prefecto_rol)
     /** Conecta el botón ☰ con el menú del prefecto; marca la opción de [p]. */
     fun conectarMenu(vista: View, p: PrefectoPantalla) =
@@ -88,17 +104,22 @@ fun PrefectoApp(
             vista, sesion.usuario.nombre.trim(), rol, PESTANAS, p, ::pestana,
             onNotificaciones = { abrir(PrefectoPantalla.Notificaciones) },
             onCerrarSesion = onCerrarSesion,
+            sinLeer = sinLeer,
         )
 
     when (val pantalla = pila.last()) {
         PrefectoPantalla.Inicio -> {
-            // En tiempo real: en cuanto un profesor da salida a su grupo, aparece aquí.
-            val flujo = remember { CetisRepositorio.escucharSalidasDeHoy() }
-            val salidas by flujo.collectAsState(initial = null)
+            // Últimos escaneos de hoy: solo se escuchan mientras se ve el Inicio.
+            val flujoEscaneos = remember { CetisRepositorio.escucharEscaneosDeHoy() }
+            val escaneos = flujoEscaneos.collectAsState(initial = null).value?.getOrDefault(emptyList())
             val hoy = remember { Formatos.tituloDeDia(Timestamp.now()) }
             PantallaXml(R.layout.prefecto_inicio, modifier) { vista ->
-                // Si la consulta falla (sin internet), se ve como "ningún grupo ha salido".
-                PrefectoVistas.llenarInicio(vista, sesion.usuario.nombre.trim(), hoy, salidas?.getOrDefault(emptyList()))
+                PrefectoVistas.llenarInicio(
+                    vista, sesion.usuario.nombre.trim(), hoy, salidas, escaneos,
+                    alertasDeHoy = alertas?.size ?: 0,
+                    alTocarAlertas = { pestana(PrefectoPantalla.Alertas) },
+                )
+                VistasComunes.marcarCampana(vista, sinLeer)
                 vista.alTocar(R.id.btn_notificaciones) { abrir(PrefectoPantalla.Notificaciones) }
                 vista.alTocar(R.id.card_escanear) { pestana(PrefectoPantalla.Escanear) }
                 vista.alTocar(R.id.card_no_control) {
@@ -119,6 +140,11 @@ fun PrefectoApp(
             onResultado = { abrir(PrefectoPantalla.Resultado) },
             modifier = modifier,
         )
+
+        PrefectoPantalla.Alertas -> PantallaXml(R.layout.prefecto_alertas, modifier) { vista ->
+            PrefectoVistas.llenarAlertas(vista, alertas)
+            conectarMenu(vista, pantalla)
+        }
 
         PrefectoPantalla.Captura -> CapturaXml(
             estado = escaneo,
@@ -168,7 +194,21 @@ fun PrefectoApp(
             modifier = modifier,
         )
 
-        PrefectoPantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
+        PrefectoPantalla.Notificaciones -> {
+            // Además de su buzón, el prefecto ve aquí los grupos que ya salieron hoy (como en Figma).
+            val tituloSalida = stringResource(R.string.prefecto_notificacion_salida_titulo)
+            val textoSalida = stringResource(R.string.prefecto_notificacion_salida_texto)
+            val deSalidas = salidas.orEmpty().map { salida ->
+                Notificacion(
+                    tipo = TipoNotificacion.SalidaDeGrupo,
+                    titulo = String.format(tituloSalida, salida.grupo.trim()),
+                    hora = Formatos.hora(salida.fechaHora),
+                    texto = if (salida.materia.isBlank()) "" else String.format(textoSalida, salida.materia, salida.autorizadaPorNombre.trim()),
+                    leida = true,
+                )
+            }
+            NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier, extrasDeHoy = deSalidas)
+        }
 
         PrefectoPantalla.CambiarContrasena -> CambiarContrasenaXml(
             obligatoria = false,

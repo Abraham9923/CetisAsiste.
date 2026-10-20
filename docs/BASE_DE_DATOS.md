@@ -44,7 +44,10 @@ cómo se dan de alta los datos**. El *porqué* de las decisiones está en los AD
 | Copia de las reglas en el proyecto | `firebase/firestore.rules` |
 | Copia de los índices en el proyecto | `firebase/firestore.indexes.json` |
 | Copia de los perfiles de usuario | `firebase/roles.json` |
-| Configuración para la herramienta `firebase` (futuro) | `firebase/firebase.json` y `firebase/.firebaserc` |
+| Configuración para la herramienta `firebase` (publicar la web, emuladores) | `firebase/firebase.json` y `firebase/.firebaserc` |
+| Pruebas de las reglas | `firebase/pruebas-reglas/` |
+| Datos de prueba para el emulador | `firebase/emulador/datos-de-prueba.mjs` |
+| Código de la web que habla con Firebase | `web/js/datos.js` |
 | Código de la app que habla con Firebase | `app/src/main/java/com/example/cetisasiste/datos/` |
 
 > **Importante:** si cambias las reglas en la consola, copia el mismo texto en
@@ -135,20 +138,40 @@ Authentication al crear la cuenta.
 `debeCambiarContrasena`, `contrasenaVence` y `actualizadoEn`. **Control Escolar** lee y
 cambia todos.
 
-#### Subcolección `usuarios/{uid}/notificaciones/{id}`
+#### Subcolección `usuarios/{uid}/notificaciones/{id}` — el buzón de avisos
+
+Todos los avisos de una persona van aquí, sin importar quién los mande (ADR-010). Las reglas
+exigen **exactamente** estos campos (ni uno más):
 
 | Campo | Tipo | Ejemplo |
 |---|---|---|
-| `tipo` | string | entrada, salida, anuncio, recordatorio, credencial, alerta, salida_grupo, estatus |
-| `titulo` | string | Entrada registrada |
-| `mensaje` | string | Juan entró al plantel a las 7:05 am. |
+| `tipo` | string | `entrada`, `salida`, `alerta`, `estatus`, `estado`, `anuncio`, `recordatorio`, `credencial` o `salida_grupo` |
+| `titulo` | string | Entrada registrada (de 1 a 120 letras) |
+| `mensaje` | string | Juan entró al plantel a las 7:05 am. (hasta 500 letras) |
 | `fecha` | timestamp | |
-| `leida` | boolean | false |
-| `alumnoId` | string | No. de control del alumno al que se refiere (si aplica) |
+| `leida` | boolean | false (siempre false al crearlo) |
+| `alumnoId` | string | No. de control del alumno del que trata (vacío si no trata de un alumno) |
+| `creadaPor` | string | uid de quien lo mandó (debe ser el de su sesión) |
+| `venceEn` | timestamp | `fecha` + 60 días: desde ahí se puede borrar |
 
-**Quién puede:** el dueño las lee, las borra y las marca como leídas (solo el campo
-`leida`). Las **crean** prefecto, profesor, enfermería o Control Escolar (en el futuro,
-Cloud Functions).
+Qué avisos hay y quién los manda:
+
+| Evento | Lo manda | `tipo` | ¿Siempre? |
+|---|---|---|---|
+| Entrada o salida sin alerta | Prefecto | `entrada` / `salida` | Sí |
+| Alerta al escanear | Prefecto | `alerta` | Solo las de `configuracion/plantel.avisarAlPadreAlertas` (§4.8) |
+| Falta, reporte, llamada de atención, castigo | Profesor | `estatus` | Solo los de `avisarAlPadreEstatus` (§4.8) |
+| Pase de salida por salud | Enfermería (web) | `estatus` | Sí |
+| Activado o desactivado por salud o por pago | Enfermería o Control Escolar (web) | `estado` | Sí |
+
+**Quién puede:** el dueño los lee, los borra y los marca como leídos (solo el campo
+`leida`). Los **crean**: Control Escolar, a cualquier cuenta; prefecto y Enfermería, solo a
+los **padres del alumno** del aviso (`alumnoId`); el profesor, solo a los padres de un alumno
+**de sus grupos**. En el futuro también los creará una Cloud Function (y mandará el push).
+
+**Espacio:** con todo el plantel se juntan miles de avisos al día. Conviene activar una
+política **TTL** (borrado automático) sobre `venceEn` y excluir `titulo` y `mensaje` de los
+índices automáticos (consola → *Firestore* → *Indexes* → *Single field*). Ver ADR-010.
 
 ### 4.2 `alumnos/{noControl}` — ficha del alumno
 
@@ -384,6 +407,11 @@ Ya existe, cargado el 19 de octubre.
 | `horaCierrePuerta` | 07:15 |
 | `diasVenceContrasena` | 90 (días que dura una contraseña nueva; 0 = no vence) |
 | `dominioCorreo` | cetis61.mx |
+| `avisarAlPadreEstatus` | *(no existe todavía)* Estatus del profesor que se le avisan al padre. Si no existe: `["falta", "reporte", "llamada_atencion", "castigo"]`. `[]` = ninguno (ADR-010) |
+| `avisarAlPadreAlertas` | *(no existe todavía)* Alertas del escaneo que se le avisan al padre. Si no existe: `["inactivo", "salida_fuera_de_horario"]`. `[]` = ninguna. Las entradas y salidas sin alerta se avisan siempre (ADR-010) |
+
+> Los dos últimos solo hay que crearlos si el plantel quiere algo distinto de lo de por
+> omisión: consola → `configuracion/plantel` → *Add field* → tipo **array** de **string**.
 
 ### 4.9 `roles/{rol}` — perfiles de usuario
 
@@ -399,7 +427,7 @@ los "moldes" que Control Escolar asigna al dar de alta una cuenta (campo `usuari
 | `etiqueta` | string | Padre de familia (texto en tarjetas; el alumno dice "Estudiante") |
 | `descripcion` | string | Sigue las entradas y salidas de su hijo, los avisos y el calendario del plantel. |
 | `plataformas` | array de string | ["android"] o ["web"] |
-| `plataformaConfirmada` | boolean | true (Enfermería: false, "web por confirmar") |
+| `plataformaConfirmada` | boolean | true (Enfermería era false, "web por confirmar"; el usuario la confirmó el 20 oct: **hay que ponerla en true en la consola**) |
 | `inicioDeSesion` | string | `noControl` (alumno) o `usuario` (los demás) |
 | `camposDelUsuario` | array de string | ["hijos"] — campos extra que lleva `usuarios/{uid}` con este rol |
 | `cambioDeContrasenaObligatorio` | boolean | false (prefecto: true) |
@@ -415,7 +443,7 @@ Resumen de los 6 perfiles:
 | `padre` | Padre de familia | Android | usuario | `hijos` | No | 9 | 8 |
 | `prefecto` | Prefecto | Android | usuario | — | **Sí** | 8 | 9 |
 | `profesor` | Profesor | Android | usuario | `grupos` | No | 6 | 6 |
-| `enfermeria` | Enfermería | Web (por confirmar) | usuario | — | No | 4 | 4 |
+| `enfermeria` | Enfermería | Web (confirmada el 20 oct, ADR-011) | usuario | — | No | 4 | 4 |
 | `control_escolar` | Control Escolar | Web | usuario | — | No | 8 | 11 |
 
 Los permisos de cada uno (salen del documento "Pantallas por rol",
@@ -455,7 +483,7 @@ Son los ids de la colección `roles` (§4.9).
 | `padre` | Padre de familia o tutor | Sí (vistas XML de padre; antes Compose) |
 | `prefecto` | Prefecto | Sí (vistas XML), con escáner QR, captura por No. de control, resultado y alertas |
 | `profesor` | Profesor | Sí (vistas XML): grupos, alumnos, estatus y salida del grupo |
-| `enfermeria` | Enfermería | No (web, por confirmar): ve un aviso |
+| `enfermeria` | Enfermería | No: usa la web (ADR-011); en la app ve un aviso |
 | `control_escolar` | Control Escolar | No (web): ve un aviso |
 
 ### 5.2 Estatus (`alumnos/{m}/estatus.tipo`)
@@ -491,7 +519,8 @@ Están en `firebase/firestore.rules` y publicadas en la consola. Resumen:
 | Colección | Alumno | Padre | Prefecto | Profesor | Enfermería | Control Escolar |
 |---|---|---|---|---|---|---|
 | `usuarios` (el suyo) | Lee | Lee | Lee | Lee | Lee | **Todo** |
-| `usuarios/…/notificaciones` (las suyas) | Lee, marca leída | Lee, marca leída | Lee + crea | Lee + crea | Lee + crea | Lee + crea |
+| `usuarios/…/notificaciones` (las suyas) | Lee, marca leída | Lee, marca leída | Lee, marca leída | Lee, marca leída | Lee, marca leída | Lee, marca leída |
+| `usuarios/…/notificaciones` (crear en otra cuenta) | — | — | A los padres del alumno | A los padres de sus alumnos | A los padres del alumno | A cualquiera |
 | `alumnos` | El suyo | Sus hijos | Lee todos; cambia `ubicacion` | Sus grupos | Lee todos; cambia `activoPorSalud` | **Todo** |
 | `alumnos/…/estatus` | — | — | Lee | Lee y crea (sus grupos) | Lee; crea `pase_salud` | **Todo** |
 | `alumnos/…/cambiosDeEstado` | — | — | — | — | Lee; crea `salud` | Lee; crea `pago` |
@@ -509,6 +538,12 @@ Además:
 - **Sin sesión no se puede leer ni escribir nada.** (Se comprobó: una lectura sin sesión
   responde *403 Permission denied*.)
 - **Si `activo` es false**, la cuenta no puede hacer nada aunque tenga contraseña.
+- **Lo que se crea va firmado:** los avisos (`creadaPor`), los estatus (`asignadoPor`), los
+  cambios de estado (`por`), los registros (`registradoPor`) y las salidas de grupo
+  (`autorizadaPor`) deben llevar el uid de quien los crea; si no, se rechazan.
+- **Pruebas:** las reglas tienen 21 pruebas automáticas con el emulador
+  ([firebase/pruebas-reglas](../firebase/pruebas-reglas/README.md)). Córrelas antes de publicar
+  un cambio.
 - **Cualquier colección que no esté en la tabla queda cerrada**, incluidas las viejas
   (`CetisAsiste` y los documentos antiguos de `usuarios` con contraseña).
 
@@ -517,7 +552,8 @@ Además:
 ## 7. Índices
 
 Firestore necesita un "índice compuesto" para las búsquedas que filtran por un campo y
-ordenan por otro. Hay 10 (consola → *Indexes* → *Manual*). Los de `registros` y
+ordenan por otro. Hay 11 (consola → *Indexes* → *Manual*); el de `fecha`, `alerta`,
+`fechaHora` es del 20 de octubre (ADR-010) y **hay que crearlo en la consola**. Los de `registros` y
 `salidasDeGrupo` sirven para la lista de **cualquier** semestre, porque Firestore los aplica a
 toda colección con ese nombre.
 
@@ -525,7 +561,8 @@ toda colección con ese nombre.
 |---|---|---|
 | `registros` | `alumnoId` ↑, `fechaHora` ↓ | Entradas y salidas de un alumno (padre, alumno) |
 | `registros` | `grupoId` ↑, `fechaHora` ↓ | Registros de un grupo (profesor) |
-| `registros` | `fecha` ↑, `fechaHora` ↓ | Registros de un día (Control Escolar, prefecto) |
+| `registros` | `fecha` ↑, `fechaHora` ↓ | Registros de un día (Control Escolar, prefecto: "Últimos escaneos") |
+| `registros` | `fecha` ↑, `alerta` ↑, `fechaHora` ↓ | Alertas de un día (prefecto: "Alertas de hoy"; Control Escolar) |
 | `salidasDeGrupo` | `fecha` ↑, `fechaHora` ↓ | Grupos que ya salieron hoy (prefecto) |
 | `anuncios` | `dirigidoA` (arreglo), `fecha` ↓ | Boletín según el rol |
 | `alumnos` | `grupoId` ↑, `nombre` ↑ | Lista de alumnos de un grupo (profesor, enfermería) |
@@ -685,6 +722,8 @@ le mostrará "Cambiar contraseña" antes que nada. Al cambiarla, la app regresa 
 |---|---|
 | `datos/Modelos.kt` | La forma de cada documento (`UsuarioDoc`, `AlumnoDoc`, `RegistroDoc`…), los nombres de las colecciones (`Colecciones`) y los roles (`Rol`) |
 | `datos/CetisRepositorio.kt` | **Único lugar que habla con Firebase:** inicia y cierra sesión, y hace todas las consultas |
+| `datos/Avisos.kt` | A quién se le avisa de qué y cómo se arma un aviso del buzón (sin Firebase; pruebas en `AvisosTest`) |
+| `datos/Escaneo.kt` | Qué alerta corresponde a un escaneo (sin Firebase; pruebas en `EscaneoTest`) |
 | `datos/Formatos.kt` | Convierte fechas y documentos en los textos de Figma ("Hoy · 5 oct", "7:00 – 7:50 am") y dibuja el QR |
 | `ui/CetisApp.kt` | Bienvenida → inicio de sesión → (cambio de contraseña obligatorio) → pantallas según el rol |
 | `ui/padres/PadresApp.kt` | Pide los datos del hijo y muestra las vistas XML del padre |
@@ -694,11 +733,14 @@ le mostrará "Cambiar contraseña" antes que nada. Al cambiarla, la app regresa 
 | `ui/comun/` | Pantallas que comparten varios roles (calendario, notificaciones, horario, perfil, contraseña) |
 
 **En tiempo real.** La cuenta (`usuarios/{uid}`), la ficha del alumno
-(`alumnos/{No. de control}`), su grupo (`grupos/{grupoId}`) y, en el Inicio del prefecto, las
-salidas de grupo de hoy se **escuchan**: si alguien las cambia, la app se actualiza sola en
-uno o dos segundos, sin cerrar sesión. Si la cuenta se desactiva (`activo = false`) o se
-borra, la app cierra la sesión y lo dice. Las demás listas (anuncios, eventos, registros,
-notificaciones, horario, grupos, alumnos, estatus) se leen cada vez que se abre su pantalla.
+(`alumnos/{No. de control}`), su grupo (`grupos/{grupoId}`), los **avisos sin leer** (para la
+campana), la pantalla de **Notificaciones** mientras está abierta y, en el prefecto, las
+salidas de grupo, los últimos escaneos y las alertas de hoy se **escuchan**: si alguien las
+cambia, la app se actualiza sola en uno o dos segundos, sin cerrar sesión. Si la cuenta se
+desactiva (`activo = false`) o se borra, la app cierra la sesión y lo dice. Las demás listas
+(anuncios, eventos, registros del alumno, horario, grupos, alumnos, estatus) se leen cada vez
+que se abre su pantalla. `configuracion/plantel` se guarda 5 minutos en memoria para no leerla
+en cada escaneo.
 
 **¿De dónde sale cada nombre?** Ojo, hay dos campos `nombre` y **no se sincronizan solos**:
 
@@ -723,26 +765,29 @@ Qué lee cada pantalla:
 | Calendario | `eventos` que empiezan en el mes actual |
 | Perfil, Credencial, Código QR | `alumnos/{No. de control}` (el QR se dibuja con `CETIS61:` + el No. de control) |
 | Entradas y salidas | `periodos/{periodoActual}/registros` del alumno: los 20 más recientes del semestre, agrupados por día; "Ver más" trae otros 20 |
-| Notificaciones | `usuarios/{uid}/notificaciones`, las 50 más recientes |
+| Notificaciones | `usuarios/{uid}/notificaciones`, las 50 más recientes, **en tiempo real** (el prefecto ve arriba, además, los grupos que salieron hoy) |
+| Campana y menú ☰ (todos) | `usuarios/{uid}/notificaciones` donde `leida` = false (hasta 10), **en tiempo real** |
 | Horario (alumno, padre, y el de cualquier grupo para prefecto y profesor) | `grupos/{grupoId}/horario/{día elegido}` |
 | Aviso para roles sin pantallas | `roles/{rol}` (nombre del perfil y si es solo web) |
-| Inicio (prefecto) | `periodos/{periodoActual}/salidasDeGrupo` donde `fecha` = hoy, **en tiempo real** |
+| Inicio (prefecto) | `periodos/{periodoActual}/salidasDeGrupo` donde `fecha` = hoy, y `registros` donde `fecha` = hoy (los 8 más recientes), **en tiempo real** |
+| Alertas de hoy (prefecto; también el contador del Inicio) | `periodos/{periodoActual}/registros` donde `fecha` = hoy y `alerta` es una de las seis, del más nuevo al más viejo, **en tiempo real** |
 | Horarios de grupos (prefecto) | `grupos` donde `periodoId` = semestre en curso y `turno` = el elegido, por `nombre` |
 | Inicio (profesor) | `grupos/{id}` de cada id en `usuarios/{uid}.grupos` |
 | Grupo (profesor) | `alumnos` donde `estado` = inscrito y `grupoId` = el grupo, por `apellidoPaterno`; y las salidas de hoy |
 | Perfil del alumno (profesor) | `alumnos/{No. de control}` y `alumnos/{No. de control}/estatus` (los 30 más recientes) |
 | Dar salida al grupo (profesor) | `grupos/{grupoId}/horario/{hoy}` (última clase) y las salidas de hoy |
-| Escáner y captura (prefecto) | `alumnos/{No. de control}`, sus 10 estatus más recientes y, si es salida, las salidas de grupo de hoy |
+| Escáner y captura (prefecto) | `alumnos/{No. de control}`, sus 10 estatus más recientes, `configuracion/plantel` (qué alertas se avisan) y, si es salida, las salidas de grupo de hoy |
+| Cambiar estatus (profesor) | `configuracion/plantel` (qué estatus se avisan al padre) |
 
-Qué **escribe** cada pantalla (todo lo permiten las reglas de §6; no hubo que cambiarlas):
+Qué **escribe** cada pantalla (todo lo permiten las reglas de §6):
 
 | Pantalla | Escribe | Campos |
 |---|---|---|
-| Cambiar estatus (profesor) | Crea `alumnos/{m}/estatus/{auto}` | `tipo` (falta, reporte, llamada_atencion o castigo), `descripcion`, `fecha`, `vigenteHasta` = null, `asignadoPor`, `asignadoPorNombre` |
+| Cambiar estatus (profesor) | **Todo de una vez:** crea `alumnos/{m}/estatus/{auto}` y, si el estatus se avisa (§4.8), un aviso en `usuarios/{padre}/notificaciones` para cada padre | Estatus: `tipo` (falta, reporte, llamada_atencion o castigo), `descripcion`, `fecha`, `vigenteHasta` = null, `asignadoPor`, `asignadoPorNombre`. Aviso: `tipo` = estatus (campos en §4.1) |
 | Dar salida al grupo (profesor) | Crea `periodos/{semestre}/salidasDeGrupo/{auto}` | `grupoId`, `grupo`, `fecha` (AAAA-MM-DD), `fechaHora`, `autorizadaPor`, `autorizadaPorNombre`, `materia` |
 | Cambiar contraseña (todos) | Cambia la contraseña en Authentication y actualiza `usuarios/{uid}` | `debeCambiarContrasena` = false, `contrasenaVence`, `actualizadoEn` |
 | Notificaciones (todos) | Actualiza `usuarios/{uid}/notificaciones/{id}` | `leida` = true |
-| Escáner y captura (prefecto) | **Todo de una vez:** crea `periodos/{semestre}/registros/{auto}` (siempre); si no hubo alerta, actualiza `alumnos/{n}` y crea `usuarios/{padre}/notificaciones/{auto}` para cada padre | Registro: ver §4.4. Alumno: `ubicacion` (dentro o fuera), `ultimoRegistro`, `actualizadoEn`. Aviso: `tipo` (entrada o salida), `titulo`, `mensaje`, `fecha`, `leida` = false, `alumnoId` |
+| Escáner y captura (prefecto) | **Todo de una vez:** crea `periodos/{semestre}/registros/{auto}` (siempre); si no hubo alerta, actualiza `alumnos/{n}`; y crea `usuarios/{padre}/notificaciones/{auto}` para cada padre si no hubo alerta o si la alerta se avisa (§4.8) | Registro: ver §4.4. Alumno: `ubicacion` (dentro o fuera), `ultimoRegistro`, `actualizadoEn`. Aviso: `tipo` = entrada, salida o alerta (campos en §4.1) |
 
 ---
 
@@ -815,6 +860,27 @@ Además (ya con la estructura por semestre de ADR-005):
 los 4 documentos de `usuarios` de la tabla; `alumnos/25311754` (con sus `inscripciones` y
 `privado`); y `grupos/2026-2027-1_102` (al borrarlo, la consola también borra su `horario`).
 El semestre `periodos/2026-2027-1` y `periodoActual` **no** son de prueba: se quedan.
+
+---
+
+## 10.2 La web y la base de datos
+
+La web de Control Escolar y Enfermería (carpeta `web/`, ADR-011) usa la **misma base, las
+mismas cuentas y las mismas reglas**. Su único archivo que habla con Firebase es
+`web/js/datos.js`.
+
+| Pantalla de la web | Lee | Escribe (todo de una vez, con avisos a los padres) |
+|---|---|---|
+| Iniciar sesión | `usuarios/{uid}` (solo entran `control_escolar` y `enfermeria`) | — |
+| Alumnos | `grupos` del semestre y turno; `alumnos` del grupo (inscritos, por apellido) o por `nombreBusqueda` (empieza con…); o `alumnos/{No. de control}` | — |
+| Perfil del alumno | `alumnos/{n}` (en vivo), `estatus`, `cambiosDeEstado`, `privado/salud`; Control Escolar también `privado/datos` y sus `registros` del semestre | — |
+| Pase de salud (Enfermería) | — | Crea `alumnos/{n}/estatus` (`pase_salud`, vale hoy) y un aviso `estatus` a cada padre |
+| Activar/desactivar por salud (Enfermería) o por pago (Control Escolar) | — | Cambia `activoPorSalud` o `activoPorPago` y `actualizadoEn`; crea `cambiosDeEstado` (`campo`, `valor`, `motivo`, `fecha`, `por`, `porNombre`) y un aviso `estado` a cada padre |
+| Datos de salud | `privado/salud` | Guarda `privado/salud` (solo los campos de la pantalla) |
+| Nuevo estatus (Control Escolar) | `configuracion/plantel` | Crea `estatus` (con `vigenteHasta` opcional) y, si el tipo se avisa (§4.8), un aviso `estatus` a cada padre |
+| Entradas y salidas (Control Escolar) | `periodos/{periodoActual}/registros` del día elegido, en vivo (con "solo alertas", el índice `fecha`, `alerta`, `fechaHora`) | — |
+| Avisos al padre (Control Escolar) | `configuracion/plantel` | Cambia `avisarAlPadreEstatus`, `avisarAlPadreAlertas` y `actualizadoEn` |
+| Notificaciones | `usuarios/{uid}/notificaciones` (en vivo) | `leida` = true |
 
 ---
 

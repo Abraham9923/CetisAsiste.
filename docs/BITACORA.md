@@ -11,6 +11,119 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ---
 
+## 20 de octubre de 2026
+
+### 20-03. Primera versión de la web de Control Escolar y Enfermería (ADR-011)
+
+- **Pedido del usuario:** "empieza a crear el apartado web, son 2 usuarios".
+- **Qué se hizo:**
+  - Carpeta nueva **`web/`**: una página con HTML, CSS y JavaScript **sin compilar**, con la
+    librería de Firebase 12.19.0 desde `gstatic.com`. Colores, letra y logo de la app.
+  - **Acceso:** usuario o correo y contraseña, como la app; solo entran `control_escolar` y
+    `enfermeria`; los demás ven "Esta cuenta se usa en la app…". Cambio de contraseña
+    obligatorio si toca. La cuenta se escucha en vivo.
+  - **Enfermería:** alumnos por grupo y búsqueda, perfil, **pase de salida por salud**,
+    **activar/desactivar por salud** y datos de salud.
+  - **Control Escolar:** lo mismo para ver alumnos, **activar/desactivar por pago**, **nuevo
+    estatus**, datos personales, entradas y salidas del alumno, **Entradas y salidas del
+    día** (en vivo, "solo alertas") y **Avisos al padre** (guarda
+    `configuracion/plantel.avisarAlPadreEstatus` y `avisarAlPadreAlertas`).
+  - Cada acción se guarda en un lote con los **avisos a los padres** (ADR-010), firmada con el
+    uid de la sesión. Notificaciones propias con contador en el menú.
+  - **Hosting:** `firebase/firebase.json` publica `web/` y configura los emuladores de
+    Authentication, Firestore y Hosting.
+  - **Emulador:** `firebase/emulador/datos-de-prueba.mjs` carga cuentas y datos "Prueba".
+  - La app ahora dice "El perfil de … se usa desde la web de CetisAsiste, en una computadora"
+    (antes: "que todavía no está lista"). `firebase/roles.json`: Enfermería confirmada en web.
+- **Archivos:** `web/` (nuevo: `index.html`, `css/estilos.css`, `js/*.js`,
+  `js/pantallas/*.js`, `pruebas/`, `README.md`, `package.json`, fuentes y logo copiados de la
+  app), `firebase/firebase.json`, `firebase/emulador/datos-de-prueba.mjs` (nuevo),
+  `firebase/roles.json`, `.gitignore`, `app/src/main/res/values/strings.xml`,
+  `ui/CetisApp.kt` (comentario). Documentos: ADR-011 (nuevo), BASE_DE_DATOS.md (§2, §4.9,
+  §10), PENDIENTES.md (§1, §8), TRASPASO_AGENTE.md.
+- **Cómo se comprobó:** `npm test` en `web/` pasa **10 pruebas** (`avisos.js` y
+  `formatos.js`). Con los emuladores (reglas reales) y Chromium, `npm run recorrido` pasa los
+  **18 pasos**: el padre no entra; Enfermería da un pase y desactiva por salud (en la base
+  quedan el estatus firmado y 2 avisos al padre); el cambio de contraseña obligatorio
+  funciona; Control Escolar activa por pago, pone un castigo (aviso al padre), ve 3 entradas
+  con 2 alertas, guarda los avisos al padre y marca sus notificaciones como leídas; en un
+  teléfono de 390 px no hay scroll horizontal. Se revisaron las capturas (se corrigió el
+  contraste de la tarjeta guinda y el menú del teléfono). La app vuelve a compilar con sus 30
+  pruebas. **No se probó con la base real** (falta registrar la web en Firebase y publicarla).
+
+### 20-02. Revisión de la arquitectura de todo el sistema
+
+- **Pedido del usuario:** "analiza la arquitectura del proyecto, dime qué le mejorarías".
+- **Qué se hizo:** documento nuevo [ARQUITECTURA.md](ARQUITECTURA.md) con cómo está el
+  sistema, lo que conviene conservar y **qué mejorar, por prioridad**: el escaneo sin señal
+  se queda en "Guardando…" (A1), la hora la pone el teléfono (A2), un solo proyecto para
+  pruebas y plantel (A3), el plan (A4), aviso de privacidad y Analytics (B1), custom claims
+  (B2), App Check (B3), respaldos (B4), un script de administración con el Admin SDK para
+  importar alumnos y crear cuentas (E1), GitHub Actions (D1) y sacar `.idea/` de git (D2).
+  ADR-008 ahora enlaza a esta revisión (§3.4 dice qué avanzó). **No se cambió código**: el
+  usuario decide qué se aplica.
+- **Archivos:** `docs/ARQUITECTURA.md` (nuevo), `docs/adr/ADR-008-mejoras-a-la-estructura.md`,
+  `docs/PENDIENTES.md` (§12).
+- **Cómo se comprobó:** cada punto se revisó en el código (por ejemplo, `lote.commit().await()`
+  en `CetisRepositorio.registrarEscaneo` para A1 y `Timestamp.now()` para A2).
+
+### 20-01. Notificaciones, alertas y avisos para padres y prefectos (ADR-010)
+
+- **Pedido del usuario:** "encárgate de la gestión del sistema de notificaciones, alertas y
+  avisos, tanto para los padres como las alertas para los prefectos".
+- **Qué se hizo:**
+  - **Un solo buzón** por cuenta (`usuarios/{uid}/notificaciones`) para todos los avisos.
+    Nuevo `datos/Avisos.kt` (a quién se avisa y cómo se arma el aviso, sin Firebase) y
+    `TipoAviso` en `Modelos.kt`. Cada aviso trae ahora `creadaPor` y `venceEn` (+60 días).
+  - **Padre:** además de cada entrada y salida, recibe un aviso cuando el profesor pone falta,
+    reporte, llamada de atención o castigo (con la descripción), y cuando al escanear a su
+    hijo hay alerta de "inactivo" o "salida fuera de horario". El plantel lo cambia con
+    `configuracion/plantel.avisarAlPadreEstatus` y `avisarAlPadreAlertas` (si no existen, se
+    usa lo de por omisión). Antes, con alerta no se le avisaba (ADR-009 punto 6).
+  - **Campana en vivo (los cuatro roles):** el punto rojo sale **solo** si hay avisos sin leer
+    (antes salía siempre; nuevo ícono `ic_bell` sin punto); el menú ☰ muestra cuántos ("3",
+    "9+") con el nuevo estilo `Cetis.Contador`. La pantalla Notificaciones se escucha en
+    tiempo real; "Marcar todas como leídas" solo sale si hay algo sin leer. Íconos por tipo
+    (alerta en rojo, estatus, estado, grupo que salió).
+  - **Prefecto:** en el Inicio, "Últimos escaneos" (8, en vivo, en rojo los que tuvieron
+    alerta) y el renglón "Alertas de hoy" con cuántas van; pantalla nueva **Alertas de hoy**
+    (`prefecto_alertas.xml`, también en el menú ☰); el resultado del escaneo dice **por qué**
+    saltó la alerta; en Notificaciones ve los grupos que salieron hoy.
+  - **Profesor:** "Cambiar estatus" avisa si el padre recibirá el aviso; el estatus y los
+    avisos se guardan en un mismo lote.
+  - **Reglas:** el buzón acepta solo avisos con la forma correcta y firmados; prefecto y
+    Enfermería solo avisan a los padres del alumno, el profesor solo a los de sus grupos.
+    Estatus (`asignadoPor`) y cambios de estado (`por`) también deben ir firmados.
+  - **Pruebas de las reglas** con el emulador: `firebase/pruebas-reglas/` (21 pruebas; 6 fallan
+    con las reglas anteriores). `firebase/firebase.json` ahora configura el emulador.
+  - **Índice nuevo:** `registros` (`fecha`, `alerta`, `fechaHora`) para "Alertas de hoy".
+  - **Menos lecturas:** `configuracion/plantel` se guarda 5 minutos en memoria (antes se leía
+    dos veces en cada escaneo).
+- **Archivos:** `datos/Avisos.kt` (nuevo), `datos/Modelos.kt`, `datos/CetisRepositorio.kt`,
+  `datos/Escaneo.kt` (`castigoVigente`), `ui/comun/Carga.kt` (`sinLeerEnVivo`),
+  `ui/comun/PantallasComunes.kt`, `ui/comun/VistasComunes.kt` (`marcarCampana`, contador del
+  menú), `ui/comun/VariablesComunes.kt`, `ui/alumno/AlumnoApp.kt`, `ui/padres/PadresApp.kt`,
+  `ui/prefecto/PrefectoApp.kt`, `ui/prefecto/PrefectoVistas.kt`,
+  `ui/prefecto/EscaneoPrefecto.kt`, `ui/profesor/ProfesorApp.kt`,
+  `ui/profesor/ProfesorVistas.kt`; `res/layout/prefecto_alertas.xml` (nuevo),
+  `prefecto_inicio.xml`, `prefecto_resultado.xml`, `profesor_cambiar_estatus.xml`,
+  `comun_menu.xml`; `res/drawable/ic_bell.xml` y `shape_contador.xml` (nuevos);
+  `strings_prefecto.xml`, `strings_profesor.xml`, `strings_comun.xml`, `styles_cetis.xml`;
+  `app/src/test/.../AvisosTest.kt` (nuevo); `firebase/firestore.rules`,
+  `firebase/firestore.indexes.json`, `firebase/firebase.json`, `firebase/pruebas-reglas/`
+  (nuevo). Documentos: ADR-010 (nuevo), BASE_DE_DATOS.md (§4.1, §4.8, §6, §7, §10),
+  MANUAL_TECNICO.md, VISTAS_POR_ROL.md, PENDIENTES.md.
+- **Cómo se comprobó:** en la sesión en la nube (Linux, con el SDK de Android 37):
+  `gradlew :app:assembleDebug` compila; `:app:testDebugUnitTest` pasa las **30 pruebas** (20
+  de `EscaneoTest`, 9 de `AvisosTest` y la de ejemplo); `:app:lintDebug` sin errores. Las
+  reglas pasan sus **21 pruebas** en el emulador de Firestore. **No se probó en el teléfono**
+  (no hay teléfono en la nube): lo prueba el usuario (PENDIENTES §10, "Avisos").
+- **Falta (lo hace el usuario en la consola):** publicar las reglas, crear el índice e
+  instalar la app nueva al mismo tiempo (PENDIENTES §1, punto 4). Los `.docx` no se generaron
+  (en la nube no hay Word): correr `md_a_word.ps1` con cada `.md` cambiado.
+
+---
+
 ## 19 de octubre de 2026
 
 ### 19-35. No. de control de 14 dígitos, QR con el No. de control y escaneo del prefecto (ADR-009)

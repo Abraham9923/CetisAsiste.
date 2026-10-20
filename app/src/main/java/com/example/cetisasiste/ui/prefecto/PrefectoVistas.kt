@@ -11,8 +11,10 @@ import androidx.core.content.ContextCompat
 import com.example.cetisasiste.R
 import com.example.cetisasiste.datos.Alerta
 import com.example.cetisasiste.datos.AlumnoDoc
+import com.example.cetisasiste.datos.EstatusDoc
 import com.example.cetisasiste.datos.Formatos
 import com.example.cetisasiste.datos.GrupoDoc
+import com.example.cetisasiste.datos.RegistroDoc
 import com.example.cetisasiste.datos.SalidaDeGrupoDoc
 import com.example.cetisasiste.datos.TipoRegistro
 import com.example.cetisasiste.datos.Turno
@@ -29,12 +31,41 @@ import com.example.cetisasiste.ui.comun.texto
 object PrefectoVistas {
 
     /**
-     * prefecto_inicio.xml. [salidas] son los grupos que ya salieron hoy; null mientras carga.
-     * [hoy] es la fecha como se lee ("Hoy · lunes 19 de octubre").
+     * prefecto_inicio.xml. [hoy] es la fecha como se lee ("Hoy · lunes 19 de octubre").
+     * [escaneos] son los últimos escaneos de hoy y [salidas] los grupos que ya salieron hoy
+     * (null mientras cargan); [alertasDeHoy] cuántas alertas van hoy. Al tocar el renglón
+     * "Alertas de hoy" se llama a [alTocarAlertas].
      */
-    fun llenarInicio(vista: View, nombre: String, hoy: String, salidas: List<SalidaDeGrupoDoc>?) {
+    fun llenarInicio(
+        vista: View,
+        nombre: String,
+        hoy: String,
+        salidas: List<SalidaDeGrupoDoc>?,
+        escaneos: List<RegistroDoc>?,
+        alertasDeHoy: Int,
+        alTocarAlertas: () -> Unit,
+    ) {
+        val contexto = vista.context
         vista.texto(R.id.txt_nombre, nombre)
         vista.texto(R.id.txt_fecha, hoy)
+        VistasComunes.llenarRenglon(
+            vista.findViewById(R.id.fila_alertas),
+            Renglon(
+                icono = R.drawable.ic_warning,
+                titulo = contexto.getString(R.string.prefecto_alertas_fila),
+                detalle = if (alertasDeHoy > 0) {
+                    contexto.resources.getQuantityString(R.plurals.prefecto_alertas_cuantas, alertasDeHoy, alertasDeHoy)
+                } else {
+                    contexto.getString(R.string.prefecto_alertas_ninguna)
+                },
+                fondoIcono = if (alertasDeHoy > 0) R.drawable.shape_circulo_peligro else R.drawable.shape_circulo_brand,
+            ),
+            alTocar = alTocarAlertas,
+        )
+        VistasComunes.llenarLista(vista.findViewById(R.id.lista_escaneos), escaneos.orEmpty(), R.layout.comun_item_lista) { fila, registro ->
+            VistasComunes.llenarRenglon(fila, renglonDeEscaneo(contexto, registro))
+        }
+        vista.mostrar(R.id.txt_vacio_escaneos, escaneos?.isEmpty() == true)
         VistasComunes.llenarLista(vista.findViewById(R.id.lista_salidas), salidas.orEmpty(), R.layout.comun_item_lista) { fila, salida ->
             VistasComunes.llenarRenglon(
                 fila,
@@ -74,6 +105,48 @@ object PrefectoVistas {
             )
         }
         vista.mostrar(R.id.txt_vacio, grupos?.isEmpty() == true)
+    }
+
+    /** prefecto_alertas.xml: cuántas alertas van hoy y un renglón por alerta ([alertas] es null mientras carga). */
+    fun llenarAlertas(vista: View, alertas: List<RegistroDoc>?) {
+        val contexto = vista.context
+        val cuantas = alertas?.size ?: 0
+        vista.mostrar(R.id.txt_resumen, alertas != null)
+        vista.texto(R.id.txt_resumen, contexto.resources.getQuantityString(R.plurals.prefecto_alertas_resumen, cuantas, cuantas))
+        vista.mostrar(R.id.txt_contador, cuantas > 0)
+        vista.texto(R.id.txt_contador, cuantas.toString())
+        VistasComunes.llenarLista(vista.findViewById(R.id.lista_alertas), alertas.orEmpty(), R.layout.comun_item_lista) { fila, registro ->
+            VistasComunes.llenarRenglon(fila, renglonDeEscaneo(contexto, registro))
+        }
+        vista.mostrar(R.id.txt_vacio, alertas?.isEmpty() == true)
+    }
+
+    /**
+     * Un escaneo como renglón: nombre del alumno (o el número, si no existe), hora, Entrada o
+     * Salida y, si tuvo alerta, cuál (con el círculo en rojo).
+     */
+    private fun renglonDeEscaneo(contexto: Context, registro: RegistroDoc): Renglon {
+        val entrada = registro.tipo == TipoRegistro.ENTRADA
+        val alerta = registro.alerta
+        val partes = listOfNotNull(
+            Formatos.hora(registro.fechaHora),
+            contexto.getString(if (entrada) R.string.prefecto_entrada else R.string.prefecto_salida),
+            alerta?.let { contexto.getString(tituloDeAlerta(it)) },
+        )
+        return Renglon(
+            icono = when {
+                alerta != null -> R.drawable.ic_warning
+                entrada -> R.drawable.ic_log_in
+                else -> R.drawable.ic_log_out
+            },
+            titulo = registro.alumnoNombre.trim().ifBlank { contexto.getString(R.string.prefecto_escaneo_sin_alumno, registro.alumnoId) },
+            detalle = partes.joinToString(" · "),
+            fondoIcono = when {
+                alerta != null -> R.drawable.shape_circulo_peligro
+                entrada -> R.drawable.shape_circulo_brand
+                else -> R.drawable.shape_circulo_accent
+            },
+        )
     }
 
     // ---------- Escaneo ----------
@@ -155,10 +228,15 @@ object PrefectoVistas {
         vista.mostrar(R.id.chip_alerta, etiqueta != null)
         etiqueta?.let { vista.texto(R.id.txt_alerta, it) }
 
+        val motivo = motivoDeAlerta(contexto, resultado)
+        vista.mostrar(R.id.txt_motivo, motivo != null)
+        motivo?.let { vista.texto(R.id.txt_motivo, it) }
+
         val aviso = vista.findViewById<TextView>(R.id.txt_aviso)
         aviso.setBackgroundResource(if (ok) R.drawable.shape_aviso_exito else R.drawable.shape_aviso_peligro)
         aviso.setText(
             when {
+                !ok && resultado.seAvisoAlPadre -> R.string.prefecto_alerta_guardada_y_aviso
                 !ok -> R.string.prefecto_alerta_guardada
                 !resultado.seAvisoAlPadre -> R.string.prefecto_sin_padre
                 resultado.tipo == TipoRegistro.ENTRADA -> R.string.prefecto_aviso_padre_entrada
@@ -167,8 +245,29 @@ object PrefectoVistas {
         )
     }
 
+    /** Por qué saltó la alerta, en una frase para el prefecto; null si no hubo alerta. */
+    private fun motivoDeAlerta(contexto: Context, resultado: ResultadoEscaneo): String? {
+        val alumno = resultado.alumno
+        return when (resultado.alerta) {
+            null -> null
+            Alerta.NO_DADO_DE_ALTA -> contexto.getString(if (alumno == null) R.string.prefecto_motivo_no_existe else R.string.prefecto_motivo_baja)
+            Alerta.INACTIVO -> contexto.getString(
+                if (alumno?.activoPorPago == false) R.string.prefecto_motivo_inactivo_pago else R.string.prefecto_motivo_inactivo_salud,
+            )
+            Alerta.YA_INGRESO -> contexto.getString(
+                R.string.prefecto_motivo_ya_ingreso, Formatos.horaOFecha(alumno?.ultimoRegistro?.fechaHora),
+            )
+            Alerta.NO_HA_INGRESADO -> contexto.getString(R.string.prefecto_motivo_no_ha_ingresado)
+            Alerta.CASTIGO -> resultado.castigo?.takeIf { it.descripcion.isNotBlank() }
+                ?.let { contexto.getString(R.string.prefecto_motivo_castigo, it.descripcion.trim(), it.asignadoPorNombre.trim()) }
+                ?: contexto.getString(R.string.prefecto_motivo_castigo_sin_detalle)
+            else -> contexto.getString(R.string.prefecto_motivo_salida_fuera)
+        }
+    }
+
+    /** Título de cada alerta ("Alumno inactivo"…). También va en el aviso al padre y en las listas. */
     @StringRes
-    private fun tituloDeAlerta(alerta: String?): Int = when (alerta) {
+    fun tituloDeAlerta(alerta: String?): Int = when (alerta) {
         Alerta.NO_DADO_DE_ALTA -> R.string.prefecto_alerta_no_dado_de_alta
         Alerta.INACTIVO -> R.string.prefecto_alerta_inactivo
         Alerta.YA_INGRESO -> R.string.prefecto_alerta_ya_ingreso
@@ -205,4 +304,6 @@ data class ResultadoEscaneo(
     val alerta: String?,
     val fechaHora: Timestamp,
     val seAvisoAlPadre: Boolean,
+    /** El castigo vigente (si la alerta es por castigo), para decir de qué se trata. */
+    val castigo: EstatusDoc? = null,
 )
