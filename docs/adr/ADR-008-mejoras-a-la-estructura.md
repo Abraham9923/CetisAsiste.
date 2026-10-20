@@ -1,7 +1,8 @@
 # ADR-008: Mejoras a la estructura del proyecto (propuesta)
 
 **Estado:** Propuesta (19 de octubre de 2026). Nada de esto está hecho todavía: el usuario
-decide qué se aplica y en qué orden.
+decide qué se aplica y en qué orden. **Revisada el 20 de octubre** junto con todo el sistema
+en [ARQUITECTURA.md](../ARQUITECTURA.md) §3.4 (qué avanzó y qué es ahora más urgente).
 **Fecha:** 19 de octubre de 2026
 **Quién decide:** el equipo de CetisAsiste
 

@@ -13,6 +13,22 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ## 20 de octubre de 2026
 
+### 20-02. Revisión de la arquitectura de todo el sistema
+
+- **Pedido del usuario:** "analiza la arquitectura del proyecto, dime qué le mejorarías".
+- **Qué se hizo:** documento nuevo [ARQUITECTURA.md](ARQUITECTURA.md) con cómo está el
+  sistema, lo que conviene conservar y **qué mejorar, por prioridad**: el escaneo sin señal
+  se queda en "Guardando…" (A1), la hora la pone el teléfono (A2), un solo proyecto para
+  pruebas y plantel (A3), el plan (A4), aviso de privacidad y Analytics (B1), custom claims
+  (B2), App Check (B3), respaldos (B4), un script de administración con el Admin SDK para
+  importar alumnos y crear cuentas (E1), GitHub Actions (D1) y sacar `.idea/` de git (D2).
+  ADR-008 ahora enlaza a esta revisión (§3.4 dice qué avanzó). **No se cambió código**: el
+  usuario decide qué se aplica.
+- **Archivos:** `docs/ARQUITECTURA.md` (nuevo), `docs/adr/ADR-008-mejoras-a-la-estructura.md`,
+  `docs/PENDIENTES.md` (§12).
+- **Cómo se comprobó:** cada punto se revisó en el código (por ejemplo, `lote.commit().await()`
+  en `CetisRepositorio.registrarEscaneo` para A1 y `Timestamp.now()` para A2).
+
 ### 20-01. Notificaciones, alertas y avisos para padres y prefectos (ADR-010)
 
 - **Pedido del usuario:** "encárgate de la gestión del sistema de notificaciones, alertas y

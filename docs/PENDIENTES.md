@@ -219,6 +219,11 @@ juntos lo que salga.
 
 ## 12. Estructura del código (propuesta, ADR-008)
 
+> **20 de octubre:** la revisión de **todo el sistema** está en [ARQUITECTURA.md](ARQUITECTURA.md),
+> con más puntos (escaneo sin señal, hora del servidor, proyecto de pruebas, App Check,
+> custom claims, respaldos, script de administración, GitHub Actions). Su §4 trae el orden
+> que se propone. Esta tabla sigue siendo la del código de la app.
+
 Mejoras que **el usuario decide** si se hacen. En orden: primero lo barato y seguro.
 
 | # | Mejora | Esfuerzo | Cuándo |
