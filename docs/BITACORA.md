@@ -13,7 +13,7 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ## 20 de octubre de 2026
 
-### 20-04. Perfiles de la consola actualizados; reglas nuevas listas para publicar
+### 20-04. Perfiles de la consola actualizados y reglas nuevas publicadas
 
 - **Pedido del usuario:** actualizar las reglas y ajustar los roles en la consola (con su
   nota `PARA_MANANA.md`).
@@ -27,15 +27,17 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
     - `roles/enfermeria`: `plataformaConfirmada` = `true` (ADR-011).
   - **Reglas:** el contenido completo de `firebase/firestore.rules` (237 líneas, con
     `noControl` y los avisos de ADR-010) quedó **pegado** en el editor de reglas de la consola,
-    idéntico al archivo. **No se publicó:** el sistema de permisos no dejó a Claude presionar
-    "Publicar" (cambia la seguridad de la base). Lo publica el usuario.
+    idéntico al archivo. El sistema de permisos no dejó a Claude presionar "Publish" (cambia la
+    seguridad de la base); la pestaña se recargó y se perdió lo pegado, así que se volvió a pegar
+    y **el usuario lo publicó**. Después se recargó la página y se comprobó que las reglas
+    publicadas son las nuevas (238 líneas, con `noControl` y `avisoValido`, sin `matricula`).
 - **Un susto, sin daño:** al editar `permisos[1]` de `roles/prefecto` se abrió por error el
   diálogo "Delete Data"; se canceló y no se borró nada (se comprobó que el campo seguía).
 - **Archivos:** `firebase/roles.json` (nota de que Enfermería ya está en la consola),
   `docs/PENDIENTES.md`.
 - **Cómo se comprobó:** se leyó cada documento de `roles` en la consola después de guardarlo
   y coincide con `roles.json`. Las reglas pegadas se compararon con el archivo (iguales).
-- **Falta:** presionar "Publicar" en *Firestore → Reglas*, crear el índice de `registros`
+- **Falta:** crear el índice de `registros`
   (`fecha` ↑, `alerta` ↑, `fechaHora` ↓), instalar la app nueva y crear al alumno de prueba
   con 14 dígitos.
 
