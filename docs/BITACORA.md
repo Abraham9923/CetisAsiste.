@@ -13,6 +13,31 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ## 20 de octubre de 2026
 
+### 20-05. Web registrada en Firebase y abierta en esta computadora sin Node.js
+
+- **Pedido del usuario:** ver la web funcionando contra la base real, en esta PC (Windows,
+  sin Node.js ni Python).
+- **Qué se hizo:**
+  - **App web registrada** en la consola (Configuración del proyecto → *Tus apps* → Web),
+    con el nombre "CetisAsiste web" y **sin** Hosting. Su `apiKey` y `appId` quedaron en
+    `web/js/config.js`. Con eso la web ya usa la **base real** también en `localhost`; el
+    emulador ahora se pide con `?emulador`.
+  - **Servidor web sin Node:** `docs/herramientas/servidor_web.ps1`, hecho con lo que trae
+    Windows (PowerShell 5.1). Entrega la carpeta `web/` en <http://localhost:5000> con el tipo
+    correcto de cada archivo (los `.js` como `text/javascript`, porque son módulos), sin caché
+    y sin dejar salir de `web/`. Está fuera de `web/` para que no se publique.
+  - `.claude/launch.json`: configuración "web" que enciende ese servidor, para abrirla en el
+    navegador integrado de Claude.
+- **Archivos:** `web/js/config.js`, `docs/herramientas/servidor_web.ps1` (nuevo),
+  `.claude/launch.json` (nuevo), `web/README.md`, `docs/PENDIENTES.md`.
+- **Cómo se comprobó:** con el servidor encendido, la pantalla de acceso carga en el
+  navegador integrado sin errores en la consola y sin la franja amarilla del emulador; el
+  servidor entregó todos los archivos de la página (HTML, CSS, módulos, fuentes y logo, con 200) y responde 404 a un archivo
+  que no existe. Se corrigió un error con las peticiones `HEAD` (pedían solo encabezados y el
+  servidor intentaba mandar el archivo). Después **el usuario entró con su cuenta de Control
+  Escolar** (Claude no escribe contraseñas) y confirmó que la web funciona con la base real.
+- **Falta:** **publicar la web** con Firebase Hosting (necesita Node.js).
+
 ### 20-04. Perfiles de la consola actualizados y reglas nuevas publicadas
 
 - **Pedido del usuario:** actualizar las reglas y ajustar los roles en la consola (con su

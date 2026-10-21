@@ -44,9 +44,8 @@ fija (12.19.0, en `firebase.js` y `datos.js`). Todo el texto de la base se pone 
 
 ## Ponerla a funcionar (una sola vez)
 
-1. **Registrar la web en Firebase:** consola → ⚙ *Configuración del proyecto* → *Tus apps* →
-   *Agregar app* → **Web** (`</>`) → nombre "CetisAsiste web" (no marques Hosting todavía).
-   Copia `apiKey` y `appId` en [`js/config.js`](js/config.js).
+1. ~~**Registrar la web en Firebase**~~ **Hecho** (20 oct): se llama "CetisAsiste web" y su
+   `apiKey` y `appId` ya están en [`js/config.js`](js/config.js).
 2. **Publicar las reglas** (`firebase/firestore.rules`) y **crear el índice** de alertas, si
    no se ha hecho (PENDIENTES §1, punto 4). La web necesita las reglas nuevas.
 3. **Confirmar Enfermería en la web:** en `roles/enfermeria`, `plataformaConfirmada` = `true`
@@ -67,6 +66,21 @@ fija (12.19.0, en `firebase.js` y `datos.js`). Todo el texto de la base se pone 
 > servidor). Siguen dándose de alta en la consola (BASE_DE_DATOS §9) hasta tener el script
 > de administración (ARQUITECTURA.md, punto E1).
 
+## Abrirla en esta computadora sin Node.js (base real)
+
+Windows ya trae lo necesario. En PowerShell, desde la raíz del proyecto:
+
+```bash
+powershell -ExecutionPolicy Bypass -File docs\herramientas\servidor_web.ps1
+```
+
+Abre <http://localhost:5000> y entra con tu cuenta de Control Escolar o Enfermería. Usa la
+**base real**: lo que hagas ahí lo ven los padres en su app. Para apagarlo: `Ctrl+C`.
+
+El script ([`servidor_web.ps1`](../docs/herramientas/servidor_web.ps1)) solo entrega los
+archivos de esta carpeta; no guarda nada. Si el puerto 5000 está ocupado, agrega
+`-Puerto 5050`.
+
 ## Probar en tu computadora (sin tocar la base real)
 
 Con el **emulador de Firebase** (necesitas Node.js y Java; sirve el de Android Studio):
@@ -82,9 +96,8 @@ cd firebase
 node emulador/datos-de-prueba.mjs
 ```
 
-Abre <http://127.0.0.1:5000>. Mientras `apiKey` esté vacío en `config.js`, la web usa el
-emulador sola (arriba sale una franja amarilla que lo dice). Si ya llenaste `config.js`,
-abre <http://127.0.0.1:5000/?emulador>.
+Abre <http://127.0.0.1:5000/?emulador> (como `config.js` ya está lleno, sin `?emulador` la
+web usaría la base real). Arriba sale una franja amarilla que dice que es el emulador.
 
 Cuentas de prueba (contraseña `prueba1234`): `control.prueba`, `enfermeria.prueba`,
 `cambio.prueba` (debe cambiar su contraseña al entrar) y `padre.prueba` (no puede entrar).
