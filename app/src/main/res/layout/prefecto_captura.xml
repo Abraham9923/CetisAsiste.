@@ -25,6 +25,12 @@
                     android:id="@+id/txt_titulo"
                     style="@style/Cetis.BarraSuperior.Titulo"
                     android:text="@string/prefecto_titulo_captura" />
+                <!-- Campana: la muestra y la conecta el código (PantallaXml) -->
+                <ImageButton
+                    android:id="@+id/btn_notificaciones"
+                    style="@style/Cetis.BarraSuperior.Campana"
+                    android:layout_marginStart="@dimen/cetis_space_8"
+                    android:visibility="gone" />
             </LinearLayout>
         </FrameLayout>
 

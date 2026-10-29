@@ -3,6 +3,7 @@ package com.example.cetisasiste.ui.prefecto
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,8 +21,10 @@ import com.example.cetisasiste.datos.Sesion
 import com.example.cetisasiste.datos.Turno
 import com.example.cetisasiste.ui.comun.CalendarioXml
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
+import com.example.cetisasiste.ui.comun.Campana
 import com.example.cetisasiste.ui.comun.HorarioXml
 import com.example.cetisasiste.ui.comun.Notificacion
+import com.example.cetisasiste.ui.comun.LocalCampana
 import com.example.cetisasiste.ui.comun.NotificacionesXml
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.PerfilPersonalXml
@@ -107,116 +110,117 @@ fun PrefectoApp(
             sinLeer = sinLeer,
         )
 
-    when (val pantalla = pila.last()) {
-        PrefectoPantalla.Inicio -> {
-            // Últimos escaneos de hoy: solo se escuchan mientras se ve el Inicio.
-            val flujoEscaneos = remember { CetisRepositorio.escucharEscaneosDeHoy() }
-            val escaneos = flujoEscaneos.collectAsState(initial = null).value?.getOrDefault(emptyList())
-            val hoy = remember { Formatos.tituloDeDia(Timestamp.now()) }
-            PantallaXml(R.layout.prefecto_inicio, modifier) { vista ->
-                PrefectoVistas.llenarInicio(
-                    vista, sesion.usuario.nombre.trim(), hoy, salidas, escaneos,
-                    alertasDeHoy = alertas?.size ?: 0,
-                    alTocarAlertas = { pestana(PrefectoPantalla.Alertas) },
-                )
-                VistasComunes.marcarCampana(vista, sinLeer)
-                vista.alTocar(R.id.btn_notificaciones) { abrir(PrefectoPantalla.Notificaciones) }
-                vista.alTocar(R.id.card_escanear) { pestana(PrefectoPantalla.Escanear) }
-                vista.alTocar(R.id.card_no_control) {
-                    escaneo.mensaje = null
-                    abrir(PrefectoPantalla.Captura)
+    // La campana sale en la barra de arriba de todas las pantallas (menos en Notificaciones).
+    CompositionLocalProvider(LocalCampana provides Campana(sinLeer) { abrir(PrefectoPantalla.Notificaciones) }) {
+        when (val pantalla = pila.last()) {
+            PrefectoPantalla.Inicio -> {
+                // Últimos escaneos de hoy: solo se escuchan mientras se ve el Inicio.
+                val flujoEscaneos = remember { CetisRepositorio.escucharEscaneosDeHoy() }
+                val escaneos = flujoEscaneos.collectAsState(initial = null).value?.getOrDefault(emptyList())
+                val hoy = remember { Formatos.tituloDeDia(Timestamp.now()) }
+                PantallaXml(R.layout.prefecto_inicio, modifier) { vista ->
+                    PrefectoVistas.llenarInicio(
+                        vista, sesion.usuario.nombre.trim(), hoy, salidas, escaneos,
+                        alertasDeHoy = alertas?.size ?: 0,
+                        alTocarAlertas = { pestana(PrefectoPantalla.Alertas) },
+                    )
+                    vista.alTocar(R.id.card_escanear) { pestana(PrefectoPantalla.Escanear) }
+                    vista.alTocar(R.id.card_no_control) {
+                        escaneo.mensaje = null
+                        abrir(PrefectoPantalla.Captura)
+                    }
+                    vista.alTocar(R.id.card_horarios) { pestana(PrefectoPantalla.Horarios) }
+                    vista.alTocar(R.id.card_calendario) { pestana(PrefectoPantalla.Calendario) }
+                    conectarMenu(vista, pantalla)
                 }
-                vista.alTocar(R.id.card_horarios) { pestana(PrefectoPantalla.Horarios) }
-                vista.alTocar(R.id.card_calendario) { pestana(PrefectoPantalla.Calendario) }
+            }
+
+            PrefectoPantalla.Escanear -> EscanerXml(
+                estado = escaneo,
+                sesion = sesion,
+                conectarMenu = { conectarMenu(it, pantalla) },
+                onCaptura = { abrir(PrefectoPantalla.Captura) },
+                onResultado = { abrir(PrefectoPantalla.Resultado) },
+                modifier = modifier,
+            )
+
+            PrefectoPantalla.Alertas -> PantallaXml(R.layout.prefecto_alertas, modifier) { vista ->
+                PrefectoVistas.llenarAlertas(vista, alertas)
                 conectarMenu(vista, pantalla)
             }
-        }
 
-        PrefectoPantalla.Escanear -> EscanerXml(
-            estado = escaneo,
-            sesion = sesion,
-            conectarMenu = { conectarMenu(it, pantalla) },
-            onCaptura = { abrir(PrefectoPantalla.Captura) },
-            onResultado = { abrir(PrefectoPantalla.Resultado) },
-            modifier = modifier,
-        )
+            PrefectoPantalla.Captura -> CapturaXml(
+                estado = escaneo,
+                sesion = sesion,
+                onRegresar = ::regresar,
+                onResultado = { abrir(PrefectoPantalla.Resultado) },
+                modifier = modifier,
+            )
 
-        PrefectoPantalla.Alertas -> PantallaXml(R.layout.prefecto_alertas, modifier) { vista ->
-            PrefectoVistas.llenarAlertas(vista, alertas)
-            conectarMenu(vista, pantalla)
-        }
+            PrefectoPantalla.Resultado -> ResultadoXml(escaneo, onSiguiente = ::regresar, modifier = modifier)
 
-        PrefectoPantalla.Captura -> CapturaXml(
-            estado = escaneo,
-            sesion = sesion,
-            onRegresar = ::regresar,
-            onResultado = { abrir(PrefectoPantalla.Resultado) },
-            modifier = modifier,
-        )
-
-        PrefectoPantalla.Resultado -> ResultadoXml(escaneo, onSiguiente = ::regresar, modifier = modifier)
-
-        PrefectoPantalla.Horarios -> {
-            val grupos by produceState<List<Pair<String, GrupoDoc>>?>(null, turno) {
-                value = null
-                value = cargar { CetisRepositorio.gruposDelTurno(turno) }.o(emptyList())
-            }
-            PantallaXml(R.layout.prefecto_horarios, modifier) { vista ->
-                PrefectoVistas.llenarHorarios(vista, turno, grupos) { id, grupo ->
-                    grupoElegido = id to grupo.nombre.trim()
-                    abrir(PrefectoPantalla.HorarioDeGrupo)
+            PrefectoPantalla.Horarios -> {
+                val grupos by produceState<List<Pair<String, GrupoDoc>>?>(null, turno) {
+                    value = null
+                    value = cargar { CetisRepositorio.gruposDelTurno(turno) }.o(emptyList())
                 }
-                vista.alTocar(R.id.chip_matutino) { turno = Turno.MATUTINO }
-                vista.alTocar(R.id.chip_vespertino) { turno = Turno.VESPERTINO }
-                conectarMenu(vista, pantalla)
+                PantallaXml(R.layout.prefecto_horarios, modifier) { vista ->
+                    PrefectoVistas.llenarHorarios(vista, turno, grupos) { id, grupo ->
+                        grupoElegido = id to grupo.nombre.trim()
+                        abrir(PrefectoPantalla.HorarioDeGrupo)
+                    }
+                    vista.alTocar(R.id.chip_matutino) { turno = Turno.MATUTINO }
+                    vista.alTocar(R.id.chip_vespertino) { turno = Turno.VESPERTINO }
+                    conectarMenu(vista, pantalla)
+                }
             }
-        }
 
-        PrefectoPantalla.Calendario -> CalendarioXml(
-            conectarMenu = { conectarMenu(it, pantalla) },
-            modifier = modifier,
-        )
+            PrefectoPantalla.Calendario -> CalendarioXml(
+                conectarMenu = { conectarMenu(it, pantalla) },
+                modifier = modifier,
+            )
 
-        PrefectoPantalla.Perfil -> PerfilPersonalXml(
-            sesion = sesion,
-            rol = stringResource(R.string.prefecto_rol),
-            conectarMenu = { conectarMenu(it, pantalla) },
-            onCambiarContrasena = { abrir(PrefectoPantalla.CambiarContrasena) },
-            onCerrarSesion = onCerrarSesion,
-            modifier = modifier,
-        )
+            PrefectoPantalla.Perfil -> PerfilPersonalXml(
+                sesion = sesion,
+                rol = stringResource(R.string.prefecto_rol),
+                conectarMenu = { conectarMenu(it, pantalla) },
+                onCambiarContrasena = { abrir(PrefectoPantalla.CambiarContrasena) },
+                onCerrarSesion = onCerrarSesion,
+                modifier = modifier,
+            )
 
-        PrefectoPantalla.HorarioDeGrupo -> HorarioXml(
-            grupoId = grupoElegido.first,
-            nombreGrupo = grupoElegido.second,
-            titulo = stringResource(R.string.comun_grupo_titulo, grupoElegido.second),
-            onRegresar = ::regresar,
-            modifier = modifier,
-        )
+            PrefectoPantalla.HorarioDeGrupo -> HorarioXml(
+                grupoId = grupoElegido.first,
+                nombreGrupo = grupoElegido.second,
+                titulo = stringResource(R.string.comun_grupo_titulo, grupoElegido.second),
+                onRegresar = ::regresar,
+                modifier = modifier,
+            )
 
-        PrefectoPantalla.Notificaciones -> {
-            // Además de su buzón, el prefecto ve aquí los grupos que ya salieron hoy (como en Figma).
-            val tituloSalida = stringResource(R.string.prefecto_notificacion_salida_titulo)
-            val textoSalida = stringResource(R.string.prefecto_notificacion_salida_texto)
-            val deSalidas = salidas.orEmpty().map { salida ->
-                Notificacion(
-                    tipo = TipoNotificacion.SalidaDeGrupo,
-                    titulo = String.format(tituloSalida, salida.grupo.trim()),
-                    hora = Formatos.hora(salida.fechaHora),
-                    texto = if (salida.materia.isBlank()) "" else String.format(textoSalida, salida.materia, salida.autorizadaPorNombre.trim()),
-                    leida = true,
-                )
+            PrefectoPantalla.Notificaciones -> {
+                // Además de su buzón, el prefecto ve aquí los grupos que ya salieron hoy (como en Figma).
+                val tituloSalida = stringResource(R.string.prefecto_notificacion_salida_titulo)
+                val textoSalida = stringResource(R.string.prefecto_notificacion_salida_texto)
+                val deSalidas = salidas.orEmpty().map { salida ->
+                    Notificacion(
+                        tipo = TipoNotificacion.SalidaDeGrupo,
+                        titulo = String.format(tituloSalida, salida.grupo.trim()),
+                        hora = Formatos.hora(salida.fechaHora),
+                        texto = if (salida.materia.isBlank()) "" else String.format(textoSalida, salida.materia, salida.autorizadaPorNombre.trim()),
+                        leida = true,
+                    )
+                }
+                NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier, extrasDeHoy = deSalidas)
             }
-            NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier, extrasDeHoy = deSalidas)
-        }
 
-        PrefectoPantalla.CambiarContrasena -> CambiarContrasenaXml(
-            obligatoria = false,
-            onRegresar = ::regresar,
-            onCerrarSesion = onCerrarSesion,
-            onLista = ::regresar,
-            modifier = modifier,
-        )
+            PrefectoPantalla.CambiarContrasena -> CambiarContrasenaXml(
+                obligatoria = false,
+                onRegresar = ::regresar,
+                onCerrarSesion = onCerrarSesion,
+                onLista = ::regresar,
+                modifier = modifier,
+            )
+        }
     }
 }
 

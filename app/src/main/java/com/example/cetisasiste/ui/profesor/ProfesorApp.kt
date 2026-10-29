@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.EditText
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +30,10 @@ import com.example.cetisasiste.datos.SalidaDeGrupoDoc
 import com.example.cetisasiste.datos.Sesion
 import com.example.cetisasiste.datos.TipoAviso
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
+import com.example.cetisasiste.ui.comun.Campana
 import com.example.cetisasiste.ui.comun.Carga
 import com.example.cetisasiste.ui.comun.HorarioXml
+import com.example.cetisasiste.ui.comun.LocalCampana
 import com.example.cetisasiste.ui.comun.NotificacionesXml
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.PerfilPersonalXml
@@ -115,195 +118,196 @@ fun ProfesorApp(
             sinLeer = sinLeer,
         )
 
-    when (val pantalla = pila.last()) {
-        ProfesorPantalla.Inicio -> {
-            val grupos by produceState<List<Pair<String, GrupoDoc>>?>(null, usuario.grupos) {
-                value = cargar { CetisRepositorio.grupos(usuario.grupos) }.o(emptyList())
-            }
-            PantallaXml(R.layout.profesor_inicio, modifier) { vista ->
-                ProfesorVistas.llenarInicio(vista, usuario.nombre.trim(), usuario.grupos.size, grupos) { id, grupo ->
-                    grupoElegido = id to grupo.nombre.trim()
-                    abrir(ProfesorPantalla.Grupo)
+    // La campana sale en la barra de arriba de todas las pantallas (menos en Notificaciones).
+    CompositionLocalProvider(LocalCampana provides Campana(sinLeer) { abrir(ProfesorPantalla.Notificaciones) }) {
+        when (val pantalla = pila.last()) {
+            ProfesorPantalla.Inicio -> {
+                val grupos by produceState<List<Pair<String, GrupoDoc>>?>(null, usuario.grupos) {
+                    value = cargar { CetisRepositorio.grupos(usuario.grupos) }.o(emptyList())
                 }
-                vista.alTocar(R.id.btn_notificaciones) { abrir(ProfesorPantalla.Notificaciones) }
-                VistasComunes.marcarCampana(vista, sinLeer)
-                conectarMenu(vista, pantalla)
-            }
-        }
-
-        ProfesorPantalla.Boletin -> {
-            val anuncios by produceState<List<Anuncio>?>(null, sesion.uid) {
-                value = cargar { CetisRepositorio.anuncios(usuario.rol) }.o(emptyList()).map(Formatos::anuncio)
-            }
-            PantallaXml(R.layout.profesor_boletin, modifier) { vista ->
-                AlumnoVistas.llenarBoletin(vista, anuncios.orEmpty())
-                vista.mostrar(R.id.txt_vacio, anuncios?.isEmpty() == true)
-                conectarMenu(vista, pantalla)
-            }
-        }
-
-        ProfesorPantalla.Perfil -> PerfilPersonalXml(
-            sesion = sesion,
-            rol = stringResource(R.string.profesor_rol),
-            conectarMenu = { conectarMenu(it, pantalla) },
-            onCambiarContrasena = { abrir(ProfesorPantalla.CambiarContrasena) },
-            onCerrarSesion = onCerrarSesion,
-            modifier = modifier,
-        )
-
-        ProfesorPantalla.Grupo -> {
-            val alumnos by produceState<List<AlumnoDoc>?>(null, grupoId, recarga) {
-                value = cargar { CetisRepositorio.alumnosDelGrupo(grupoId) }.o(emptyList())
-            }
-            val salidaDeHoy = salidaDeHoyDelGrupo(grupoId, recarga)
-            PantallaXml(R.layout.profesor_grupo, modifier) { vista ->
-                ProfesorVistas.llenarGrupo(vista, nombreGrupo, salidaDeHoy.salida, alumnos) { noControl ->
-                    alumnoElegido = noControl
-                    abrir(ProfesorPantalla.Alumno)
-                }
-                vista.alTocar(R.id.opcion_dar_salida) { abrir(ProfesorPantalla.DarSalida) }
-                vista.alTocar(R.id.opcion_horario) { abrir(ProfesorPantalla.HorarioDelGrupo) }
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-            }
-        }
-
-        ProfesorPantalla.HorarioDelGrupo -> HorarioXml(
-            grupoId = grupoId,
-            nombreGrupo = nombreGrupo,
-            titulo = stringResource(R.string.comun_grupo_titulo, nombreGrupo),
-            onRegresar = ::regresar,
-            modifier = modifier,
-        )
-
-        ProfesorPantalla.Alumno -> {
-            val estatus by produceState<List<EstatusDoc>?>(null, alumnoElegido, recarga) {
-                value = cargar { CetisRepositorio.estatus(alumnoElegido) }.o(emptyList())
-            }
-            PantallaXml(R.layout.profesor_alumno, modifier) { vista ->
-                ProfesorVistas.llenarAlumno(vista, alumno, nombreGrupo, estatus)
-                vista.alTocar(R.id.opcion_cambiar_estatus) { abrir(ProfesorPantalla.CambiarEstatus) }
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-            }
-        }
-
-        ProfesorPantalla.CambiarEstatus -> {
-            var tipo by rememberSaveable { mutableStateOf<String?>(null) }
-            var guardando by remember { mutableStateOf(false) }
-            var mensaje by remember { mutableStateOf<Int?>(null) }
-            // Qué estatus se le avisan al padre (configuracion/plantel). Sin configuración, no se avisa.
-            val configuracion by produceState<ConfiguracionDoc?>(null) {
-                value = cargar { CetisRepositorio.configuracion() }.o(null)
-            }
-            val padres = Avisos.destinatarios(alumno)
-            fun seAvisa(t: String?): Boolean {
-                val c = configuracion ?: return false
-                return t != null && padres.isNotEmpty() && Avisos.alPadrePorEstatus(t, c)
-            }
-            PantallaXml(R.layout.profesor_cambiar_estatus, modifier) { vista ->
-                ProfesorVistas.llenarCambiarEstatus(vista, alumno, nombreGrupo, tipo, guardando, mensaje, seAvisa(tipo))
-                ProfesorVistas.CHIPS_DE_ESTATUS.forEach { (id, t) -> vista.alTocar(id) { tipo = t } }
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-                vista.alTocar(R.id.btn_guardar) {
-                    val descripcion = vista.findViewById<EditText>(R.id.edit_descripcion).text.toString().trim()
-                    val elegido = tipo
-                    mensaje = when {
-                        elegido == null -> R.string.profesor_estatus_error_tipo
-                        descripcion.isEmpty() -> R.string.profesor_estatus_error_descripcion
-                        else -> null
+                PantallaXml(R.layout.profesor_inicio, modifier) { vista ->
+                    ProfesorVistas.llenarInicio(vista, usuario.nombre.trim(), usuario.grupos.size, grupos) { id, grupo ->
+                        grupoElegido = id to grupo.nombre.trim()
+                        abrir(ProfesorPantalla.Grupo)
                     }
-                    if (elegido == null || mensaje != null) return@alTocar
-                    guardando = true
-                    scope.launch {
-                        val ahora = Timestamp.now()
-                        val nuevo = EstatusDoc(
-                            tipo = elegido,
-                            descripcion = descripcion,
-                            fecha = ahora,
-                            vigenteHasta = null,
-                            asignadoPor = sesion.uid,
-                            asignadoPorNombre = usuario.nombre.trim(),
-                        )
-                        val nombreTipo = vista.context.getString(ProfesorVistas.nombreDeEstatus(elegido))
-                        val aviso = if (!seAvisa(elegido)) null else Avisos.nuevo(
-                            tipo = TipoAviso.ESTATUS,
-                            titulo = vista.context.getString(R.string.profesor_aviso_estatus_titulo, nombreTipo),
-                            mensaje = vista.context.getString(
-                                R.string.profesor_aviso_estatus_mensaje,
-                                nombreTipo.lowercase(), alumno?.nombre?.trim().orEmpty(), usuario.nombre.trim(), descripcion,
-                            ),
-                            alumnoId = alumnoElegido,
-                            creadaPor = sesion.uid,
-                            ahora = ahora,
-                        )
-                        val resultado = cargar { CetisRepositorio.agregarEstatus(alumnoElegido, nuevo, aviso, padres) }
-                        guardando = false
-                        if (resultado is Carga.Listo) {
-                            vista.avisar(R.string.profesor_estatus_guardado)
-                            recarga++
-                            regresar()
-                        } else {
-                            mensaje = R.string.comun_error_guardar
+                    conectarMenu(vista, pantalla)
+                }
+            }
+
+            ProfesorPantalla.Boletin -> {
+                val anuncios by produceState<List<Anuncio>?>(null, sesion.uid) {
+                    value = cargar { CetisRepositorio.anuncios(usuario.rol) }.o(emptyList()).map(Formatos::anuncio)
+                }
+                PantallaXml(R.layout.profesor_boletin, modifier) { vista ->
+                    AlumnoVistas.llenarBoletin(vista, anuncios.orEmpty())
+                    vista.mostrar(R.id.txt_vacio, anuncios?.isEmpty() == true)
+                    conectarMenu(vista, pantalla)
+                }
+            }
+
+            ProfesorPantalla.Perfil -> PerfilPersonalXml(
+                sesion = sesion,
+                rol = stringResource(R.string.profesor_rol),
+                conectarMenu = { conectarMenu(it, pantalla) },
+                onCambiarContrasena = { abrir(ProfesorPantalla.CambiarContrasena) },
+                onCerrarSesion = onCerrarSesion,
+                modifier = modifier,
+            )
+
+            ProfesorPantalla.Grupo -> {
+                val alumnos by produceState<List<AlumnoDoc>?>(null, grupoId, recarga) {
+                    value = cargar { CetisRepositorio.alumnosDelGrupo(grupoId) }.o(emptyList())
+                }
+                val salidaDeHoy = salidaDeHoyDelGrupo(grupoId, recarga)
+                PantallaXml(R.layout.profesor_grupo, modifier) { vista ->
+                    ProfesorVistas.llenarGrupo(vista, nombreGrupo, salidaDeHoy.salida, alumnos) { noControl ->
+                        alumnoElegido = noControl
+                        abrir(ProfesorPantalla.Alumno)
+                    }
+                    vista.alTocar(R.id.opcion_dar_salida) { abrir(ProfesorPantalla.DarSalida) }
+                    vista.alTocar(R.id.opcion_horario) { abrir(ProfesorPantalla.HorarioDelGrupo) }
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                }
+            }
+
+            ProfesorPantalla.HorarioDelGrupo -> HorarioXml(
+                grupoId = grupoId,
+                nombreGrupo = nombreGrupo,
+                titulo = stringResource(R.string.comun_grupo_titulo, nombreGrupo),
+                onRegresar = ::regresar,
+                modifier = modifier,
+            )
+
+            ProfesorPantalla.Alumno -> {
+                val estatus by produceState<List<EstatusDoc>?>(null, alumnoElegido, recarga) {
+                    value = cargar { CetisRepositorio.estatus(alumnoElegido) }.o(emptyList())
+                }
+                PantallaXml(R.layout.profesor_alumno, modifier) { vista ->
+                    ProfesorVistas.llenarAlumno(vista, alumno, nombreGrupo, estatus)
+                    vista.alTocar(R.id.opcion_cambiar_estatus) { abrir(ProfesorPantalla.CambiarEstatus) }
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                }
+            }
+
+            ProfesorPantalla.CambiarEstatus -> {
+                var tipo by rememberSaveable { mutableStateOf<String?>(null) }
+                var guardando by remember { mutableStateOf(false) }
+                var mensaje by remember { mutableStateOf<Int?>(null) }
+                // Qué estatus se le avisan al padre (configuracion/plantel). Sin configuración, no se avisa.
+                val configuracion by produceState<ConfiguracionDoc?>(null) {
+                    value = cargar { CetisRepositorio.configuracion() }.o(null)
+                }
+                val padres = Avisos.destinatarios(alumno)
+                fun seAvisa(t: String?): Boolean {
+                    val c = configuracion ?: return false
+                    return t != null && padres.isNotEmpty() && Avisos.alPadrePorEstatus(t, c)
+                }
+                PantallaXml(R.layout.profesor_cambiar_estatus, modifier) { vista ->
+                    ProfesorVistas.llenarCambiarEstatus(vista, alumno, nombreGrupo, tipo, guardando, mensaje, seAvisa(tipo))
+                    ProfesorVistas.CHIPS_DE_ESTATUS.forEach { (id, t) -> vista.alTocar(id) { tipo = t } }
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                    vista.alTocar(R.id.btn_guardar) {
+                        val descripcion = vista.findViewById<EditText>(R.id.edit_descripcion).text.toString().trim()
+                        val elegido = tipo
+                        mensaje = when {
+                            elegido == null -> R.string.profesor_estatus_error_tipo
+                            descripcion.isEmpty() -> R.string.profesor_estatus_error_descripcion
+                            else -> null
+                        }
+                        if (elegido == null || mensaje != null) return@alTocar
+                        guardando = true
+                        scope.launch {
+                            val ahora = Timestamp.now()
+                            val nuevo = EstatusDoc(
+                                tipo = elegido,
+                                descripcion = descripcion,
+                                fecha = ahora,
+                                vigenteHasta = null,
+                                asignadoPor = sesion.uid,
+                                asignadoPorNombre = usuario.nombre.trim(),
+                            )
+                            val nombreTipo = vista.context.getString(ProfesorVistas.nombreDeEstatus(elegido))
+                            val aviso = if (!seAvisa(elegido)) null else Avisos.nuevo(
+                                tipo = TipoAviso.ESTATUS,
+                                titulo = vista.context.getString(R.string.profesor_aviso_estatus_titulo, nombreTipo),
+                                mensaje = vista.context.getString(
+                                    R.string.profesor_aviso_estatus_mensaje,
+                                    nombreTipo.lowercase(), alumno?.nombre?.trim().orEmpty(), usuario.nombre.trim(), descripcion,
+                                ),
+                                alumnoId = alumnoElegido,
+                                creadaPor = sesion.uid,
+                                ahora = ahora,
+                            )
+                            val resultado = cargar { CetisRepositorio.agregarEstatus(alumnoElegido, nuevo, aviso, padres) }
+                            guardando = false
+                            if (resultado is Carga.Listo) {
+                                vista.avisar(R.string.profesor_estatus_guardado)
+                                recarga++
+                                regresar()
+                            } else {
+                                mensaje = R.string.comun_error_guardar
+                            }
                         }
                     }
                 }
             }
-        }
 
-        ProfesorPantalla.DarSalida -> {
-            var guardando by remember { mutableStateOf(false) }
-            var mensaje by remember { mutableStateOf<Int?>(null) }
-            val hoy = remember { Formatos.tituloDeDia(Timestamp.now()) }
-            val ultimaClase by produceState<ClaseDoc?>(null, grupoId) {
-                val dia = Formatos.diaEscolarDeHoy() ?: return@produceState
-                val clases = cargar { CetisRepositorio.horario(grupoId, Formatos.idDeDia(dia)) }.o(emptyList())
-                value = clases.lastOrNull { it.ultimaDelTurno } ?: clases.lastOrNull()
-            }
-            val salidaDeHoy = salidaDeHoyDelGrupo(grupoId, recarga)
-            PantallaXml(R.layout.profesor_dar_salida, modifier) { vista ->
-                ProfesorVistas.llenarDarSalida(
-                    vista, nombreGrupo, hoy, ultimaClase,
-                    salidaDeHoy = salidaDeHoy.salida,
-                    // Mientras se revisa si ya salió, el botón espera apagado (así no se registra dos veces).
-                    revisando = salidaDeHoy is Carga.Cargando || guardando,
-                    mensaje = mensaje,
-                )
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-                vista.alTocar(R.id.btn_dar_salida) {
-                    mensaje = null
-                    guardando = true
-                    scope.launch {
-                        val salida = SalidaDeGrupoDoc(
-                            grupoId = grupoId,
-                            grupo = nombreGrupo,
-                            fecha = Formatos.fechaDeHoy(),
-                            fechaHora = Timestamp.now(),
-                            autorizadaPor = sesion.uid,
-                            autorizadaPorNombre = usuario.nombre.trim(),
-                            materia = ultimaClase?.materia.orEmpty(),
-                        )
-                        val resultado = cargar { CetisRepositorio.darSalidaAlGrupo(salida) }
-                        guardando = false
-                        if (resultado is Carga.Listo) {
-                            vista.avisar(R.string.profesor_salida_guardada)
-                            recarga++
-                            regresar()
-                        } else {
-                            mensaje = R.string.comun_error_guardar
+            ProfesorPantalla.DarSalida -> {
+                var guardando by remember { mutableStateOf(false) }
+                var mensaje by remember { mutableStateOf<Int?>(null) }
+                val hoy = remember { Formatos.tituloDeDia(Timestamp.now()) }
+                val ultimaClase by produceState<ClaseDoc?>(null, grupoId) {
+                    val dia = Formatos.diaEscolarDeHoy() ?: return@produceState
+                    val clases = cargar { CetisRepositorio.horario(grupoId, Formatos.idDeDia(dia)) }.o(emptyList())
+                    value = clases.lastOrNull { it.ultimaDelTurno } ?: clases.lastOrNull()
+                }
+                val salidaDeHoy = salidaDeHoyDelGrupo(grupoId, recarga)
+                PantallaXml(R.layout.profesor_dar_salida, modifier) { vista ->
+                    ProfesorVistas.llenarDarSalida(
+                        vista, nombreGrupo, hoy, ultimaClase,
+                        salidaDeHoy = salidaDeHoy.salida,
+                        // Mientras se revisa si ya salió, el botón espera apagado (así no se registra dos veces).
+                        revisando = salidaDeHoy is Carga.Cargando || guardando,
+                        mensaje = mensaje,
+                    )
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                    vista.alTocar(R.id.btn_dar_salida) {
+                        mensaje = null
+                        guardando = true
+                        scope.launch {
+                            val salida = SalidaDeGrupoDoc(
+                                grupoId = grupoId,
+                                grupo = nombreGrupo,
+                                fecha = Formatos.fechaDeHoy(),
+                                fechaHora = Timestamp.now(),
+                                autorizadaPor = sesion.uid,
+                                autorizadaPorNombre = usuario.nombre.trim(),
+                                materia = ultimaClase?.materia.orEmpty(),
+                            )
+                            val resultado = cargar { CetisRepositorio.darSalidaAlGrupo(salida) }
+                            guardando = false
+                            if (resultado is Carga.Listo) {
+                                vista.avisar(R.string.profesor_salida_guardada)
+                                recarga++
+                                regresar()
+                            } else {
+                                mensaje = R.string.comun_error_guardar
+                            }
                         }
                     }
                 }
             }
+
+            ProfesorPantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
+
+            ProfesorPantalla.CambiarContrasena -> CambiarContrasenaXml(
+                obligatoria = false,
+                onRegresar = ::regresar,
+                onCerrarSesion = onCerrarSesion,
+                onLista = ::regresar,
+                modifier = modifier,
+            )
         }
-
-        ProfesorPantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
-
-        ProfesorPantalla.CambiarContrasena -> CambiarContrasenaXml(
-            obligatoria = false,
-            onRegresar = ::regresar,
-            onCerrarSesion = onCerrarSesion,
-            onLista = ::regresar,
-            modifier = modifier,
-        )
     }
 }
 

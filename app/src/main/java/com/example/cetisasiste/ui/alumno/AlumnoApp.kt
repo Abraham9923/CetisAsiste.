@@ -3,6 +3,7 @@ package com.example.cetisasiste.ui.alumno
 import androidx.activity.compose.BackHandler
 import androidx.annotation.LayoutRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -23,7 +24,9 @@ import com.example.cetisasiste.datos.Sesion
 import com.example.cetisasiste.ui.MensajeCentrado
 import com.example.cetisasiste.ui.comun.CHIPS_DE_DIAS
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
+import com.example.cetisasiste.ui.comun.Campana
 import com.example.cetisasiste.ui.comun.Carga
+import com.example.cetisasiste.ui.comun.LocalCampana
 import com.example.cetisasiste.ui.comun.NotificacionesXml
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.Pestana
@@ -34,7 +37,7 @@ import com.example.cetisasiste.ui.comun.cargar
 import com.example.cetisasiste.ui.comun.nombreDeGrupoEnVivo
 import com.example.cetisasiste.ui.comun.sinLeerEnVivo
 
-/** Pantallas del alumno. Son las vistas XML de res/layout/alumno_*.xml. */
+
 enum class AlumnoPantalla(@param:LayoutRes val layout: Int) {
     Inicio(R.layout.alumno_inicio),
     Boletin(R.layout.alumno_boletin),
@@ -57,11 +60,8 @@ private val PESTANAS = listOf(
 )
 
 /**
- * Apartado del alumno. Muestra las vistas XML (PantallaXml), las llena con AlumnoVistas y
- * conecta sus botones.
- *
- * Los datos salen de Firestore: alumnos/{No. de control de la sesión}, el horario de su
- * grupo y los anuncios dirigidos a "alumno". El alumno solo consulta; no cambia nada.
+ * Pantalla principal del alumno.
+ * Los datos salen de Firestore
  */
 @Composable
 fun AlumnoApp(
@@ -104,63 +104,63 @@ fun AlumnoApp(
     val rol = stringResource(R.string.comun_rol_alumno)
 
     val pantalla = pila.last()
-    // Las pantallas comunes piden sus propios datos.
-    when (pantalla) {
-        AlumnoPantalla.CambiarContrasena -> return CambiarContrasenaXml(
-            obligatoria = false,
-            onRegresar = ::regresar,
-            onCerrarSesion = onCerrarSesion,
-            onLista = ::regresar,
-            modifier = modifier,
-        )
-        AlumnoPantalla.Notificaciones -> return NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
-        else -> Unit
-    }
-    PantallaXml(pantalla.layout, modifier) { vista ->
+    // La campana sale en la barra de arriba de todas las pantallas (menos en Notificaciones).
+    CompositionLocalProvider(LocalCampana provides Campana(sinLeer) { abrir(AlumnoPantalla.Notificaciones) }) {
         when (pantalla) {
-            AlumnoPantalla.Inicio -> {
-                AlumnoVistas.llenarInicio(vista, alumno)
-                VistasComunes.marcarCampana(vista, sinLeer)
-                vista.alTocar(R.id.btn_notificaciones) { abrir(AlumnoPantalla.Notificaciones) }
-                vista.alTocar(R.id.card_qr) { abrir(AlumnoPantalla.CodigoQr) }
-                vista.alTocar(R.id.card_credencial) { abrir(AlumnoPantalla.Credencial) }
-                vista.alTocar(R.id.card_horario) { pestana(AlumnoPantalla.Horario) }
-                vista.alTocar(R.id.card_boletin) { pestana(AlumnoPantalla.Boletin) }
-            }
-            AlumnoPantalla.Boletin -> AlumnoVistas.llenarBoletin(vista, anuncios)
-            AlumnoPantalla.Horario -> {
-                AlumnoVistas.llenarHorario(vista, HorarioDelDia(alumno.grupo, dia, clases))
-                CHIPS_DE_DIAS.forEach { (id, d) -> vista.alTocar(id) { dia = d } }
-            }
-            AlumnoPantalla.Perfil, AlumnoPantalla.ConfirmarCerrarSesion -> {
-                AlumnoVistas.llenarPerfil(vista, alumno)
-                vista.alTocar(R.id.opcion_qr) { abrir(AlumnoPantalla.CodigoQr) }
-                vista.alTocar(R.id.opcion_credencial) { abrir(AlumnoPantalla.Credencial) }
-                vista.alTocar(R.id.opcion_contrasena) { abrir(AlumnoPantalla.CambiarContrasena) }
-                vista.alTocar(R.id.opcion_cerrar_sesion) { abrir(AlumnoPantalla.ConfirmarCerrarSesion) }
-                vista.alTocar(R.id.btn_cancelar) { regresar() }
-                vista.alTocar(R.id.btn_confirmar) { onCerrarSesion() }
-            }
-            AlumnoPantalla.CodigoQr -> {
-                AlumnoVistas.llenarCodigoQr(vista, alumno, qr)
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-            }
-            AlumnoPantalla.Credencial -> {
-                AlumnoVistas.llenarCredencial(vista, alumno)
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-            }
-            // Se muestran arriba (pantallas comunes); aquí no llegan.
-            AlumnoPantalla.CambiarContrasena, AlumnoPantalla.Notificaciones -> Unit
-        }
-        // Menú ☰ (solo en Inicio, Boletín, Horario y Perfil). En "¿Cerrar sesión?" la capa
-        // oscura tapa el botón, así que no se conecta.
-        if (PESTANAS.any { it.destino == pantalla }) {
-            VistasComunes.conectarMenu(
-                vista, alumno.nombre, rol, PESTANAS, pantalla, ::pestana,
-                onNotificaciones = { abrir(AlumnoPantalla.Notificaciones) },
+            // Las pantallas comunes piden sus propios datos.
+            AlumnoPantalla.CambiarContrasena -> CambiarContrasenaXml(
+                obligatoria = false,
+                onRegresar = ::regresar,
                 onCerrarSesion = onCerrarSesion,
-                sinLeer = sinLeer,
+                onLista = ::regresar,
+                modifier = modifier,
             )
+            AlumnoPantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
+            else -> PantallaXml(pantalla.layout, modifier) { vista ->
+                when (pantalla) {
+                    AlumnoPantalla.Inicio -> {
+                        AlumnoVistas.llenarInicio(vista, alumno)
+                        vista.alTocar(R.id.card_qr) { abrir(AlumnoPantalla.CodigoQr) }
+                        vista.alTocar(R.id.card_credencial) { abrir(AlumnoPantalla.Credencial) }
+                        vista.alTocar(R.id.card_horario) { pestana(AlumnoPantalla.Horario) }
+                        vista.alTocar(R.id.card_boletin) { pestana(AlumnoPantalla.Boletin) }
+                    }
+                    AlumnoPantalla.Boletin -> AlumnoVistas.llenarBoletin(vista, anuncios)
+                    AlumnoPantalla.Horario -> {
+                        AlumnoVistas.llenarHorario(vista, HorarioDelDia(alumno.grupo, dia, clases))
+                        CHIPS_DE_DIAS.forEach { (id, d) -> vista.alTocar(id) { dia = d } }
+                    }
+                    AlumnoPantalla.Perfil, AlumnoPantalla.ConfirmarCerrarSesion -> {
+                        AlumnoVistas.llenarPerfil(vista, alumno)
+                        vista.alTocar(R.id.opcion_qr) { abrir(AlumnoPantalla.CodigoQr) }
+                        vista.alTocar(R.id.opcion_credencial) { abrir(AlumnoPantalla.Credencial) }
+                        vista.alTocar(R.id.opcion_contrasena) { abrir(AlumnoPantalla.CambiarContrasena) }
+                        vista.alTocar(R.id.opcion_cerrar_sesion) { abrir(AlumnoPantalla.ConfirmarCerrarSesion) }
+                        vista.alTocar(R.id.btn_cancelar) { regresar() }
+                        vista.alTocar(R.id.btn_confirmar) { onCerrarSesion() }
+                    }
+                    AlumnoPantalla.CodigoQr -> {
+                        AlumnoVistas.llenarCodigoQr(vista, alumno, qr)
+                        vista.alTocar(R.id.btn_regresar) { regresar() }
+                    }
+                    AlumnoPantalla.Credencial -> {
+                        AlumnoVistas.llenarCredencial(vista, alumno)
+                        vista.alTocar(R.id.btn_regresar) { regresar() }
+                    }
+                    // Se muestran arriba (pantallas comunes); aquí no llegan.
+                    AlumnoPantalla.CambiarContrasena, AlumnoPantalla.Notificaciones -> Unit
+                }
+                // Menú ☰ (solo en Inicio, Boletín, Horario y Perfil). En "¿Cerrar sesión?" la capa
+                // oscura tapa el botón, así que no se conecta.
+                if (PESTANAS.any { it.destino == pantalla }) {
+                    VistasComunes.conectarMenu(
+                        vista, alumno.nombre, rol, PESTANAS, pantalla, ::pestana,
+                        onNotificaciones = { abrir(AlumnoPantalla.Notificaciones) },
+                        onCerrarSesion = onCerrarSesion,
+                        sinLeer = sinLeer,
+                    )
+                }
+            }
         }
     }
 }

@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Figma: "Credencial digital - Alumno (79:1176)" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cetis_surface_background"
+    android:background="@color/cetis_surface_background">
+<!-- La columna va dentro de un FrameLayout (como en Perfil): PantallaXml le pone al primer hijo
+     el espacio de la barra de gestos; si ese hijo fuera la barra superior, el título subiría
+     hasta la hora y la batería. -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingStart="@dimen/cetis_screen_margin"
     android:paddingEnd="@dimen/cetis_screen_margin">
@@ -48,12 +54,20 @@
             <TextView
                 android:id="@+id/txt_titulo"
                 style="@style/Cetis.Texto.TituloNombre"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
                 android:layout_height="wrap_content"
                 android:accessibilityHeading="true"
                 android:maxLines="1"
                 android:text="@string/alumno_titulo_credencial"
                 android:textColor="@color/cetis_text_on_brand" />
+            <!-- Campana: la muestra y la conecta el código (PantallaXml) -->
+            <ImageButton
+                android:id="@+id/btn_notificaciones"
+                style="@style/Cetis.BarraSuperior.Campana"
+                android:layout_marginStart="@dimen/cetis_space_8"
+                android:visibility="gone" />
         </LinearLayout>
     </FrameLayout>
 
@@ -63,12 +77,15 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:fillViewport="true"
         android:paddingBottom="@dimen/cetis_space_16"
         android:scrollbars="none">
 
+        <!-- La credencial queda centrada en el espacio libre debajo de la barra -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="vertical">
             <!-- CredentialCard (79:1178) · variables: alumno.nombre, alumno.rol, alumno.grupo,
                  alumno.noControl, alumno.vigencia -->
@@ -245,3 +262,4 @@
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
+</FrameLayout>

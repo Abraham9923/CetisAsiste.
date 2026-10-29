@@ -37,10 +37,10 @@ import java.util.Calendar
  * Pantallas que comparten varios roles. Cada una pide sus propios datos a Firestore y usa un
  * layout comun_*.xml. Los *App.kt de cada rol solo las abren y les dicen a dónde regresar.
  *
- *   CalendarioXml        padre y prefecto (pestaña)
- *   NotificacionesXml    todos (campana de Inicio y opción del menú ☰)
- *   HorarioXml           padre (su hijo), prefecto (cualquier grupo) y profesor (sus grupos)
- *   PerfilPersonalXml    prefecto y profesor (pestaña)
+ *   CalendarioXml: padre y prefecto (pestaña)
+ *   NotificacionesXml: todos (campana de Inicio y opción del menú ☰)
+ *   HorarioXml: padre (su hijo), prefecto (cualquier grupo) y profesor (sus grupos)
+ *   PerfilPersonalXml: prefecto y profesor (pestaña)
  *   CambiarContrasenaXml todos, incluido el alumno
  */
 
@@ -78,10 +78,7 @@ fun CalendarioXml(
 }
 
 /**
- * Avisos personales de la cuenta (usuarios/{uid}/notificaciones), separados en hoy y
- * anteriores. Se escuchan en tiempo real: un aviso nuevo aparece sin salir de la pantalla, y
- * al marcarlos como leídos la campana se apaga sola.
- *
+ * Avisos personales de la cuenta (usuarios/{uid}/notificaciones)
  * [extrasDeHoy] son avisos que no están en el buzón y se muestran arriba de los de hoy (el
  * prefecto ve ahí los grupos que ya salieron de clases).
  */
@@ -213,7 +210,7 @@ fun CambiarContrasenaXml(
     }
 }
 
-/** Mínimo de caracteres de una contraseña nueva (Firebase pide 6; el plantel, 8). */
+/** Mínimo de caracteres de una contraseña nueva (Firebase pide 6 caracteres en el plantel, 8). */
 private const val MINIMO_CONTRASENA = 8
 
 /** Revisa los tres campos antes de llamar a Firebase. Devuelve el texto del error o null. */

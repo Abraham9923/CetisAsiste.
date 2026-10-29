@@ -45,7 +45,7 @@ $capitulos = @(
        resumen = 'El porqué de cada decisión de las pantallas'
        partes = @(@{ archivo = 'DECISIONES.md' }) },
     @{ titulo = 'Registro de decisiones (ADR)'
-       resumen = 'Las seis decisiones grandes, con sus opciones y consecuencias'
+       resumen = 'Las decisiones grandes, con sus opciones y consecuencias'
        intro = 'Un ADR (registro de decisión de arquitectura) explica una decisión importante: el problema, las opciones que había, cuál se eligió y qué consecuencias tiene. Las acciones que faltan de cada uno también están en el documento *Pendientes* (aparte).'
        partes = @(Get-ChildItem (Join-Path $docs 'adr') -Filter 'ADR-*.md' | Sort-Object Name |
                   ForEach-Object { @{ archivo = "adr\$($_.Name)" } }) },

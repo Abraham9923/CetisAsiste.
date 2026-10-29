@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -55,6 +56,7 @@ fun PantallaXml(
 ) {
     // La app dibuja de borde a borde: el contenido termina arriba de la barra de gestos de Android.
     val abajo = WindowInsets.navigationBars.getBottom(LocalDensity.current)
+    val campana = LocalCampana.current
     // key(): cuando cambia la pantalla se infla su XML desde cero.
     key(layout) {
         AndroidView(
@@ -65,10 +67,25 @@ fun PantallaXml(
                 // diálogo y el menú sí llegan hasta abajo.
                 (vista as? ViewGroup)?.getChildAt(0)?.let { it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, abajo) }
                 llenar(vista)
+                // Campana de la barra superior (btn_notificaciones), si la pantalla la tiene.
+                if (campana != null) {
+                    vista.findViewById<View>(R.id.btn_notificaciones)?.isVisible = true
+                    VistasComunes.marcarCampana(vista, campana.sinLeer)
+                    vista.alTocar(R.id.btn_notificaciones, campana.abrir)
+                }
             },
         )
     }
 }
+
+/** Campana de la barra superior: cuántos avisos hay sin leer y qué hace al tocarla. */
+class Campana(val sinLeer: Int, val abrir: () -> Unit)
+
+/**
+ * La campana de las pantallas del rol. Cada *App.kt la pone con CompositionLocalProvider y así
+ * sale en todas sus pantallas; donde no hay (cambio obligatorio de contraseña) no se ve.
+ */
+val LocalCampana = compositionLocalOf<Campana?> { null }
 
 /** Una pantalla principal del rol. Cada una sale como opción del menú ☰ (comun_menu.xml). */
 class Pestana<T>(val destino: T, @param:DrawableRes val icono: Int, @param:StringRes val texto: Int)
@@ -106,7 +123,7 @@ object VistasComunes {
     }
 
     /**
-     * La campana de Inicio (btn_notificaciones): con punto rojo solo si hay avisos sin leer, y
+     * La campana de la barra superior (btn_notificaciones): con punto rojo solo si hay avisos sin leer, y
      * para quien usa lector de pantalla dice cuántos ("Notificaciones, 3 sin leer").
      */
     fun marcarCampana(pantalla: View, sinLeer: Int) {

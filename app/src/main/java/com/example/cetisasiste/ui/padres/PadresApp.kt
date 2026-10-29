@@ -3,6 +3,7 @@ package com.example.cetisasiste.ui.padres
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,9 +25,11 @@ import com.example.cetisasiste.datos.Sesion
 import com.example.cetisasiste.ui.MensajeCentrado
 import com.example.cetisasiste.ui.comun.CalendarioXml
 import com.example.cetisasiste.ui.comun.CambiarContrasenaXml
+import com.example.cetisasiste.ui.comun.Campana
 import com.example.cetisasiste.ui.comun.Carga
 import com.example.cetisasiste.ui.comun.DiaDeRegistros
 import com.example.cetisasiste.ui.comun.HorarioXml
+import com.example.cetisasiste.ui.comun.LocalCampana
 import com.example.cetisasiste.ui.comun.NotificacionesXml
 import com.example.cetisasiste.ui.comun.PantallaXml
 import com.example.cetisasiste.ui.comun.Pestana
@@ -108,102 +111,103 @@ fun PadresApp(
             sinLeer = sinLeer,
         )
 
-    when (val pantalla = pila.last()) {
-        PadrePantalla.Inicio -> {
-            val destacado by produceState<String?>(null, sesion.uid) {
-                value = cargar { CetisRepositorio.anuncios(sesion.usuario.rol) }.o(emptyList())
-                    .firstOrNull { it.destacado }?.titulo
+    // La campana sale en la barra de arriba de todas las pantallas (menos en Notificaciones).
+    CompositionLocalProvider(LocalCampana provides Campana(sinLeer) { abrir(PadrePantalla.Notificaciones) }) {
+        when (val pantalla = pila.last()) {
+            PadrePantalla.Inicio -> {
+                val destacado by produceState<String?>(null, sesion.uid) {
+                    value = cargar { CetisRepositorio.anuncios(sesion.usuario.rol) }.o(emptyList())
+                        .firstOrNull { it.destacado }?.titulo
+                }
+                PantallaXml(R.layout.padre_inicio, modifier) { vista ->
+                    PadresVistas.llenarInicio(vista, alumno, destacado)
+                    vista.alTocar(R.id.banner_importante) { pestana(PadrePantalla.Anuncios) }
+                    vista.alTocar(R.id.card_qr) { abrir(PadrePantalla.CodigoQr) }
+                    vista.alTocar(R.id.card_credencial) { abrir(PadrePantalla.Credencial) }
+                    vista.alTocar(R.id.card_entradas) { abrir(PadrePantalla.EntradasSalidas) }
+                    vista.alTocar(R.id.card_horario) { abrir(PadrePantalla.Horario) }
+                    conectarMenu(vista, pantalla)
+                }
             }
-            PantallaXml(R.layout.padre_inicio, modifier) { vista ->
-                PadresVistas.llenarInicio(vista, alumno, destacado)
-                VistasComunes.marcarCampana(vista, sinLeer)
-                vista.alTocar(R.id.btn_notificaciones) { abrir(PadrePantalla.Notificaciones) }
-                vista.alTocar(R.id.banner_importante) { pestana(PadrePantalla.Anuncios) }
-                vista.alTocar(R.id.card_qr) { abrir(PadrePantalla.CodigoQr) }
-                vista.alTocar(R.id.card_credencial) { abrir(PadrePantalla.Credencial) }
-                vista.alTocar(R.id.card_entradas) { abrir(PadrePantalla.EntradasSalidas) }
-                vista.alTocar(R.id.card_horario) { abrir(PadrePantalla.Horario) }
+
+            PadrePantalla.Anuncios -> {
+                // null mientras carga (así no se ve "Todavía no hay anuncios" antes de tiempo).
+                val anuncios by produceState<List<Anuncio>?>(null, sesion.uid) {
+                    value = cargar { CetisRepositorio.anuncios(sesion.usuario.rol) }.o(emptyList()).map(Formatos::anuncio)
+                }
+                PantallaXml(R.layout.padre_anuncios, modifier) { vista ->
+                    PadresVistas.llenarAnuncios(vista, anuncios.orEmpty(), cargado = anuncios != null)
+                    conectarMenu(vista, pantalla)
+                }
+            }
+
+            PadrePantalla.Calendario -> CalendarioXml(
+                conectarMenu = { conectarMenu(it, pantalla) },
+                modifier = modifier,
+            )
+
+            PadrePantalla.Perfil -> PantallaXml(R.layout.padre_perfil, modifier) { vista ->
+                AlumnoVistas.llenarPerfil(vista, alumno)
+                vista.alTocar(R.id.opcion_credencial) { abrir(PadrePantalla.Credencial) }
+                vista.alTocar(R.id.opcion_entradas) { abrir(PadrePantalla.EntradasSalidas) }
+                vista.alTocar(R.id.opcion_contrasena) { abrir(PadrePantalla.CambiarContrasena) }
+                vista.alTocar(R.id.opcion_cerrar_sesion) { VistasComunes.mostrarDialogoCerrarSesion(vista, onCerrarSesion) }
                 conectarMenu(vista, pantalla)
             }
-        }
 
-        PadrePantalla.Anuncios -> {
-            // null mientras carga (así no se ve "Todavía no hay anuncios" antes de tiempo).
-            val anuncios by produceState<List<Anuncio>?>(null, sesion.uid) {
-                value = cargar { CetisRepositorio.anuncios(sesion.usuario.rol) }.o(emptyList()).map(Formatos::anuncio)
+            PadrePantalla.CodigoQr -> {
+                val qr = remember(doc.noControl) { Formatos.imagenQr(NoControl.contenidoQr(doc.noControl)) }
+                PantallaXml(R.layout.alumno_codigo_qr, modifier) { vista ->
+                    AlumnoVistas.llenarCodigoQr(vista, alumno, qr)
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                }
             }
-            PantallaXml(R.layout.padre_anuncios, modifier) { vista ->
-                PadresVistas.llenarAnuncios(vista, anuncios.orEmpty(), cargado = anuncios != null)
-                conectarMenu(vista, pantalla)
-            }
-        }
 
-        PadrePantalla.Calendario -> CalendarioXml(
-            conectarMenu = { conectarMenu(it, pantalla) },
-            modifier = modifier,
-        )
-
-        PadrePantalla.Perfil -> PantallaXml(R.layout.padre_perfil, modifier) { vista ->
-            AlumnoVistas.llenarPerfil(vista, alumno)
-            vista.alTocar(R.id.opcion_credencial) { abrir(PadrePantalla.Credencial) }
-            vista.alTocar(R.id.opcion_entradas) { abrir(PadrePantalla.EntradasSalidas) }
-            vista.alTocar(R.id.opcion_contrasena) { abrir(PadrePantalla.CambiarContrasena) }
-            vista.alTocar(R.id.opcion_cerrar_sesion) { VistasComunes.mostrarDialogoCerrarSesion(vista, onCerrarSesion) }
-            conectarMenu(vista, pantalla)
-        }
-
-        PadrePantalla.CodigoQr -> {
-            val qr = remember(doc.noControl) { Formatos.imagenQr(NoControl.contenidoQr(doc.noControl)) }
-            PantallaXml(R.layout.alumno_codigo_qr, modifier) { vista ->
-                AlumnoVistas.llenarCodigoQr(vista, alumno, qr)
+            PadrePantalla.Credencial -> PantallaXml(R.layout.alumno_credencial_digital, modifier) { vista ->
+                AlumnoVistas.llenarCredencial(vista, alumno)
                 vista.alTocar(R.id.btn_regresar) { regresar() }
             }
-        }
 
-        PadrePantalla.Credencial -> PantallaXml(R.layout.alumno_credencial_digital, modifier) { vista ->
-            AlumnoVistas.llenarCredencial(vista, alumno)
-            vista.alTocar(R.id.btn_regresar) { regresar() }
-        }
-
-        PadrePantalla.EntradasSalidas -> {
-            // Se piden de 20 en 20 (solo del semestre en curso); "Ver más" trae los siguientes.
-            val scope = rememberCoroutineScope()
-            var registros by remember(doc.noControl) { mutableStateOf(emptyList<RegistroDoc>()) }
-            var cargado by remember(doc.noControl) { mutableStateOf(false) }
-            var hayMas by remember(doc.noControl) { mutableStateOf(false) }
-            suspend fun cargarPagina() {
-                val pagina = cargar {
-                    CetisRepositorio.registros(doc.noControl, despuesDe = registros.lastOrNull()?.fechaHora)
-                }.o(emptyList())
-                registros = registros + pagina
-                hayMas = pagina.size.toLong() == CetisRepositorio.POR_PAGINA
-                cargado = true
+            PadrePantalla.EntradasSalidas -> {
+                // Se piden de 20 en 20 (solo del semestre en curso); "Ver más" trae los siguientes.
+                val scope = rememberCoroutineScope()
+                var registros by remember(doc.noControl) { mutableStateOf(emptyList<RegistroDoc>()) }
+                var cargado by remember(doc.noControl) { mutableStateOf(false) }
+                var hayMas by remember(doc.noControl) { mutableStateOf(false) }
+                suspend fun cargarPagina() {
+                    val pagina = cargar {
+                        CetisRepositorio.registros(doc.noControl, despuesDe = registros.lastOrNull()?.fechaHora)
+                    }.o(emptyList())
+                    registros = registros + pagina
+                    hayMas = pagina.size.toLong() == CetisRepositorio.POR_PAGINA
+                    cargado = true
+                }
+                LaunchedEffect(doc.noControl) { cargarPagina() }
+                PantallaXml(R.layout.padre_entradas_salidas, modifier) { vista ->
+                    PadresVistas.llenarEntradasSalidas(vista, primerNombre(alumno.nombre), agruparPorDia(registros), cargado, hayMas)
+                    vista.alTocar(R.id.txt_ver_mas) { scope.launch { cargarPagina() } }
+                    vista.alTocar(R.id.btn_regresar) { regresar() }
+                }
             }
-            LaunchedEffect(doc.noControl) { cargarPagina() }
-            PantallaXml(R.layout.padre_entradas_salidas, modifier) { vista ->
-                PadresVistas.llenarEntradasSalidas(vista, primerNombre(alumno.nombre), agruparPorDia(registros), cargado, hayMas)
-                vista.alTocar(R.id.txt_ver_mas) { scope.launch { cargarPagina() } }
-                vista.alTocar(R.id.btn_regresar) { regresar() }
-            }
+
+            PadrePantalla.Horario -> HorarioXml(
+                grupoId = doc.grupoId,
+                nombreGrupo = alumno.grupo,
+                titulo = stringResource(R.string.horario_title),
+                onRegresar = ::regresar,
+                modifier = modifier,
+            )
+
+            PadrePantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
+
+            PadrePantalla.CambiarContrasena -> CambiarContrasenaXml(
+                obligatoria = false,
+                onRegresar = ::regresar,
+                onCerrarSesion = onCerrarSesion,
+                onLista = ::regresar,
+                modifier = modifier,
+            )
         }
-
-        PadrePantalla.Horario -> HorarioXml(
-            grupoId = doc.grupoId,
-            nombreGrupo = alumno.grupo,
-            titulo = stringResource(R.string.horario_title),
-            onRegresar = ::regresar,
-            modifier = modifier,
-        )
-
-        PadrePantalla.Notificaciones -> NotificacionesXml(sesion, onRegresar = ::regresar, modifier = modifier)
-
-        PadrePantalla.CambiarContrasena -> CambiarContrasenaXml(
-            obligatoria = false,
-            onRegresar = ::regresar,
-            onCerrarSesion = onCerrarSesion,
-            onLista = ::regresar,
-            modifier = modifier,
-        )
     }
 }
 
