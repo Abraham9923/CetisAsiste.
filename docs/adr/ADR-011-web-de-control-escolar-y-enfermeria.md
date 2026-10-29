@@ -1,8 +1,8 @@
 # ADR-011: Web de Control Escolar y Enfermería (primera versión)
 
 **Estado:** Aceptada; primera versión hecha y probada con el emulador (20 de octubre de 2026).
-**Falta** registrar la web en Firebase, publicarla y probarla con datos reales (ver
-"Acciones").
+Ya está registrada en Firebase (20 oct). **Falta** publicarla y probarla con datos reales
+(ver "Acciones").
 **Fecha:** 20 de octubre de 2026
 **Quién decide:** el equipo de CetisAsiste (el usuario pidió "empieza a crear el apartado
 web, son 2 usuarios")
@@ -94,8 +94,8 @@ Cómo usarla y probarla: [web/README.md](../../web/README.md). Lo que se hizo:
 
 1. ☑ Web con las pantallas de la tabla, 10 pruebas de `avisos.js`/`formatos.js` y el
    recorrido de punta a punta (18 pasos) con el emulador.
-2. [ ] **Registrar la web en Firebase** y llenar `apiKey` y `appId` en `web/js/config.js`
-   (el usuario; web/README.md, paso 1).
+2. ☑ **Registrar la web en Firebase** y llenar `apiKey` y `appId` en `web/js/config.js`
+   (20 oct, bitácora 20-05). Sin publicarla se abre con `docs/herramientas/servidor_web.ps1`.
 3. [ ] Publicar las reglas y el índice (si no se ha hecho; PENDIENTES §1) y poner
    `roles/enfermeria.plataformaConfirmada = true` en la consola.
 4. [ ] **Publicar** con `firebase deploy --only hosting` (web/README.md, paso 4).

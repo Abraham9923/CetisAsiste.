@@ -1,21 +1,20 @@
 // CONFIGURACIÓN DE FIREBASE PARA LA WEB (proyecto appcetis-7c79d).
 //
-// Falta llenar `apiKey` y `appId` (una sola vez):
-//   consola de Firebase → ⚙ Configuración del proyecto → "Tus apps" → Agregar app → Web (</>)
-//   → nombre "CetisAsiste web" → copia aquí los valores de `apiKey` y `appId`.
+// `apiKey` y `appId` son de la app web "CetisAsiste web", registrada el 20-10-2026 en
+//   consola de Firebase → ⚙ Configuración del proyecto → "Tus apps".
 // No son secretos: lo que protege los datos son las reglas de Firestore (y, más adelante,
 // App Check). Ver web/README.md.
 //
-// Mientras `apiKey` esté vacío y la web se abra en esta computadora (localhost), se usa el
-// emulador de Firebase con datos de prueba, sin tocar la base real.
+// Como ya están llenos, la web usa la BASE REAL también en esta computadora (localhost).
+// Para usar el emulador con datos de prueba, abre la dirección con ?emulador.
 
 export const configuracionFirebase = {
-  apiKey: '',
+  apiKey: 'AIzaSyDNFHwLa09wIR3IFEEczOasA3Zje4p5CjY',
   authDomain: 'appcetis-7c79d.firebaseapp.com',
   projectId: 'appcetis-7c79d',
   storageBucket: 'appcetis-7c79d.firebasestorage.app',
   messagingSenderId: '801213728411',
-  appId: '',
+  appId: '1:801213728411:web:b95f7100603dd7b702e83e',
 };
 
 /**

@@ -13,6 +13,59 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ## 20 de octubre de 2026
 
+### 20-05. Web registrada en Firebase y abierta en esta computadora sin Node.js
+
+- **Pedido del usuario:** ver la web funcionando contra la base real, en esta PC (Windows,
+  sin Node.js ni Python).
+- **Qué se hizo:**
+  - **App web registrada** en la consola (Configuración del proyecto → *Tus apps* → Web),
+    con el nombre "CetisAsiste web" y **sin** Hosting. Su `apiKey` y `appId` quedaron en
+    `web/js/config.js`. Con eso la web ya usa la **base real** también en `localhost`; el
+    emulador ahora se pide con `?emulador`.
+  - **Servidor web sin Node:** `docs/herramientas/servidor_web.ps1`, hecho con lo que trae
+    Windows (PowerShell 5.1). Entrega la carpeta `web/` en <http://localhost:5000> con el tipo
+    correcto de cada archivo (los `.js` como `text/javascript`, porque son módulos), sin caché
+    y sin dejar salir de `web/`. Está fuera de `web/` para que no se publique.
+  - `.claude/launch.json`: configuración "web" que enciende ese servidor, para abrirla en el
+    navegador integrado de Claude.
+- **Archivos:** `web/js/config.js`, `docs/herramientas/servidor_web.ps1` (nuevo),
+  `.claude/launch.json` (nuevo), `web/README.md`, `docs/PENDIENTES.md`.
+- **Cómo se comprobó:** con el servidor encendido, la pantalla de acceso carga en el
+  navegador integrado sin errores en la consola y sin la franja amarilla del emulador; el
+  servidor entregó todos los archivos de la página (HTML, CSS, módulos, fuentes y logo, con 200) y responde 404 a un archivo
+  que no existe. Se corrigió un error con las peticiones `HEAD` (pedían solo encabezados y el
+  servidor intentaba mandar el archivo). Después **el usuario entró con su cuenta de Control
+  Escolar** (Claude no escribe contraseñas) y confirmó que la web funciona con la base real.
+- **Falta:** **publicar la web** con Firebase Hosting (necesita Node.js).
+
+### 20-04. Perfiles de la consola actualizados y reglas nuevas publicadas
+
+- **Pedido del usuario:** actualizar las reglas y ajustar los roles en la consola (con su
+  nota `PARA_MANANA.md`).
+- **Qué se hizo:**
+  - `git pull` en `main` para traer el PR #1 ya fusionado (la copia local iba 4 commits atrás
+    y no tenía cambios propios).
+  - **Perfiles en Firestore** (consola, desde Chrome), iguales a `firebase/roles.json`:
+    - `roles/alumno`: `inicioDeSesion` = `no_control`; `camposDelUsuario[0]` = `noControl`.
+    - `roles/prefecto`: `descripcion` con "No. de control"; `pantallas[2]` = "Captura por No.
+      de control"; `permisos[1]` = `capturar_no_control`.
+    - `roles/enfermeria`: `plataformaConfirmada` = `true` (ADR-011).
+  - **Reglas:** el contenido completo de `firebase/firestore.rules` (237 líneas, con
+    `noControl` y los avisos de ADR-010) quedó **pegado** en el editor de reglas de la consola,
+    idéntico al archivo. El sistema de permisos no dejó a Claude presionar "Publish" (cambia la
+    seguridad de la base); la pestaña se recargó y se perdió lo pegado, así que se volvió a pegar
+    y **el usuario lo publicó**. Después se recargó la página y se comprobó que las reglas
+    publicadas son las nuevas (238 líneas, con `noControl` y `avisoValido`, sin `matricula`).
+- **Un susto, sin daño:** al editar `permisos[1]` de `roles/prefecto` se abrió por error el
+  diálogo "Delete Data"; se canceló y no se borró nada (se comprobó que el campo seguía).
+- **Archivos:** `firebase/roles.json` (nota de que Enfermería ya está en la consola),
+  `docs/PENDIENTES.md`.
+- **Cómo se comprobó:** se leyó cada documento de `roles` en la consola después de guardarlo
+  y coincide con `roles.json`. Las reglas pegadas se compararon con el archivo (iguales).
+- **Falta:** crear el índice de `registros`
+  (`fecha` ↑, `alerta` ↑, `fechaHora` ↓), instalar la app nueva y crear al alumno de prueba
+  con 14 dígitos.
+
 ### 20-03. Primera versión de la web de Control Escolar y Enfermería (ADR-011)
 
 - **Pedido del usuario:** "empieza a crear el apartado web, son 2 usuarios".

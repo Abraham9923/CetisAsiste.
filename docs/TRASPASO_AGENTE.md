@@ -49,7 +49,7 @@ página, lista de pantallas y diferencias con la app: [referencias/FIGMA.md](ref
 | Pantallas de **prefecto** (vistas XML) | **Hechas**, con escáner QR, captura por No. de control, resultado y alertas (ADR-009). Falta probarlas con `prefecto.prueba` |
 | Pantallas de **profesor** (vistas XML) | **Hechas**; guarda estatus y salidas de grupo. Falta probarlas con `profesor.prueba` |
 | Cambiar contraseña (todos) | **Hecha**; obligatoria al entrar si `debeCambiarContrasena = true` o venció |
-| Enfermería y Control Escolar | **Web, primera versión hecha** (ADR-011, carpeta `web/`), probada con el emulador; **falta publicarla**. En Android ven un aviso |
+| Enfermería y Control Escolar | **Web, primera versión hecha** (ADR-011, carpeta `web/`), probada con el emulador y registrada en Firebase; **falta publicarla**. En Android ven un aviso |
 | Escaneo de QR y alertas | **Hecho** (ADR-009); el prefecto ve "Últimos escaneos" y "Alertas de hoy" (ADR-010) |
 | Avisos (notificaciones) | **Hechos** (ADR-010): un buzón por cuenta; el padre recibe entradas, salidas, estatus y algunas alertas; campana en vivo. Son **dentro de la app**: el **push** no existe (necesita Blaze) |
 | Plan de Firebase | **Spark (gratis)**: sin Cloud Functions y con límites diarios que **no alcanzan** para 2,500 alumnos |
@@ -106,7 +106,10 @@ Detalle completo, paso por paso: [BITACORA.md](BITACORA.md) (entradas 19-01 a 19
     estrictas con pruebas en el emulador.
 16. **Revisión de la arquitectura (20 oct):** [ARQUITECTURA.md](ARQUITECTURA.md), qué mejorar
     por prioridad (escaneo sin señal, hora del servidor, App Check, script de administración…).
-17. **Web (ADR-011, 20 oct):** carpeta `web/` para Control Escolar y Enfermería.
+17. **Web (ADR-011, 20 oct):** carpeta `web/` para Control Escolar y Enfermería. Ya está
+    registrada en Firebase (`config.js` lleno, usa la base real); en esta PC, sin Node.js, se
+    abre con `docs/herramientas/servidor_web.ps1` (o la configuración "web" de
+    `.claude/launch.json`). Falta publicarla con Hosting.
 
 ---
 
