@@ -87,6 +87,7 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
      Compose: **0 errores**.
   3. Las 29 pruebas de `Escaneo` y `Avisos` pasan.
   4. Cada vista se comparó con su frame de Figma (medidas, colores, letras e íconos).
+  5. **El usuario compiló la rama en Android Studio (1 nov) y compiló sin errores.**
 - **Lo que no quedó idéntico a Figma (a propósito):** ver la lista en
   [ARQUITECTURA.md](ARQUITECTURA.md) §1.1 y aquí:
   - "Matrícula" dice **"No. de control"** (ADR-009): Perfil del alumno y del padre,
@@ -100,8 +101,8 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
   - Sin frame en Figma (usan sus piezas): Alertas de hoy del prefecto, Boletín del profesor,
     el contenido del Horario del padre y el mensaje de roles sin pantallas.
   - La capa oscura del diálogo de cerrar sesión es negra al 60 % (Figma: casi negra al 60 %).
-- **Falta (lo hace el usuario):** abrir el proyecto en Android Studio, correr
-  `./gradlew assembleDebug` y probar en el teléfono con las cuentas de prueba de cada rol.
+- **Falta (lo hace el usuario):** probar en el teléfono con las cuentas de prueba de cada
+  rol (ya compila en Android Studio).
   Generar los `.docx` con `md_a_word.ps1` si se quieren con el formato de Word de siempre
   (en la nube se generaron con un convertidor sencillo).
 

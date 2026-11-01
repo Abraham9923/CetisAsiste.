@@ -74,8 +74,8 @@ segundo plano.
 **Cómo se revisa sin teléfono:** además de las 29 pruebas, en una sesión sin acceso a Google
 Maven se compiló el Kotlin con `kotlinc` contra `android.jar`, las clases de ViewBinding y `R`
 generadas de los XML y firmas de AndroidX y Firebase, y un revisor de recursos comprobó cada
-`@string`, `@drawable`, `@id` y restricción. Falta la prueba real: `./gradlew assembleDebug`
-en Android Studio (bitácora 01-11-01).
+`@string`, `@drawable`, `@id` y restricción. Después el usuario la compiló en Android Studio
+sin errores (bitácora 01-11-01). Falta probarla en el teléfono con cada rol.
 
 ## 2. Lo que está bien (conviene conservarlo)
 
