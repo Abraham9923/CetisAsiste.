@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chip de una lista horizontal (RecyclerView): los grupos de "Horarios de grupos" del prefecto
+     (Figma Chip/101 de 78:971). El elegido va en guinda con letra blanca (lo pone el código).
+     Variable: el texto del chip. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="34dp"
+    android:layout_marginEnd="@dimen/cetis_space_8">
+
+    <TextView
+        android:id="@+id/textoChip"
+        style="@style/Cetis.Texto.TituloTarjeta"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:background="@drawable/shape_chip"
+        android:clickable="true"
+        android:clipToOutline="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="102" />
+</androidx.constraintlayout.widget.ConstraintLayout>

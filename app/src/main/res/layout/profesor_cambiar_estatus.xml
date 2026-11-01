@@ -1,141 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cambiar estatus: el profesor registra una falta, un reporte, una llamada de atención o un
-     castigo (son los cuatro que le permiten las reglas de Firestore). Se guarda en
-     alumnos/{No. de control}/estatus. Variables: alumno.nombre y su No. de control y grupo. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Cambiar estatus - Profesor" (78:1086). Tres tipos: Falta, Reporte y Llamada de
+     atención, como RadioButton dentro de un RadioGroup (se elige UNO).
+     Lleva ScrollView: al abrir el teclado el contenido ya no cabe en la pantalla. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Cetis.Pantalla">
+    style="@style/Cetis.Pantalla.Desplazable">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contenido"
+        style="@style/Cetis.Pantalla.Contenido">
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+        <include
+            android:id="@+id/barraSuperior"
+            layout="@layout/comun_barra_superior"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/cetis_app_bar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <!-- Alumno (79:718): a quién se le pone el estatus -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/tarjetaAlumno"
+            style="@style/Cetis.Tarjeta"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:paddingStart="@dimen/cetis_space_12"
+            android:paddingEnd="@dimen/cetis_space_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+            <TextView
+                android:id="@+id/textoIniciales"
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_circulo_iniciales"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="{alumno.iniciales}" />
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
+            <TextView
+                android:id="@+id/textoNombre"
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/cetis_space_12"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintBottom_toTopOf="@id/textoDetalle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/textoIniciales"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="{alumno.nombre}" />
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/profesor_titulo_cambiar_estatus" />
-            </LinearLayout>
-        </FrameLayout>
+            <TextView
+                android:id="@+id/textoDetalle"
+                style="@style/Cetis.Texto.SubtituloTarjeta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/textoNombre"
+                app:layout_constraintTop_toBottomOf="@id/textoNombre"
+                tools:text="Grupo {alumno.grupo} · No. de control {alumno.noControl}" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <!-- Tipo (79:729): RadioGroup, el profesor elige UN tipo de estatus (chips de Figma) -->
+        <TextView
+            android:id="@+id/etiquetaTipo"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:text="@string/campo_tipo_estatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tarjetaAlumno" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <RadioGroup
+            android:id="@+id/grupoTipoEstatus"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaTipo">
 
-                <!-- A quién se le pone el estatus -->
-                <LinearLayout style="@style/Cetis.Tarjeta">
+            <RadioButton
+                android:id="@+id/chipFalta"
+                style="@style/Cetis.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/estatus_falta" />
 
-                    <TextView
-                        android:id="@+id/txt_nombre"
-                        style="@style/Cetis.Texto.TituloTarjeta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="{alumno.nombre}" />
+            <RadioButton
+                android:id="@+id/chipReporte"
+                style="@style/Cetis.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginEnd="@dimen/cetis_space_8"
+                android:text="@string/estatus_reporte"
+                tools:checked="true" />
 
-                    <TextView
-                        android:id="@+id/txt_detalle"
-                        style="@style/Cetis.Texto.SubtituloTarjeta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        tools:text="{alumno.noControl} · Grupo {alumno.grupo}" />
-                </LinearLayout>
+            <RadioButton
+                android:id="@+id/chipLlamada"
+                style="@style/Cetis.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/estatus_llamada_atencion" />
+        </RadioGroup>
 
-                <TextView
-                    style="@style/Cetis.Campo.Titulo"
-                    android:text="@string/profesor_estatus_tipo" />
+        <!-- Motivo (79:738): área de texto de 132 dp -->
+        <TextView
+            android:id="@+id/etiquetaMotivo"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:labelFor="@+id/campoMotivo"
+            android:text="@string/campo_motivo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/grupoTipoEstatus" />
 
-                <!-- Tipos: el elegido va en guinda (lo marca el código) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_8"
-                    android:orientation="horizontal">
+        <EditText
+            android:id="@+id/campoMotivo"
+            style="@style/Cetis.Texto.Cuerpo"
+            android:layout_width="0dp"
+            android:layout_height="132dp"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:background="@drawable/shape_input"
+            android:gravity="top|start"
+            android:hint="@string/pista_motivo"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textCapSentences"
+            android:paddingStart="15.5dp"
+            android:paddingTop="13.5dp"
+            android:paddingEnd="15.5dp"
+            android:paddingBottom="13.5dp"
+            android:textColorHint="@color/cetis_text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaMotivo" />
 
-                    <TextView
-                        android:id="@+id/chip_falta"
-                        style="@style/Cetis.Chip"
-                        android:layout_marginEnd="@dimen/cetis_space_8"
-                        android:text="@string/estatus_falta" />
+        <!-- Error al revisar o guardar (solo se ve si hay uno) -->
+        <TextView
+            android:id="@+id/textoMensaje"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:textColor="@color/cetis_status_danger"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/campoMotivo" />
 
-                    <TextView
-                        android:id="@+id/chip_reporte"
-                        style="@style/Cetis.Chip"
-                        android:text="@string/estatus_reporte" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_8"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/chip_llamada_atencion"
-                        style="@style/Cetis.Chip"
-                        android:layout_marginEnd="@dimen/cetis_space_8"
-                        android:text="@string/estatus_llamada_atencion" />
-
-                    <TextView
-                        android:id="@+id/chip_castigo"
-                        style="@style/Cetis.Chip"
-                        android:text="@string/estatus_castigo" />
-                </LinearLayout>
-
-                <TextView
-                    style="@style/Cetis.Campo.Titulo"
-                    android:text="@string/profesor_estatus_descripcion" />
-
-                <EditText
-                    android:id="@+id/edit_descripcion"
-                    style="@style/Cetis.Texto.Cuerpo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/shape_input"
-                    android:gravity="top|start"
-                    android:hint="@string/profesor_estatus_descripcion_hint"
-                    android:importantForAutofill="no"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:maxLength="300"
-                    android:minHeight="110dp"
-                    android:padding="14dp"
-                    android:textColorHint="@color/cetis_text_secondary" />
-
-                <!-- Solo si el estatus elegido se le avisa al padre (configuracion/plantel, ADR-010) -->
-                <TextView
-                    android:id="@+id/txt_aviso_padre"
-                    style="@style/Cetis.Texto.CuerpoChico"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:text="@string/profesor_estatus_aviso_padre"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/txt_mensaje"
-                    style="@style/Cetis.Texto.CuerpoChico"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:textColor="@color/cetis_status_danger"
-                    android:visibility="gone"
-                    tools:text="{mensaje}"
-                    tools:visibility="visible" />
-
-                <Button
-                    android:id="@+id/btn_guardar"
-                    style="@style/Cetis.Boton"
-                    android:text="@string/profesor_estatus_guardar" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+        <Button
+            android:id="@+id/botonGuardar"
+            style="@style/Cetis.Boton"
+            android:layout_width="0dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:text="@string/boton_guardar_estatus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoMensaje" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

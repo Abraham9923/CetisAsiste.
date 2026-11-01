@@ -34,24 +34,24 @@ import kotlin.coroutines.resumeWithException
  * Las pantallas no consultan la base: le piden los datos a este objeto.
  * Así, si cambia la base de datos, solo se toca este archivo.
  *
- * Todas las funciones son `suspend`: se llaman desde una corrutina
- * (LaunchedEffect / produceState en Compose) y no congelan la pantalla.
+ * Las funciones son `suspend`: se llaman desde una corrutina (lifecycleScope de cada
+ * pantalla) y no congelan la pantalla.
  */
 
 /** Lo que la app sabe de la persona que inició sesión. */
 data class Sesion(
-    val uid: String,
+    val idUsuario: String,
     val usuario: UsuarioDoc,
 )
 
 /** Resultado de intentar iniciar sesión. */
-sealed interface ResultadoLogin {
-    data class Correcto(val sesion: Sesion) : ResultadoLogin
-    data class Error(val mensaje: MensajeLogin) : ResultadoLogin
+sealed interface ResultadoInicioSesion {
+    data class Correcto(val sesion: Sesion) : ResultadoInicioSesion
+    data class Error(val mensaje: MensajeInicioSesion) : ResultadoInicioSesion
 }
 
 /** Errores posibles al iniciar sesión (el texto de cada uno está en strings.xml). */
-enum class MensajeLogin {
+enum class MensajeInicioSesion {
     CamposVacios,
     NoControlInvalido,
     DatosIncorrectos,
@@ -81,8 +81,8 @@ object CetisRepositorio {
      */
     const val DOMINIO_CORREO = "cetis61.mx"
 
-    private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
-    private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
+    private val autenticacion: FirebaseAuth get() = FirebaseAuth.getInstance()
+    private val baseDeDatos: FirebaseFirestore get() = FirebaseFirestore.getInstance()
 
     /** "00000000000000" → "00000000000000@cetis61.mx". Si ya trae @, se deja igual. */
     fun correoDeAcceso(usuario: String): String {
@@ -92,65 +92,65 @@ object CetisRepositorio {
 
     // ---------- Sesión ----------
 
-    suspend fun iniciarSesion(usuario: String, contrasena: String): ResultadoLogin {
+    suspend fun iniciarSesion(usuario: String, contrasena: String): ResultadoInicioSesion {
         if (usuario.isBlank() || contrasena.isEmpty()) {
-            return ResultadoLogin.Error(MensajeLogin.CamposVacios)
+            return ResultadoInicioSesion.Error(MensajeInicioSesion.CamposVacios)
         }
         // Si escribe solo números es un alumno: su No. de control debe tener 14 dígitos.
         val limpio = usuario.trim()
         if (limpio.all { it in '0'..'9' } && !NoControl.esValido(limpio)) {
-            return ResultadoLogin.Error(MensajeLogin.NoControlInvalido)
+            return ResultadoInicioSesion.Error(MensajeInicioSesion.NoControlInvalido)
         }
         return try {
-            val resultado = auth.signInWithEmailAndPassword(correoDeAcceso(usuario), contrasena).await()
-            val uid = resultado.user?.uid ?: return ResultadoLogin.Error(MensajeLogin.Desconocido)
-            cargarSesion(uid)
-        } catch (e: FirebaseAuthException) {
-            ResultadoLogin.Error(MensajeLogin.DatosIncorrectos)
-        } catch (e: FirebaseNetworkException) {
-            ResultadoLogin.Error(MensajeLogin.SinConexion)
-        } catch (e: FirebaseTooManyRequestsException) {
-            ResultadoLogin.Error(MensajeLogin.DemasiadosIntentos)
-        } catch (e: FirebaseFirestoreException) {
-            auth.signOut()
-            ResultadoLogin.Error(
-                if (e.code == FirebaseFirestoreException.Code.UNAVAILABLE) MensajeLogin.SinConexion
-                else MensajeLogin.Desconocido
+            val resultado = autenticacion.signInWithEmailAndPassword(correoDeAcceso(usuario), contrasena).esperar()
+            val idUsuario = resultado.user?.uid ?: return ResultadoInicioSesion.Error(MensajeInicioSesion.Desconocido)
+            cargarSesion(idUsuario)
+        } catch (excepcion: FirebaseAuthException) {
+            ResultadoInicioSesion.Error(MensajeInicioSesion.DatosIncorrectos)
+        } catch (excepcion: FirebaseNetworkException) {
+            ResultadoInicioSesion.Error(MensajeInicioSesion.SinConexion)
+        } catch (excepcion: FirebaseTooManyRequestsException) {
+            ResultadoInicioSesion.Error(MensajeInicioSesion.DemasiadosIntentos)
+        } catch (excepcion: FirebaseFirestoreException) {
+            autenticacion.signOut()
+            ResultadoInicioSesion.Error(
+                if (excepcion.code == FirebaseFirestoreException.Code.UNAVAILABLE) MensajeInicioSesion.SinConexion
+                else MensajeInicioSesion.Desconocido
             )
         }
     }
 
     /** Si la app ya tenía una sesión abierta (se cerró sin "Cerrar sesión"), la recupera. */
     suspend fun sesionGuardada(): Sesion? {
-        val uid = auth.currentUser?.uid ?: return null
+        val idUsuario = autenticacion.currentUser?.uid ?: return null
         return try {
-            (cargarSesion(uid) as? ResultadoLogin.Correcto)?.sesion
-        } catch (e: FirebaseFirestoreException) {
+            (cargarSesion(idUsuario) as? ResultadoInicioSesion.Correcto)?.sesion
+        } catch (excepcion: FirebaseFirestoreException) {
             null
         }
     }
 
     fun cerrarSesion() {
-        auth.signOut()
+        autenticacion.signOut()
     }
 
     /**
      * Lee usuarios/{uid}. Si no existe o está desactivada, cierra la sesión de Authentication:
      * tener contraseña no basta, Control Escolar también debe haber creado su ficha.
      */
-    private suspend fun cargarSesion(uid: String): ResultadoLogin {
-        val documento = db.collection(Colecciones.USUARIOS).document(uid).get().await()
+    private suspend fun cargarSesion(idUsuario: String): ResultadoInicioSesion {
+        val documento = baseDeDatos.collection(Colecciones.USUARIOS).document(idUsuario).get().esperar()
         val usuario = documento.toObject(UsuarioDoc::class.java)
         return when {
             usuario == null -> {
-                auth.signOut()
-                ResultadoLogin.Error(MensajeLogin.CuentaNoRegistrada)
+                autenticacion.signOut()
+                ResultadoInicioSesion.Error(MensajeInicioSesion.CuentaNoRegistrada)
             }
             !usuario.activo -> {
-                auth.signOut()
-                ResultadoLogin.Error(MensajeLogin.CuentaDesactivada)
+                autenticacion.signOut()
+                ResultadoInicioSesion.Error(MensajeInicioSesion.CuentaDesactivada)
             }
-            else -> ResultadoLogin.Correcto(Sesion(uid, usuario))
+            else -> ResultadoInicioSesion.Correcto(Sesion(idUsuario, usuario))
         }
     }
 
@@ -160,8 +160,8 @@ object CetisRepositorio {
     // pantalla se actualiza sola. Dejan de escuchar cuando la pantalla ya no las usa.
 
     /** usuarios/{uid}: null si se borró; falla si no hay permiso (cuenta desactivada). */
-    fun escucharUsuario(uid: String): Flow<Result<UsuarioDoc?>> =
-        escuchar(Colecciones.USUARIOS, uid, UsuarioDoc::class.java)
+    fun escucharUsuario(idUsuario: String): Flow<Result<UsuarioDoc?>> =
+        escuchar(Colecciones.USUARIOS, idUsuario, UsuarioDoc::class.java)
 
     /** alumnos/{noControl}: null si no existe. */
     fun escucharAlumno(noControl: String): Flow<Result<AlumnoDoc?>> =
@@ -181,7 +181,7 @@ object CetisRepositorio {
     }
 
     private fun <T : Any> escuchar(coleccion: String, id: String, clase: Class<T>): Flow<Result<T?>> = callbackFlow {
-        val registro = db.collection(coleccion).document(id).addSnapshotListener { documento, error ->
+        val registro = baseDeDatos.collection(coleccion).document(id).addSnapshotListener { documento, error ->
             if (error != null) {
                 trySend(Result.failure(error))
                 close()
@@ -199,7 +199,7 @@ object CetisRepositorio {
                 trySend(Result.failure(error))
                 close()
             } else {
-                trySend(Result.success(lista?.documents.orEmpty().mapNotNull { doc -> doc.toObject(clase)?.let { doc.id to it } }))
+                trySend(Result.success(lista?.documents.orEmpty().mapNotNull { documento -> documento.toObject(clase)?.let { documento.id to it } }))
             }
         }
         awaitClose { registro.remove() }
@@ -216,16 +216,16 @@ object CetisRepositorio {
     ): Flow<Result<List<Pair<String, T>>>> = flow {
         val periodo = try {
             periodoActual()
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            emit(Result.failure(e))
+        } catch (excepcion: Exception) {
+            if (excepcion is kotlinx.coroutines.CancellationException) throw excepcion
+            emit(Result.failure(excepcion))
             return@flow
         }
         if (periodo.isBlank()) {
             emit(Result.success(emptyList()))
             return@flow
         }
-        emitAll(escucharLista(consulta(db.collection(Colecciones.PERIODOS).document(periodo)), clase))
+        emitAll(escucharLista(consulta(baseDeDatos.collection(Colecciones.PERIODOS).document(periodo)), clase))
     }
 
     // ---------- Consultas ----------
@@ -233,42 +233,42 @@ object CetisRepositorio {
     /** alumnos/{noControl}, o null si no existe o no hay permiso. */
     suspend fun alumno(noControl: String): AlumnoDoc? {
         if (noControl.isBlank()) return null
-        return db.collection(Colecciones.ALUMNOS).document(noControl).get().await()
+        return baseDeDatos.collection(Colecciones.ALUMNOS).document(noControl).get().esperar()
             .toObject(AlumnoDoc::class.java)
     }
 
     /** Perfil del rol (roles/{rol}), o null si no existe. */
     suspend fun rol(rol: String): RolDoc? {
         if (rol.isBlank()) return null
-        return db.collection(Colecciones.ROLES).document(rol).get().await()
+        return baseDeDatos.collection(Colecciones.ROLES).document(rol).get().esperar()
             .toObject(RolDoc::class.java)
     }
 
     /** Clases de un grupo en un día ("lunes" … "viernes"). Lista vacía si no hay horario. */
     suspend fun horario(grupoId: String, dia: String): List<ClaseDoc> {
         if (grupoId.isBlank()) return emptyList()
-        return db.collection(Colecciones.GRUPOS).document(grupoId)
+        return baseDeDatos.collection(Colecciones.GRUPOS).document(grupoId)
             .collection(Colecciones.HORARIO).document(dia)
-            .get().await()
+            .get().esperar()
             .toObject(HorarioDoc::class.java)?.clases.orEmpty()
     }
 
     /** Anuncios dirigidos al rol, del más nuevo al más viejo. */
     suspend fun anuncios(rol: String, limite: Long = 50): List<AnuncioDoc> =
-        db.collection(Colecciones.ANUNCIOS)
+        baseDeDatos.collection(Colecciones.ANUNCIOS)
             .whereArrayContains("dirigidoA", rol)
             .orderBy("fecha", Query.Direction.DESCENDING)
             .limit(limite)
-            .get().await()
+            .get().esperar()
             .toObjects(AnuncioDoc::class.java)
 
     /** Eventos que empiezan entre [desde] (incluido) y [hasta] (excluido), en orden. */
     suspend fun eventos(desde: Timestamp, hasta: Timestamp): List<EventoDoc> =
-        db.collection(Colecciones.EVENTOS)
+        baseDeDatos.collection(Colecciones.EVENTOS)
             .whereGreaterThanOrEqualTo("inicio", desde)
             .whereLessThan("inicio", hasta)
             .orderBy("inicio")
-            .get().await()
+            .get().esperar()
             .toObjects(EventoDoc::class.java)
 
     /**
@@ -279,7 +279,7 @@ object CetisRepositorio {
     suspend fun configuracion(): ConfiguracionDoc {
         val guardada = configuracionGuardada
         if (guardada != null && System.currentTimeMillis() - guardada.first < VIGENCIA_CONFIGURACION_MS) return guardada.second
-        val leida = db.collection(Colecciones.CONFIGURACION).document("plantel").get().await()
+        val leida = baseDeDatos.collection(Colecciones.CONFIGURACION).document("plantel").get().esperar()
             .toObject(ConfiguracionDoc::class.java) ?: ConfiguracionDoc()
         configuracionGuardada = System.currentTimeMillis() to leida
         return leida
@@ -302,42 +302,42 @@ object CetisRepositorio {
         if (noControl.isBlank()) return emptyList()
         val periodo = periodoActual()
         if (periodo.isBlank()) return emptyList()
-        var consulta = db.collection(Colecciones.PERIODOS).document(periodo)
+        var consulta = baseDeDatos.collection(Colecciones.PERIODOS).document(periodo)
             .collection(Colecciones.REGISTROS)
             .whereEqualTo("alumnoId", noControl)
             .orderBy("fechaHora", Query.Direction.DESCENDING)
         if (despuesDe != null) consulta = consulta.startAfter(despuesDe)
-        return consulta.limit(POR_PAGINA).get().await().toObjects(RegistroDoc::class.java)
+        return consulta.limit(POR_PAGINA).get().esperar().toObjects(RegistroDoc::class.java)
     }
 
     /** Cuántos registros se piden a la vez (cada uno cuenta como una lectura). */
     const val POR_PAGINA = 20L
 
-    private fun buzon(uid: String) =
-        db.collection(Colecciones.USUARIOS).document(uid).collection(Colecciones.NOTIFICACIONES)
+    private fun buzon(idUsuario: String) =
+        baseDeDatos.collection(Colecciones.USUARIOS).document(idUsuario).collection(Colecciones.NOTIFICACIONES)
 
     /**
      * Avisos personales de la cuenta (su buzón), del más nuevo al más viejo, en tiempo real:
      * un aviso nuevo aparece sin salir de la pantalla. Solo se escucha mientras la pantalla de
      * Notificaciones está abierta.
      */
-    fun escucharNotificaciones(uid: String, limite: Long = 50): Flow<Result<List<Pair<String, NotificacionDoc>>>> =
-        escucharLista(buzon(uid).orderBy("fecha", Query.Direction.DESCENDING).limit(limite), NotificacionDoc::class.java)
+    fun escucharNotificaciones(idUsuario: String, limite: Long = 50): Flow<Result<List<Pair<String, NotificacionDoc>>>> =
+        escucharLista(buzon(idUsuario).orderBy("fecha", Query.Direction.DESCENDING).limit(limite), NotificacionDoc::class.java)
 
     /**
      * Cuántos avisos sin leer tiene la cuenta (para la campana), en tiempo real. Cuenta hasta
      * Avisos.MAXIMO_SIN_LEER: así cada cambio cuesta pocas lecturas.
      */
-    fun escucharSinLeer(uid: String): Flow<Result<Int>> =
-        escucharLista(buzon(uid).whereEqualTo("leida", false).limit(Avisos.MAXIMO_SIN_LEER), NotificacionDoc::class.java)
+    fun escucharSinLeer(idUsuario: String): Flow<Result<Int>> =
+        escucharLista(buzon(idUsuario).whereEqualTo("leida", false).limit(Avisos.MAXIMO_SIN_LEER), NotificacionDoc::class.java)
             .map { resultado -> resultado.map { it.size } }
 
     /** Marca como leídas las notificaciones indicadas (solo cambia el campo `leida`). */
-    suspend fun marcarLeidas(uid: String, ids: List<String>) {
+    suspend fun marcarLeidas(idUsuario: String, ids: List<String>) {
         if (ids.isEmpty()) return
-        val lote = db.batch()
-        ids.forEach { lote.update(buzon(uid).document(it), "leida", true) }
-        lote.commit().await()
+        val lote = baseDeDatos.batch()
+        ids.forEach { lote.update(buzon(idUsuario).document(it), "leida", true) }
+        lote.commit().esperar()
     }
 
     // ---------- Personal: prefecto y profesor ----------
@@ -346,12 +346,12 @@ object CetisRepositorio {
     suspend fun gruposDelTurno(turno: String): List<Pair<String, GrupoDoc>> {
         val periodo = periodoActual()
         if (periodo.isBlank()) return emptyList()
-        return db.collection(Colecciones.GRUPOS)
+        return baseDeDatos.collection(Colecciones.GRUPOS)
             .whereEqualTo("periodoId", periodo)
             .whereEqualTo("turno", turno)
             .orderBy("nombre")
-            .get().await()
-            .documents.mapNotNull { doc -> doc.toObject(GrupoDoc::class.java)?.let { doc.id to it } }
+            .get().esperar()
+            .documents.mapNotNull { documento -> documento.toObject(GrupoDoc::class.java)?.let { documento.id to it } }
     }
 
     /**
@@ -360,7 +360,7 @@ object CetisRepositorio {
      */
     suspend fun grupos(ids: List<String>): List<Pair<String, GrupoDoc>> =
         ids.filter { it.isNotBlank() }.distinct().mapNotNull { id ->
-            db.collection(Colecciones.GRUPOS).document(id).get().await()
+            baseDeDatos.collection(Colecciones.GRUPOS).document(id).get().esperar()
                 .toObject(GrupoDoc::class.java)?.let { id to it }
         }.sortedBy { it.second.nombre }
 
@@ -372,23 +372,33 @@ object CetisRepositorio {
         if (grupoId.isBlank()) return emptyList()
         // Ordena como en español: "Álvarez" junto a "Alvarado", no al final.
         val orden = Collator.getInstance(Locale.forLanguageTag("es-MX")).apply { strength = Collator.PRIMARY }
-        return db.collection(Colecciones.ALUMNOS)
+        return baseDeDatos.collection(Colecciones.ALUMNOS)
             .whereEqualTo("estado", EstadoAlumno.INSCRITO)
             .whereEqualTo("grupoId", grupoId)
             .orderBy("apellidoPaterno")
-            .get().await()
+            .get().esperar()
             .toObjects(AlumnoDoc::class.java)
             .sortedWith(compareBy(orden) { "${it.apellidoPaterno} ${it.apellidoMaterno} ${it.nombres}" })
     }
 
+    /**
+     * Grupos del semestre en curso de los dos turnos (primero el matutino), por nombre. Lo usa
+     * "Horarios de grupos" del prefecto. Son las mismas consultas que [gruposDelTurno].
+     */
+    suspend fun gruposDelSemestre(): List<Pair<String, GrupoDoc>> =
+        gruposDelTurno(Turno.MATUTINO) + gruposDelTurno(Turno.VESPERTINO)
+
+    /** El estatus más reciente del alumno (o null si no tiene). Lo usa la lista del grupo del profesor. */
+    suspend fun ultimoEstatus(noControl: String): EstatusDoc? = estatus(noControl, limite = 1).firstOrNull()
+
     /** Estatus de un alumno (faltas, reportes, castigos…), del más nuevo al más viejo. */
     suspend fun estatus(noControl: String, limite: Long = 30): List<EstatusDoc> {
         if (noControl.isBlank()) return emptyList()
-        return db.collection(Colecciones.ALUMNOS).document(noControl)
+        return baseDeDatos.collection(Colecciones.ALUMNOS).document(noControl)
             .collection(Colecciones.ESTATUS)
             .orderBy("fecha", Query.Direction.DESCENDING)
             .limit(limite)
-            .get().await()
+            .get().esperar()
             .toObjects(EstatusDoc::class.java)
     }
 
@@ -398,21 +408,21 @@ object CetisRepositorio {
      * grupo poner falta, reporte, llamada de atención o castigo, y avisar solo a sus padres.
      */
     suspend fun agregarEstatus(noControl: String, estatus: EstatusDoc, aviso: NotificacionDoc? = null, padres: List<String> = emptyList()) {
-        val lote = db.batch()
-        lote.set(db.collection(Colecciones.ALUMNOS).document(noControl).collection(Colecciones.ESTATUS).document(), estatus)
+        val lote = baseDeDatos.batch()
+        lote.set(baseDeDatos.collection(Colecciones.ALUMNOS).document(noControl).collection(Colecciones.ESTATUS).document(), estatus)
         if (aviso != null) padres.forEach { lote.set(buzon(it).document(), aviso) }
-        lote.commit().await()
+        lote.commit().esperar()
     }
 
     /** Grupos que ya salieron hoy (salidasDeGrupo del semestre en curso), del más reciente al más viejo. */
     suspend fun salidasDeGrupoDeHoy(): List<SalidaDeGrupoDoc> {
         val periodo = periodoActual()
         if (periodo.isBlank()) return emptyList()
-        return db.collection(Colecciones.PERIODOS).document(periodo)
+        return baseDeDatos.collection(Colecciones.PERIODOS).document(periodo)
             .collection(Colecciones.SALIDAS_DE_GRUPO)
             .whereEqualTo("fecha", Formatos.fechaDeHoy())
             .orderBy("fechaHora", Query.Direction.DESCENDING)
-            .get().await()
+            .get().esperar()
             .toObjects(SalidaDeGrupoDoc::class.java)
     }
 
@@ -465,9 +475,9 @@ object CetisRepositorio {
     suspend fun darSalidaAlGrupo(salida: SalidaDeGrupoDoc) {
         val periodo = periodoActual()
         check(periodo.isNotBlank()) { "No hay un semestre en curso (configuracion/plantel.periodoActual)." }
-        db.collection(Colecciones.PERIODOS).document(periodo)
+        baseDeDatos.collection(Colecciones.PERIODOS).document(periodo)
             .collection(Colecciones.SALIDAS_DE_GRUPO)
-            .add(salida).await()
+            .add(salida).esperar()
     }
 
     // ---------- Escaneo del prefecto ----------
@@ -492,14 +502,14 @@ object CetisRepositorio {
     suspend fun registrarEscaneo(registro: RegistroDoc, alumno: AlumnoDoc?, aviso: NotificacionDoc?) {
         val periodo = periodoActual()
         check(periodo.isNotBlank()) { "No hay un semestre en curso (configuracion/plantel.periodoActual)." }
-        val lote = db.batch()
+        val lote = baseDeDatos.batch()
         lote.set(
-            db.collection(Colecciones.PERIODOS).document(periodo).collection(Colecciones.REGISTROS).document(),
+            baseDeDatos.collection(Colecciones.PERIODOS).document(periodo).collection(Colecciones.REGISTROS).document(),
             registro,
         )
         if (alumno != null && registro.alerta == null) {
             lote.update(
-                db.collection(Colecciones.ALUMNOS).document(registro.alumnoId),
+                baseDeDatos.collection(Colecciones.ALUMNOS).document(registro.alumnoId),
                 mapOf(
                     "ubicacion" to Escaneo.ubicacionDespues(registro.tipo),
                     "ultimoRegistro" to mapOf("tipo" to registro.tipo, "fechaHora" to registro.fechaHora),
@@ -508,7 +518,7 @@ object CetisRepositorio {
             )
         }
         if (aviso != null) Avisos.destinatarios(alumno).forEach { padre -> lote.set(buzon(padre).document(), aviso) }
-        lote.commit().await()
+        lote.commit().esperar()
     }
 
     // ---------- Contraseña ----------
@@ -519,20 +529,20 @@ object CetisRepositorio {
      * cuándo vence la nueva (configuracion/plantel.diasVenceContrasena; 0 = no vence).
      */
     suspend fun cambiarContrasena(actual: String, nueva: String): ResultadoContrasena {
-        val cuenta = auth.currentUser ?: return ResultadoContrasena.Desconocido
+        val cuenta = autenticacion.currentUser ?: return ResultadoContrasena.Desconocido
         val correo = cuenta.email ?: return ResultadoContrasena.Desconocido
         try {
-            cuenta.reauthenticate(EmailAuthProvider.getCredential(correo, actual)).await()
-            cuenta.updatePassword(nueva).await()
-        } catch (e: FirebaseAuthWeakPasswordException) {
+            cuenta.reauthenticate(EmailAuthProvider.getCredential(correo, actual)).esperar()
+            cuenta.updatePassword(nueva).esperar()
+        } catch (excepcion: FirebaseAuthWeakPasswordException) {
             return ResultadoContrasena.Debil
-        } catch (e: FirebaseAuthInvalidCredentialsException) {
+        } catch (excepcion: FirebaseAuthInvalidCredentialsException) {
             return ResultadoContrasena.ActualIncorrecta
-        } catch (e: FirebaseNetworkException) {
+        } catch (excepcion: FirebaseNetworkException) {
             return ResultadoContrasena.SinConexion
-        } catch (e: FirebaseTooManyRequestsException) {
+        } catch (excepcion: FirebaseTooManyRequestsException) {
             return ResultadoContrasena.DemasiadosIntentos
-        } catch (e: FirebaseException) {
+        } catch (excepcion: FirebaseException) {
             return ResultadoContrasena.Desconocido
         }
         // La contraseña ya cambió. Si esta parte falla (por ejemplo, sin internet), lo único que
@@ -540,15 +550,15 @@ object CetisRepositorio {
         try {
             val dias = configuracion().diasVenceContrasena
             val vence = if (dias > 0) Timestamp(Date(System.currentTimeMillis() + dias * UN_DIA_MS)) else null
-            db.collection(Colecciones.USUARIOS).document(cuenta.uid).update(
+            baseDeDatos.collection(Colecciones.USUARIOS).document(cuenta.uid).update(
                 mapOf(
                     "debeCambiarContrasena" to false,
                     "contrasenaVence" to vence,
                     "actualizadoEn" to Timestamp.now(),
                 )
-            ).await()
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
+            ).esperar()
+        } catch (excepcion: Exception) {
+            if (excepcion is kotlinx.coroutines.CancellationException) throw excepcion
         }
         return ResultadoContrasena.Lista
     }
@@ -557,7 +567,7 @@ object CetisRepositorio {
 }
 
 /** Espera a que termine una tarea de Firebase sin bloquear la pantalla. */
-suspend fun <T> Task<T>.await(): T = suspendCancellableCoroutine { continuacion ->
+suspend fun <T> Task<T>.esperar(): T = suspendCancellableCoroutine { continuacion ->
     addOnSuccessListener { continuacion.resume(it) }
     addOnFailureListener { continuacion.resumeWithException(it) }
     addOnCanceledListener { continuacion.cancel() }

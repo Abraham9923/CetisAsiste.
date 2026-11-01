@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Letra de los chips que son RadioButton: blanca si están elegidos, guinda si no (Figma Chip). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/cetis_text_on_brand" android:state_checked="true" />
+    <item android:color="@color/cetis_brand_900" />
+</selector>

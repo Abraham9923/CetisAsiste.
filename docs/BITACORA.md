@@ -11,6 +11,103 @@ Para el detalle de la base de datos ver [BASE_DE_DATOS.md](BASE_DE_DATOS.md); pa
 
 ---
 
+## 1 de noviembre de 2026
+
+### 01-11-01. Vistas en ConstraintLayout, una Activity por pantalla, ViewBinding y sin Compose
+
+- **Pedido del usuario:** cambiar el maquetado de todos los XML de `res/layout` con
+  ConstraintLayout (ScrollView solo donde el contenido no cabe), ImageButton para los botones
+  de solo ícono, RecyclerView para todo lo que se repite, RadioButton y CheckBox donde hagan
+  falta, ViewBinding sin `findViewById`, una Activity por pantalla abierta con Intent
+  explícito, nombres en español, borrar la Bienvenida, pasar a XML lo que quedaba en Compose
+  y quitar Compose, todos los textos en `strings.xml`, y que cada vista quede igual a su frame
+  de Figma (salvo el menú hamburguesa, la campana arriba y los RadioButton/CheckBox).
+- **Qué se hizo:**
+  - **Vistas (`res/layout`, 42 archivos).** Las 38 que quedaban se rehicieron con
+    `ConstraintLayout` (o `ScrollView` + un solo `ConstraintLayout`), revisando cada una
+    contra su frame de Figma. Se agregaron `comun_barra_superior.xml` y
+    `comun_barra_inicio.xml` (la barra guinda, que se incluye en cada pantalla),
+    `comun_item_chip.xml` (chips de grupo del prefecto), `comun_mensaje.xml` (antes
+    `MensajeCentrado` de Compose) y `comun_iniciar_sesion.xml` (antes
+    `alumno_iniciar_sesion.xml` + la pantalla Compose; es de todos los roles). Se borró
+    `alumno_confirmar_cerrar_sesion.xml`: ahora el diálogo se muestra encima del Perfil.
+  - **Cambios para quedar igual a Figma:** Perfil (subtítulo gris); Inicio del alumno (solo la
+    tarjeta Credencial lleva la esquina café); Inicio del padre (sin "CetisAsiste" en la barra
+    y con esquina en las cuatro tarjetas); el nombre completo en Entradas y salidas; el QR en
+    guinda oscuro; las pantallas internas sin flecha de regresar (Figma usa ☰ + título; se
+    regresa con el botón "atrás" de Android); **prefecto**: Inicio con "Escanear código QR",
+    Horarios de grupos y Calendario y "Últimos escaneos"; Horarios en una sola pantalla
+    (grupo, día y clases); captura con cursor y borde de 2 dp; resultado sin el párrafo del
+    motivo; **profesor**: Inicio con "Dar salida al grupo" (el grupo de la última clase de
+    hoy), "Mis grupos" y Boletín; lista de alumnos con buscador y su último estatus; perfil
+    del alumno con 3 acciones e Historial; Cambiar estatus con 3 tipos (sin castigo) y
+    "Motivo"; Dar salida con la tarjeta del grupo. Aviso amarillo de contraseña vencida
+    (colores nuevos `cetis_status_warning` y `cetis_status_warning_bg`).
+  - **RadioButton (dentro de RadioGroup):** días del horario (alumno, padre, prefecto),
+    Entrada / Salida (escáner y captura del prefecto) y tipo de estatus (profesor). Se elige
+    una sola opción; se ven como los chips de Figma (`selector_chip`, `selector_segmento`).
+  - **CheckBox:** el ojo de los campos de contraseña (iniciar sesión y los tres de cambiar
+    contraseña): activa o desactiva "mostrar la contraseña". Se ve como el ojo de Figma.
+  - **Código (Kotlin).** Una Activity por pantalla (29, todas en `AndroidManifest.xml`) en
+    `pantallas/{comun,alumno,padre,prefecto,profesor}`; `PantallaBase` (bordes, sesión, ☰ y
+    campana), `SesionActiva` (la sesión y sus escuchas en vivo, una vez para toda la app),
+    `Navegacion` y `Claves` (Intents y extras), `MenuLateral` y `DialogoCerrarSesion` (no son
+    Activities), `Adaptadores` y `Llenado` (RecyclerView con ViewBinding). Se borraron
+    `ui/` (Compose, `*App.kt`, `*Vistas.kt`, tema), `Main.kt`, `AlumnoVariables.kt` y
+    `AlumnoVistas.kt`. Nombres internos en español (por ejemplo `ResultadoLogin` →
+    `ResultadoInicioSesion`, `auth`/`db` → `autenticacion`/`baseDeDatos`, `Sesion.uid` →
+    `Sesion.idUsuario`, `await()` → `esperar()`; pruebas `EscaneoPrueba` y `AvisosPrueba`).
+  - **Bienvenida borrada** (`BienvenidaScreen.kt`, `bg_splash_accent.xml`, el texto
+    `splash_tagline`): la app abre en Iniciar sesión; si ya había sesión, pasa directo al
+    Inicio del rol.
+  - **Sin Compose:** se quitaron el plugin `kotlin.compose`, `buildFeatures { compose }` y
+    sus dependencias; se agregaron `activity-ktx`, `constraintlayout`, `recyclerview` y
+    `buildFeatures { viewBinding = true }`.
+  - **Textos:** un solo `res/values/strings.xml` (272 textos con nombres en español); se
+    borraron `strings_alumno.xml`, `strings_comun.xml`, `strings_prefecto.xml` y
+    `strings_profesor.xml`. Las palabras de `Formatos` ("Hoy", "Estudiante", "semestre",
+    "am"/"pm") también salen de ahí. Se borraron recursos que ya no se usaban
+    (`colors.xml` de la plantilla, `ic_arrow_left`, `ic_log_in_brand_48`).
+  - **Firebase sin cambios:** mismas consultas, escrituras y reglas. Se agregaron
+    `gruposDelSemestre()` y `ultimoEstatus()`, que reúsan consultas que ya existían.
+- **Archivos:** `app/build.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`,
+  `app/src/main/AndroidManifest.xml`, `app/src/main/java/**` (todo), `app/src/main/res/layout/**`,
+  `res/values/strings.xml`, `styles_cetis.xml`, `colors_cetis.xml`, `dimens_cetis.xml`,
+  `res/color/cetis_texto_chip.xml` y drawables nuevos (`selector_*`, `shape_*advertencia*`,
+  `shape_circulo_blanco`, `ic_ojo_contrasena`, `ic_search_field`), `app/src/test/**`,
+  `docs/ARQUITECTURA.md`.
+- **Cómo se comprobó:** en la sesión en la nube no se pudo correr `./gradlew assembleDebug`:
+  la red del entorno bloquea `dl.google.com` (Google Maven y el SDK de Android). En su lugar:
+  1. Se compiló **todo el Kotlin** con `kotlinc` 2.2.10 contra `android.jar` (API 37), las
+     clases `R` y de ViewBinding generadas de los XML y firmas de AndroidX y Firebase:
+     **0 errores**.
+  2. Un revisor de recursos comprobó cada `@string`, `@drawable`, `@color`, `@dimen`,
+     `@style` e `@id`, que no haya textos escritos directo, ids en camelCase, restricciones
+     horizontales y verticales en cada hijo de ConstraintLayout, ningún `findViewById` ni
+     Compose: **0 errores**.
+  3. Las 29 pruebas de `Escaneo` y `Avisos` pasan.
+  4. Cada vista se comparó con su frame de Figma (medidas, colores, letras e íconos).
+  5. **El usuario compiló la rama en Android Studio (1 nov) y compiló sin errores.**
+- **Lo que no quedó idéntico a Figma (a propósito):** ver la lista en
+  [ARQUITECTURA.md](ARQUITECTURA.md) §1.1 y aquí:
+  - "Matrícula" dice **"No. de control"** (ADR-009): Perfil del alumno y del padre,
+    Credencial, Captura ("Capturar No. de control", "Escribir No. de control"), Resultado,
+    lista y perfil del alumno del profesor y Cambiar estatus.
+  - Iniciar sesión es una sola para todos: el campo dice "No. de control o usuario".
+  - "Código para acceso al plantel" lleva acento (Figma: "Codigo").
+  - Los datos reales cambian lo que se ve: el aviso importante del padre muestra el título
+    del anuncio destacado; "Mis grupos" del profesor muestra semestre y turno (la app no
+    tiene la materia del grupo); el escáner muestra la cámara dentro del marco.
+  - Sin frame en Figma (usan sus piezas): Alertas de hoy del prefecto, Boletín del profesor,
+    el contenido del Horario del padre y el mensaje de roles sin pantallas.
+  - La capa oscura del diálogo de cerrar sesión es negra al 60 % (Figma: casi negra al 60 %).
+- **Falta (lo hace el usuario):** probar en el teléfono con las cuentas de prueba de cada
+  rol (ya compila en Android Studio).
+  Generar los `.docx` con `md_a_word.ps1` si se quieren con el formato de Word de siempre
+  (en la nube se generaron con un convertidor sencillo).
+
+---
+
 ## 20 de octubre de 2026
 
 ### 20-05. Web registrada en Firebase y abierta en esta computadora sin Node.js

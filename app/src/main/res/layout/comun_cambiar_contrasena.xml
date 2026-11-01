@@ -1,140 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cambiar contraseña. La usan todos los roles (Perfil → "Cambiar contraseña").
-     Si la cuenta tiene debeCambiarContrasena = true o su contraseña ya venció, la app la
-     muestra sola al entrar: entonces no hay flecha de regresar, solo "Cerrar sesión".
-     Los campos usan el diseño de "TextField" (Figma 32:423). -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Cambiar contrasena obligatorio" (77:505). La usan todos los roles: obligatoria al
+     entrar (con el aviso amarillo) o desde Perfil (sin el aviso).
+     Lleva ScrollView: al abrir el teclado el contenido ya no cabe en la pantalla.
+     Los ojos de cada campo son CheckBox (muestran u ocultan esa contraseña). -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Cetis.Pantalla">
+    style="@style/Cetis.Pantalla.Desplazable">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contenido"
+        style="@style/Cetis.Pantalla.Contenido">
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+        <include
+            android:id="@+id/barraSuperior"
+            layout="@layout/comun_barra_superior"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/cetis_app_bar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <!-- ExpiredNotice (78:903): solo cuando el cambio es obligatorio (Control Escolar lo pidió o venció) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/avisoVencida"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:background="@drawable/shape_aviso_advertencia"
+            android:padding="@dimen/cetis_space_16"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barraSuperior"
+            tools:visibility="visible">
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+            <ImageView
+                android:id="@+id/iconoVencida"
+                style="@style/Cetis.Circulo"
+                android:background="@drawable/shape_circulo_advertencia"
+                android:padding="10dp"
+                android:src="@drawable/ic_lock"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
+            <TextView
+                android:id="@+id/tituloVencida"
+                style="@style/Cetis.Texto.TituloTarjeta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/cetis_space_12"
+                android:text="@string/aviso_contrasena_vencida_titulo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iconoVencida"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/perfil_option_password" />
-            </LinearLayout>
-        </FrameLayout>
+            <TextView
+                android:id="@+id/textoVencida"
+                style="@style/Cetis.Texto.CuerpoChico"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/aviso_contrasena_vencida_texto"
+                android:textColor="@color/cetis_brand_900"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tituloVencida"
+                app:layout_constraintTop_toBottomOf="@id/tituloVencida" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <!-- Form (78:911): 4 dp más adentro que la pantalla, 16 dp entre campos -->
+        <TextView
+            android:id="@+id/etiquetaActual"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:labelFor="@+id/campoActual"
+            android:text="@string/campo_contrasena_actual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/avisoVencida" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <EditText
+            android:id="@+id/campoActual"
+            style="@style/Cetis.Campo.Caja"
+            android:layout_width="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
+            android:autofillHints="password"
+            android:drawableStart="@drawable/ic_lock_field"
+            android:hint="@string/pista_contrasena"
+            android:imeOptions="actionNext"
+            android:inputType="textPassword"
+            android:paddingEnd="44dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaActual" />
 
-                <!-- Solo cuando el cambio es obligatorio -->
-                <TextView
-                    android:id="@+id/txt_obligatoria"
-                    style="@style/Cetis.Texto.Cuerpo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_aviso_peligro"
-                    android:padding="@dimen/cetis_space_12"
-                    android:text="@string/comun_contrasena_obligatoria"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
+        <!-- Ojo: CheckBox para mostrar u ocultar esta contraseña -->
+        <CheckBox
+            android:id="@+id/casillaMostrarActual"
+            style="@style/Cetis.Campo.Ojo"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/campoActual"
+            app:layout_constraintEnd_toEndOf="@id/campoActual"
+            app:layout_constraintTop_toTopOf="@id/campoActual" />
 
-                <TextView
-                    style="@style/Cetis.Texto.CuerpoChico"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:text="@string/comun_contrasena_ayuda" />
+        <TextView
+            android:id="@+id/etiquetaNueva"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:labelFor="@+id/campoNueva"
+            android:text="@string/campo_contrasena_nueva"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/campoActual" />
 
-                <TextView
-                    style="@style/Cetis.Campo.Titulo"
-                    android:labelFor="@+id/edit_actual"
-                    android:text="@string/comun_contrasena_actual" />
+        <EditText
+            android:id="@+id/campoNueva"
+            style="@style/Cetis.Campo.Caja"
+            android:layout_width="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
+            android:autofillHints="newPassword"
+            android:drawableStart="@drawable/ic_lock_field"
+            android:hint="@string/pista_contrasena"
+            android:imeOptions="actionNext"
+            android:inputType="textPassword"
+            android:paddingEnd="44dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaNueva" />
 
-                <LinearLayout style="@style/Cetis.Campo.Caja">
+        <!-- Ojo: CheckBox para mostrar u ocultar esta contraseña -->
+        <CheckBox
+            android:id="@+id/casillaMostrarNueva"
+            style="@style/Cetis.Campo.Ojo"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/campoNueva"
+            app:layout_constraintEnd_toEndOf="@id/campoNueva"
+            app:layout_constraintTop_toTopOf="@id/campoNueva" />
 
-                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
+        <TextView
+            android:id="@+id/etiquetaRepetir"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:labelFor="@+id/campoRepetir"
+            android:text="@string/campo_contrasena_repetir"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/campoNueva" />
 
-                    <EditText
-                        android:id="@+id/edit_actual"
-                        style="@style/Cetis.Campo.Edicion"
-                        android:autofillHints="password"
-                        android:imeOptions="actionNext"
-                        android:inputType="textPassword" />
-                </LinearLayout>
+        <EditText
+            android:id="@+id/campoRepetir"
+            style="@style/Cetis.Campo.Caja"
+            android:layout_width="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
+            android:autofillHints="newPassword"
+            android:drawableStart="@drawable/ic_lock_field"
+            android:hint="@string/pista_contrasena"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:paddingEnd="44dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaRepetir" />
 
-                <TextView
-                    style="@style/Cetis.Campo.Titulo"
-                    android:labelFor="@+id/edit_nueva"
-                    android:text="@string/comun_contrasena_nueva" />
+        <!-- Ojo: CheckBox para mostrar u ocultar esta contraseña -->
+        <CheckBox
+            android:id="@+id/casillaMostrarRepetir"
+            style="@style/Cetis.Campo.Ojo"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/campoRepetir"
+            app:layout_constraintEnd_toEndOf="@id/campoRepetir"
+            app:layout_constraintTop_toTopOf="@id/campoRepetir" />
 
-                <LinearLayout style="@style/Cetis.Campo.Caja">
+        <!-- Error al revisar o guardar (solo se ve si hay uno) -->
+        <TextView
+            android:id="@+id/textoMensaje"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:layout_marginEnd="4dp"
+            android:textColor="@color/cetis_status_danger"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/campoRepetir" />
 
-                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
-
-                    <EditText
-                        android:id="@+id/edit_nueva"
-                        style="@style/Cetis.Campo.Edicion"
-                        android:autofillHints="newPassword"
-                        android:imeOptions="actionNext"
-                        android:inputType="textPassword" />
-                </LinearLayout>
-
-                <TextView
-                    style="@style/Cetis.Campo.Titulo"
-                    android:labelFor="@+id/edit_repetir"
-                    android:text="@string/comun_contrasena_repetir" />
-
-                <LinearLayout style="@style/Cetis.Campo.Caja">
-
-                    <ImageView style="@style/Cetis.Campo.Icono" android:src="@drawable/ic_lock_field" />
-
-                    <EditText
-                        android:id="@+id/edit_repetir"
-                        style="@style/Cetis.Campo.Edicion"
-                        android:autofillHints="newPassword"
-                        android:imeOptions="actionDone"
-                        android:inputType="textPassword" />
-                </LinearLayout>
-
-                <!-- Mensaje de error, en rojo (lo pone el código) -->
-                <TextView
-                    android:id="@+id/txt_mensaje"
-                    style="@style/Cetis.Texto.CuerpoChico"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:textColor="@color/cetis_status_danger"
-                    android:visibility="gone"
-                    tools:text="{mensaje}"
-                    tools:visibility="visible" />
-
-                <Button
-                    android:id="@+id/btn_guardar"
-                    style="@style/Cetis.Boton"
-                    android:text="@string/comun_contrasena_guardar" />
-
-                <!-- Solo cuando el cambio es obligatorio -->
-                <TextView
-                    android:id="@+id/txt_cerrar_sesion"
-                    style="@style/Cetis.Texto.SubtituloTarjeta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:padding="@dimen/cetis_space_8"
-                    android:text="@string/comun_cerrar_sesion_enlace"
-                    android:textColor="@color/cetis_brand_accent"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+        <Button
+            android:id="@+id/botonGuardar"
+            style="@style/Cetis.Boton"
+            android:layout_width="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:layout_marginEnd="4dp"
+            android:text="@string/boton_guardar_continuar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoMensaje" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

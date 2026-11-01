@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Iniciar sesion" (alumno 124:1876, padre 32:435, prefecto 125:1090, profesor 125:1613).
+     Es la primera pantalla de la app y la usan todos los roles (antes era Compose).
+     Lleva ScrollView: al abrir el teclado el contenido ya no cabe en la pantalla.
+     El ojo de la contraseña es un CheckBox (muestra u oculta la contraseña). -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla.Desplazable">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contenido"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Hero: guinda con las esquinas de abajo redondeadas y el adorno diagonal -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/portada"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_hero_login"
+            android:clipToOutline="true"
+            android:paddingBottom="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imagenAdorno"
+                android:layout_width="160dp"
+                android:layout_height="300dp"
+                android:importantForAccessibility="no"
+                android:scaleType="fitStart"
+                android:src="@drawable/bg_login_accent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- AppIcon: 76 dp = zona de la barra de estado (28) + espacio del diseño (48) -->
+            <ImageView
+                android:id="@+id/iconoApp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="76dp"
+                android:background="@drawable/shape_icono_app"
+                android:importantForAccessibility="no"
+                android:padding="18dp"
+                android:src="@drawable/ic_log_in_brand_36"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textoNombreApp"
+                style="@style/Cetis.Texto.NombreApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:accessibilityHeading="true"
+                android:text="@string/nombre_app"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iconoApp" />
+
+            <TextView
+                android:id="@+id/textoSubtitulo"
+                style="@style/Cetis.Texto.Cuerpo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/inicio_sesion_subtitulo"
+                android:textColor="@color/cetis_text_on_brand_muted"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textoNombreApp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Form: márgenes de 32 dp a los lados -->
+        <TextView
+            android:id="@+id/etiquetaUsuario"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="28dp"
+            android:labelFor="@+id/campoUsuario"
+            android:text="@string/campo_usuario_inicio_sesion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/portada" />
+
+        <EditText
+            android:id="@+id/campoUsuario"
+            style="@style/Cetis.Campo.Caja"
+            android:layout_width="0dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:autofillHints="username"
+            android:drawableStart="@drawable/ic_user_field"
+            android:hint="@string/pista_usuario_inicio_sesion"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaUsuario" />
+
+        <TextView
+            android:id="@+id/etiquetaContrasena"
+            style="@style/Cetis.Campo.Titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:labelFor="@+id/campoContrasena"
+            android:text="@string/campo_contrasena"
+            app:layout_constraintStart_toStartOf="@id/campoUsuario"
+            app:layout_constraintTop_toBottomOf="@id/campoUsuario" />
+
+        <EditText
+            android:id="@+id/campoContrasena"
+            style="@style/Cetis.Campo.Caja"
+            android:layout_width="0dp"
+            android:layout_marginTop="6dp"
+            android:autofillHints="password"
+            android:drawableStart="@drawable/ic_lock_field"
+            android:hint="@string/pista_contrasena"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:paddingEnd="44dp"
+            app:layout_constraintEnd_toEndOf="@id/campoUsuario"
+            app:layout_constraintStart_toStartOf="@id/campoUsuario"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaContrasena" />
+
+        <!-- Ojo (20 dp): CheckBox para activar / desactivar "mostrar la contraseña" -->
+        <CheckBox
+            android:id="@+id/casillaMostrarContrasena"
+            style="@style/Cetis.Campo.Ojo"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/campoContrasena"
+            app:layout_constraintEnd_toEndOf="@id/campoContrasena"
+            app:layout_constraintTop_toTopOf="@id/campoContrasena" />
+
+        <!-- ForgotPassword -->
+        <TextView
+            android:id="@+id/textoOlvidasteContrasena"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:gravity="end"
+            android:text="@string/enlace_olvidaste_contrasena"
+            android:textColor="@color/cetis_brand_accent"
+            app:layout_constraintEnd_toEndOf="@id/campoUsuario"
+            app:layout_constraintStart_toStartOf="@id/campoUsuario"
+            app:layout_constraintTop_toBottomOf="@id/campoContrasena" />
+
+        <!-- Error al iniciar sesión (solo se ve si hay uno) -->
+        <TextView
+            android:id="@+id/textoError"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:textColor="@color/cetis_status_danger"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/campoUsuario"
+            app:layout_constraintStart_toStartOf="@id/campoUsuario"
+            app:layout_constraintTop_toBottomOf="@id/textoOlvidasteContrasena"
+            tools:text="@string/error_inicio_sesion_datos"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/botonIniciarSesion"
+            style="@style/Cetis.Boton"
+            android:layout_width="0dp"
+            android:layout_marginTop="@dimen/cetis_space_16"
+            android:text="@string/boton_iniciar_sesion"
+            app:layout_constraintEnd_toEndOf="@id/campoUsuario"
+            app:layout_constraintStart_toStartOf="@id/campoUsuario"
+            app:layout_constraintTop_toBottomOf="@id/textoError" />
+
+        <!-- Logo CETis 61 (140 × 48.4), siempre abajo de la pantalla -->
+        <ImageView
+            android:id="@+id/imagenLogo"
+            android:layout_width="140dp"
+            android:layout_height="48.43dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="28dp"
+            android:contentDescription="@string/descripcion_logo_plantel"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_cetis61"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/botonIniciarSesion"
+            app:layout_constraintVertical_bias="1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

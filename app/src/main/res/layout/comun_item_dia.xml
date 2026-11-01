@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Una casilla del calendario: el número del día y, abajo, un punto si hay evento.
-     Hoy se pinta con círculo guinda y letra blanca; sábado y domingo, en gris (lo hace el código). -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Una casilla del calendario (Figma "Day" de 25:346): número en un círculo de 30 dp y, si
+     hay evento ese día, un punto café de 5 dp debajo. Renglón de la rejilla (RecyclerView).
+     Hoy: círculo guinda con letra blanca. Sábado y domingo: letra gris. Lo pone el código. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="0dp"
+    android:layout_width="match_parent"
     android:layout_height="40dp"
-    android:layout_weight="1"
-    android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:layout_marginBottom="@dimen/cetis_space_8">
 
     <TextView
-        android:id="@+id/txt_dia"
+        android:id="@+id/textoDia"
         style="@style/Cetis.Texto.CuerpoChico"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:gravity="center"
         android:textColor="@color/cetis_brand_900"
-        tools:text="5" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="6" />
 
     <ImageView
-        android:id="@+id/img_evento"
+        android:id="@+id/imagenEvento"
         android:layout_width="5dp"
         android:layout_height="5dp"
         android:layout_marginTop="2dp"
         android:importantForAccessibility="no"
         android:src="@drawable/img_event_dot"
         android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoDia"
         tools:visibility="visible" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

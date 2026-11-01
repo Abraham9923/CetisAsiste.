@@ -1,187 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: "Resultado OK - Prefecto" (77:501) y "Resultado alerta - Prefecto" (77:502).
-     Una sola vista para los dos casos: el código cambia colores, ícono y textos.
-     Variables: resultado (entrada o salida, alerta o null, hora), alumno.nombre,
-     alumno.grupo, alumno.noControl y si se avisó al padre. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Resultado OK - Prefecto" (77:501) y "Resultado alerta - Prefecto" (77:502), con las
+     variantes de "Alertas del escaner" (78:775). Cabe en la pantalla: sin ScrollView.
+     Verde si no hubo alerta; rojo con el título de la alerta si la hubo (lo pone el código).
+     "Matrícula" de Figma es "No. de control" desde ADR-009. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- ResultCard (78:706 / 78:743): blanca con borde verde (sin alerta) o rojo (con alerta) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaResultado"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:background="@drawable/shape_resultado_exito"
+        android:paddingStart="22dp"
+        android:paddingTop="30dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="26dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <!-- StatusIcon: círculo de 72 con el ícono de 40 -->
+        <ImageView
+            android:id="@+id/iconoResultado"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/shape_circulo_exito"
+            android:importantForAccessibility="no"
+            android:padding="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_check_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+        <TextView
+            android:id="@+id/textoResultado"
+            style="@style/Cetis.Texto.Banner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:accessibilityHeading="true"
+            android:gravity="center"
+            android:textColor="@color/cetis_status_success"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iconoResultado"
+            tools:text="{resultado.titulo}" />
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
+        <TextView
+            android:id="@+id/textoCuando"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoResultado"
+            tools:text="{resultado.hora}" />
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/prefecto_titulo_resultado" />
-            </LinearLayout>
-        </FrameLayout>
+        <View
+            android:id="@+id/divisor"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:background="@color/cetis_surface_pill"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoCuando" />
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <!-- Student: iniciales (52), nombre, grupo y No. de control, y la etiqueta de la alerta -->
+        <TextView
+            android:id="@+id/textoIniciales"
+            style="@style/Cetis.Texto.Seccion"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/shape_circulo_iniciales"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="@id/barreraAlumno"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoNombre"
+            tools:text="{iniciales}" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <TextView
+            android:id="@+id/textoNombre"
+            style="@style/Cetis.Texto.TituloNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/textoIniciales"
+            app:layout_constraintTop_toBottomOf="@id/divisor"
+            tools:text="{alumno.nombre}" />
 
-                <LinearLayout
-                    android:id="@+id/tarjeta_resultado"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_resultado_exito"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="@dimen/cetis_space_20">
+        <TextView
+            android:id="@+id/textoDetalleAlumno"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/textoNombre"
+            app:layout_constraintTop_toBottomOf="@id/textoNombre"
+            tools:text="Grupo {alumno.grupo} · No. de control {alumno.noControl}" />
 
-                    <FrameLayout
-                        android:id="@+id/circulo_resultado"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:background="@drawable/shape_circulo_exito">
+        <!-- StatusChip rojo con la alerta (solo si hubo alerta y existe el alumno) -->
+        <TextView
+            android:id="@+id/textoEtiquetaAlerta"
+            style="@style/Cetis.Estatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/shape_estatus_peligro"
+            android:drawableStart="@drawable/shape_punto_peligro"
+            android:textColor="@color/cetis_status_danger"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/textoNombre"
+            app:layout_constraintTop_toBottomOf="@id/textoDetalleAlumno"
+            tools:text="{alerta}"
+            tools:visibility="visible" />
 
-                        <ImageView
-                            android:id="@+id/img_resultado"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:importantForAccessibility="no"
-                            android:src="@drawable/ic_check_circle" />
-                    </FrameLayout>
+        <!-- Abajo del bloque del alumno (con o sin etiqueta): ahí se centran las iniciales -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barreraAlumno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="textoDetalleAlumno,textoEtiquetaAlerta" />
 
-                    <!-- "Entrada registrada" o el título de la alerta -->
-                    <TextView
-                        android:id="@+id/txt_resultado"
-                        style="@style/Cetis.Texto.TituloNombre"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_16"
-                        android:accessibilityHeading="true"
-                        android:gravity="center"
-                        android:textColor="@color/cetis_status_success"
-                        tools:text="{resultado.titulo}"
-                        tools:targetApi="28" />
+        <!-- Note: verde (aviso al padre) o rojo (la alerta quedó guardada) -->
+        <TextView
+            android:id="@+id/textoAviso"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:background="@drawable/shape_aviso_exito"
+            android:padding="@dimen/cetis_space_12"
+            android:textColor="@color/cetis_brand_900"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barreraAlumno"
+            tools:text="{aviso}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- "Hoy · 7:05 am · Entrada" -->
-                    <TextView
-                        android:id="@+id/txt_cuando"
-                        style="@style/Cetis.Texto.CuerpoChico"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_8"
-                        android:gravity="center"
-                        tools:text="{resultado.hora}" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="@dimen/cetis_space_16"
-                        android:background="@color/cetis_surface_pill" />
-
-                    <!-- Alumno -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_16"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/txt_iniciales"
-                            style="@style/Cetis.Texto.Seccion"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:background="@drawable/shape_circulo_iniciales"
-                            android:gravity="center"
-                            android:importantForAccessibility="no"
-                            tools:text="{iniciales}" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/cetis_space_12"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/txt_nombre"
-                                style="@style/Cetis.Texto.TituloNombre"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                tools:text="{alumno.nombre}" />
-
-                            <TextView
-                                android:id="@+id/txt_detalle"
-                                style="@style/Cetis.Texto.SubtituloTarjeta"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                tools:text="{alumno.grupo} · No. de control" />
-
-                            <TextView
-                                android:id="@+id/txt_no_control"
-                                style="@style/Cetis.Texto.SubtituloTarjeta"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                tools:text="{alumno.noControl}" />
-
-                            <!-- Etiqueta roja de la alerta ("Castigo disciplinario") -->
-                            <LinearLayout
-                                android:id="@+id/chip_alerta"
-                                style="@style/Cetis.Estatus"
-                                android:layout_marginTop="@dimen/cetis_space_4"
-                                android:background="@drawable/shape_estatus_peligro"
-                                android:visibility="gone"
-                                tools:visibility="visible">
-
-                                <View
-                                    style="@style/Cetis.Estatus.Punto"
-                                    android:background="@drawable/shape_punto_peligro" />
-
-                                <TextView
-                                    android:id="@+id/txt_alerta"
-                                    style="@style/Cetis.Estatus.Texto"
-                                    android:textColor="@color/cetis_status_danger"
-                                    tools:text="{alerta}" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Por qué saltó la alerta ("Control Escolar lo desactivó por pago."); solo con alerta -->
-                    <TextView
-                        android:id="@+id/txt_motivo"
-                        style="@style/Cetis.Texto.Cuerpo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_12"
-                        android:visibility="gone"
-                        tools:text="{alerta.motivo}"
-                        tools:visibility="visible" />
-
-                    <!-- "Se avisó a su padre…" (verde) o "La alerta quedó guardada…" (rojo) -->
-                    <TextView
-                        android:id="@+id/txt_aviso"
-                        style="@style/Cetis.Texto.Cuerpo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_16"
-                        android:background="@drawable/shape_aviso_exito"
-                        android:padding="@dimen/cetis_space_12"
-                        tools:text="{aviso}" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_siguiente"
-                    style="@style/Cetis.Boton"
-                    android:layout_marginTop="@dimen/cetis_space_20"
-                    android:text="@string/prefecto_escanear_siguiente" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <!-- Boton/Escanear siguiente -->
+    <Button
+        android:id="@+id/botonSiguiente"
+        style="@style/Cetis.Boton"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/boton_escanear_siguiente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tarjetaResultado" />
+</androidx.constraintlayout.widget.ConstraintLayout>

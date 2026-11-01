@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Header" de los Inicio (79:1300, 78:499, 78:1088, 3:33): ☰ a la izquierda,
+     "CetisAsiste" al centro y la campana con punto rojo a la derecha.
+     Se incluye con <include android:id="@+id/barraInicio" … />. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.BarraSuperior">
+
+    <ImageView
+        android:id="@+id/imagenAdorno"
+        style="@style/Cetis.BarraSuperior.Adorno"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <!-- MenuIcon de 26 dp -->
+    <ImageButton
+        android:id="@+id/botonMenu"
+        style="@style/Cetis.BarraSuperior.Menu"
+        android:layout_marginStart="5dp"
+        android:layout_marginBottom="2dp"
+        android:padding="11dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- AppName -->
+    <TextView
+        android:id="@+id/textoNombreApp"
+        style="@style/Cetis.Texto.Banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:accessibilityHeading="true"
+        android:text="@string/nombre_app"
+        android:textColor="@color/cetis_text_on_brand"
+        app:layout_constraintBottom_toBottomOf="@id/botonMenu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/botonMenu" />
+
+    <!-- Bell (con NotificationDot solo si hay avisos sin leer: lo pone el código) -->
+    <ImageButton
+        android:id="@+id/botonNotificaciones"
+        style="@style/Cetis.BarraSuperior.Campana"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/botonMenu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/botonMenu" />
+</androidx.constraintlayout.widget.ConstraintLayout>

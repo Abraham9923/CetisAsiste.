@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- StatusChip amarillo (Figma 76:538): falta, reporte o llamada de atención -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/cetis_status_warning_bg" />
+    <corners android:radius="999dp" />
+</shape>

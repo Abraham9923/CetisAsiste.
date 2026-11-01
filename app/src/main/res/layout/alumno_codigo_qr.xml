@@ -1,128 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: "Codigo QR - Alumno (79:1149)" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Codigo QR - Alumno" (79:1149). Cabe en la pantalla: sin ScrollView.
+     También la abre el padre (el QR de su hijo). Variables: alumno.nombre, alumno.rol, alumno.grupo
+     y la imagen del QR (la dibuja la app con el No. de control). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/cetis_surface_background"
-    android:orientation="vertical"
-    android:paddingStart="@dimen/cetis_screen_margin"
-    android:paddingEnd="@dimen/cetis_screen_margin">
-    <!-- AppBar (Figma 16:103) -->
-    <FrameLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
+    style="@style/Cetis.Pantalla">
+
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
         android:layout_height="@dimen/cetis_app_bar_height"
-        android:background="@drawable/shape_header"
-        android:clipToOutline="true">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="110dp"
-            android:layout_height="80dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/bg_header_accent" />
+    <!-- QRCard (79:1151): tarjeta de radio 20, relleno 20, todo centrado con 12 dp entre piezas -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaQr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:background="@drawable/shape_tarjeta_lg"
+        android:padding="@dimen/cetis_space_20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-        <!-- La hora y la batería las dibuja Android en la zona superior -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/cetis_space_16"
-            android:paddingEnd="@dimen/cetis_space_16">
-            <ImageButton
-                android:id="@+id/btn_regresar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="-6dp"
-                android:layout_marginEnd="2dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/action_back"
-                android:padding="12dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_arrow_left" />
-            <TextView
-                android:id="@+id/txt_titulo"
-                style="@style/Cetis.Texto.TituloNombre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:accessibilityHeading="true"
-                android:maxLines="1"
-                android:text="@string/alumno_titulo_codigo_qr"
-                android:textColor="@color/cetis_text_on_brand" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <ScrollView
-        android:id="@+id/scroll"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/cetis_space_16"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textoNombre"
+            style="@style/Cetis.Texto.TituloNombre"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <!-- QRCard (79:1151) · variables: alumno.nombre, alumno.rol, alumno.grupo y la imagen del QR -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/cetis_space_16"
-                android:background="@drawable/shape_tarjeta_lg"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="@dimen/cetis_space_20">
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="{alumno.nombre}" />
 
-                <TextView
-                    android:id="@+id/txt_nombre"
-                    style="@style/Cetis.Texto.TituloNombre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    tools:text="{alumno.nombre}" />
+        <TextView
+            android:id="@+id/textoRolGrupo"
+            style="@style/Cetis.Texto.Cuerpo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:gravity="center"
+            android:textColor="@color/cetis_text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoNombre"
+            tools:text="{alumno.rol} · Grupo {alumno.grupo}" />
 
-                <TextView
-                    android:id="@+id/txt_rol_grupo"
-                    style="@style/Cetis.Texto.Cuerpo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:gravity="center"
-                    android:textColor="@color/cetis_text_secondary"
-                    tools:text="{alumno.rol} · Grupo {alumno.grupo}" />
+        <!-- QRBox: caja blanca con 16 dp alrededor del código de 200 × 200 -->
+        <ImageView
+            android:id="@+id/imagenQr"
+            android:layout_width="232dp"
+            android:layout_height="232dp"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:background="@drawable/shape_caja_blanca"
+            android:contentDescription="@string/descripcion_codigo_qr"
+            android:padding="@dimen/cetis_space_16"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoRolGrupo"
+            tools:src="@drawable/img_qr_placeholder" />
 
-                <!-- QRBox: el código lo genera la app; aquí solo está el espacio de 200 × 200 -->
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:background="@drawable/shape_caja_blanca"
-                    android:padding="@dimen/cetis_space_16">
-
-                    <ImageView
-                        android:id="@+id/img_qr"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:contentDescription="@string/qr_image_description"
-                        android:scaleType="fitCenter"
-                        tools:src="@drawable/img_qr_placeholder" />
-                </FrameLayout>
-
-                <TextView
-                    style="@style/Cetis.Texto.CuerpoChico"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_12"
-                    android:gravity="center"
-                    android:text="@string/qr_caption" />
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+        <TextView
+            android:id="@+id/textoPie"
+            style="@style/Cetis.Texto.CuerpoChico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_12"
+            android:gravity="center"
+            android:text="@string/pie_codigo_qr"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imagenQr" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

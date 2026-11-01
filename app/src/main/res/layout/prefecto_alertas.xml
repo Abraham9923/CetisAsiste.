@@ -1,74 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Alertas de hoy (prefecto, ADR-010). Pestaña: el botón ☰ abre el menú del rol.
-     Todos los escaneos de hoy que tuvieron alerta, del más nuevo al más viejo, en tiempo real:
-     un comun_item_lista por alerta (alumno, hora, Entrada o Salida y qué alerta fue).
-     Variables: cuántas alertas van hoy y la lista. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Alertas de hoy del prefecto (opción del menú ☰). Su página de Figma no trae este frame:
+     usa las mismas piezas (renglones de lista y contador rojo). La lista se actualiza sola y se
+     desplaza sola (RecyclerView): sin ScrollView. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- Resumen: cuántas alertas van hoy y el contador rojo -->
+    <TextView
+        android:id="@+id/textoResumen"
+        style="@style/Cetis.Texto.Cuerpo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:layout_marginEnd="@dimen/cetis_space_12"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@id/textoContador"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior"
+        tools:text="{alertas.cuantas}"
+        tools:visibility="visible" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+    <TextView
+        android:id="@+id/textoContador"
+        style="@style/Cetis.Contador"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/textoResumen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textoResumen"
+        tools:text="3"
+        tools:visibility="visible" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+    <!-- Un renglón por alerta (comun_item_lista.xml), del más nuevo al más viejo -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaAlertas"
+        style="@style/Cetis.Lista"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoResumen"
+        tools:listitem="@layout/comun_item_lista" />
 
-                <ImageButton
-                    android:id="@+id/btn_menu"
-                    style="@style/Cetis.BarraSuperior.Menu" />
-
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/prefecto_titulo_alertas" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
-
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
-
-                <!-- "3 alertas hoy" con su contador rojo -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/txt_resumen"
-                        style="@style/Cetis.Texto.Cuerpo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        tools:text="{alertas.cuantas}" />
-
-                    <TextView
-                        android:id="@+id/txt_contador"
-                        style="@style/Cetis.Contador"
-                        android:importantForAccessibility="no"
-                        android:visibility="gone"
-                        tools:text="3"
-                        tools:visibility="visible" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/lista_alertas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_8"
-                    android:orientation="vertical" />
-
-                <TextView
-                    android:id="@+id/txt_vacio"
-                    style="@style/Cetis.Texto.Vacio"
-                    android:text="@string/prefecto_alertas_vacio"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <TextView
+        android:id="@+id/textoVacio"
+        style="@style/Cetis.Texto.Vacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/vacio_alertas"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoResumen" />
+</androidx.constraintlayout.widget.ConstraintLayout>

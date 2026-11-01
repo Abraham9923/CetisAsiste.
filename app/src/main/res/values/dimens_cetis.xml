@@ -13,8 +13,6 @@
     <dimen name="cetis_screen_margin">12dp</dimen>
     <!-- Alto de la barra superior completa (incluye la zona de la barra de estado) -->
     <dimen name="cetis_app_bar_height">80dp</dimen>
-    <!-- Zona reservada para la hora / batería que dibuja Android -->
-    <dimen name="cetis_status_bar_space">28dp</dimen>
     <!-- Ancho del menú lateral (comun_menu.xml) -->
     <dimen name="cetis_menu_width">288dp</dimen>
 </resources>

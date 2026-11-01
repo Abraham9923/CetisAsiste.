@@ -1,150 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Perfil del personal (prefecto y profesor). Mismo diseño que "Perfil - Alumno"
-     (Figma 79:1148), con los datos de su cuenta. Pestaña: el botón ☰ abre el menú del rol.
-     Variables: personal.nombre, personal.rol, personal.usuario, personal.correo -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Perfil - Prefecto" (125:964) y "Perfil - Profesor" (125:1486). Cabe en la pantalla:
+     sin ScrollView. "Cerrar sesión" abre el diálogo alumno_dialogo_cerrar_sesion.xml.
+     Variables: personal.nombre, personal.area ("Prefectura", "Docente"), personal.usuario, personal.correo -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- ProfileHeader (tarjeta de 104 dp con el avatar de 72) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaPerfil"
+        style="@style/Cetis.Tarjeta"
+        android:layout_width="0dp"
+        android:layout_height="104dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <ImageView
+            android:id="@+id/imagenFoto"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="@dimen/cetis_space_16"
+            android:contentDescription="@string/descripcion_foto"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_avatar_72"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+        <TextView
+            android:id="@+id/textoNombre"
+            style="@style/Cetis.Texto.TituloNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_16"
+            android:layout_marginEnd="@dimen/cetis_space_16"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintBottom_toTopOf="@id/textoAreaPlantel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imagenFoto"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="{personal.nombre}" />
 
-                <ImageButton
-                    android:id="@+id/btn_menu"
-                    style="@style/Cetis.BarraSuperior.Menu" />
+        <TextView
+            android:id="@+id/textoAreaPlantel"
+            style="@style/Cetis.Texto.Cuerpo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:textColor="@color/cetis_text_secondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/textoNombre"
+            app:layout_constraintStart_toStartOf="@id/textoNombre"
+            app:layout_constraintTop_toBottomOf="@id/textoNombre"
+            tools:text="{personal.area} · CETis 61" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/nav_perfil" />
-            </LinearLayout>
-        </FrameLayout>
+    <!-- Info: renglones "Etiqueta ........ valor" -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaDatos"
+        style="@style/Cetis.Tarjeta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:padding="@dimen/cetis_space_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tarjetaPerfil">
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <TextView
+            android:id="@+id/etiquetaUsuario"
+            style="@style/Cetis.Campo.Etiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/campo_usuario"
+            app:layout_constraintBottom_toBottomOf="@id/textoUsuario"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoUsuario" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <TextView
+            android:id="@+id/textoUsuario"
+            style="@style/Cetis.Campo.Valor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginTop="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/etiquetaUsuario"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="{personal.usuario}" />
 
-                <!-- ProfileHeader (79:1515) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_tarjeta"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/cetis_space_16">
+        <TextView
+            android:id="@+id/etiquetaArea"
+            style="@style/Cetis.Campo.Etiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/campo_area"
+            app:layout_constraintBottom_toBottomOf="@id/textoArea"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoArea" />
 
-                    <ImageView
-                        android:id="@+id/img_foto"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/img_avatar_72" />
+        <TextView
+            android:id="@+id/textoArea"
+            style="@style/Cetis.Campo.Valor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/etiquetaArea"
+            app:layout_constraintTop_toBottomOf="@id/textoUsuario"
+            tools:text="{personal.area}" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/cetis_space_16"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+        <TextView
+            android:id="@+id/etiquetaCorreo"
+            style="@style/Cetis.Campo.Etiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/campo_correo"
+            app:layout_constraintBottom_toBottomOf="@id/textoCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoCorreo" />
 
-                        <TextView
-                            android:id="@+id/txt_nombre"
-                            style="@style/Cetis.Texto.TituloNombre"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:text="{personal.nombre}" />
+        <TextView
+            android:id="@+id/textoCorreo"
+            style="@style/Cetis.Campo.Valor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/etiquetaCorreo"
+            app:layout_constraintTop_toBottomOf="@id/textoArea"
+            tools:text="{personal.correo}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <TextView
-                            android:id="@+id/txt_rol"
-                            style="@style/Cetis.Texto.Cuerpo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textColor="@color/cetis_text_secondary"
-                            tools:text="{personal.rol}" />
-                    </LinearLayout>
-                </LinearLayout>
+    <TextView
+        android:id="@+id/textoAviso"
+        style="@style/Cetis.Texto.SubtituloTarjeta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/aviso_datos_personal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tarjetaDatos" />
 
-                <!-- Info (79:1522) -->
-                <LinearLayout style="@style/Cetis.Tarjeta">
+    <!-- Options -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/opcionContrasena"
+        style="@style/Cetis.Tarjeta.Tocable"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:paddingStart="@dimen/cetis_space_12"
+        android:paddingEnd="@dimen/cetis_space_12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoAviso">
 
-                    <LinearLayout
-                        style="@style/Cetis.Campo.Renglon"
-                        android:layout_marginTop="0dp">
+        <ImageView
+            android:id="@+id/opcionContrasenaIcono"
+            style="@style/Cetis.Circulo.Chico"
+            android:src="@drawable/ic_lock"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            style="@style/Cetis.Campo.Etiqueta.Renglon"
-                            android:text="@string/field_usuario" />
+        <TextView
+            android:id="@+id/opcionContrasenaTexto"
+            style="@style/Cetis.Texto.TituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginEnd="@dimen/cetis_space_12"
+            android:text="@string/opcion_cambiar_contrasena"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/opcionContrasenaFlecha"
+            app:layout_constraintStart_toEndOf="@id/opcionContrasenaIcono"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/txt_usuario"
-                            style="@style/Cetis.Campo.Valor.Renglon"
-                            tools:text="{personal.usuario}" />
-                    </LinearLayout>
+        <ImageView
+            android:id="@+id/opcionContrasenaFlecha"
+            style="@style/Cetis.Flecha"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <LinearLayout style="@style/Cetis.Campo.Renglon">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/opcionCerrarSesion"
+        style="@style/Cetis.Tarjeta.Tocable"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        android:paddingStart="@dimen/cetis_space_12"
+        android:paddingEnd="@dimen/cetis_space_12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/opcionContrasena">
 
-                        <TextView
-                            style="@style/Cetis.Campo.Etiqueta.Renglon"
-                            android:text="@string/field_correo" />
+        <ImageView
+            android:id="@+id/opcionCerrarSesionIcono"
+            style="@style/Cetis.Circulo.Chico"
+            android:background="@drawable/shape_circulo_accent"
+            android:src="@drawable/ic_log_out"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/txt_correo"
-                            style="@style/Cetis.Campo.Valor.Renglon"
-                            tools:text="{personal.correo}" />
-                    </LinearLayout>
-                </LinearLayout>
+        <TextView
+            android:id="@+id/opcionCerrarSesionTexto"
+            style="@style/Cetis.Texto.TituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cetis_space_12"
+            android:layout_marginEnd="@dimen/cetis_space_12"
+            android:text="@string/opcion_cerrar_sesion"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/opcionCerrarSesionFlecha"
+            app:layout_constraintStart_toEndOf="@id/opcionCerrarSesionIcono"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    style="@style/Cetis.Texto.SubtituloTarjeta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:text="@string/alumno_perfil_aviso" />
-
-                <!-- Options (79:1533) -->
-                <LinearLayout
-                    android:id="@+id/opcion_contrasena"
-                    style="@style/Cetis.Opcion"
-                    android:layout_marginTop="@dimen/cetis_space_16">
-
-                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
-
-                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_lock" />
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/Cetis.Opcion.Texto"
-                        android:text="@string/perfil_option_password" />
-
-                    <ImageView style="@style/Cetis.Opcion.Flecha" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/opcion_cerrar_sesion"
-                    style="@style/Cetis.Opcion">
-
-                    <FrameLayout
-                        style="@style/Cetis.Opcion.Circulo"
-                        android:background="@drawable/shape_circulo_accent">
-
-                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_log_out" />
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/Cetis.Opcion.Texto"
-                        android:text="@string/perfil_option_logout" />
-
-                    <ImageView style="@style/Cetis.Opcion.Flecha" />
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+        <ImageView
+            android:id="@+id/opcionCerrarSesionFlecha"
+            style="@style/Cetis.Flecha"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
