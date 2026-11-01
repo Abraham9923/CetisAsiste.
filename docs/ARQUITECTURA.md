@@ -1,6 +1,7 @@
 # Arquitectura de CetisAsiste: cómo está y qué le mejoraría
 
-**Fecha:** 20 de octubre de 2026
+**Fecha:** 20 de octubre de 2026 (actualizado el 1 de noviembre de 2026: la app pasó a
+Activities con vistas XML, ViewBinding e Intents; ver §1.1 y la bitácora 01-11-01)
 **Para quién:** el equipo y quien continúe el proyecto.
 **Qué es:** una revisión de **todo el sistema** (app, base de datos, reglas, web y forma de
 trabajar), hecha después de terminar los avisos (ADR-010) y antes de empezar la web
@@ -25,11 +26,56 @@ el código de la app; lo que dice ADR-008 sigue valiendo y aquí se marca qué c
 - **No hay servidor propio.** Cada app escribe directo en Firestore y **las reglas de
   seguridad son la única defensa** (ADR-002). Lo que "decide" (qué alerta toca, a quién se
   avisa) corre en el teléfono o en el navegador de quien hace la acción.
-- **App Android:** una sola actividad; cada rol tiene su `*App.kt` (navegación y datos) que
-  muestra vistas XML dentro de Compose. `CetisRepositorio` es el único que habla con
-  Firebase. La lógica que se puede probar está aparte y tiene pruebas (`Escaneo.kt`,
-  `Avisos.kt`).
+- **App Android (desde el 1 de noviembre):** cada pantalla es una **Activity** con su vista
+  XML (ConstraintLayout) y su clase de **ViewBinding**; se abren con **Intents explícitos** y
+  los datos viajan como extras. Ya no hay Compose. `CetisRepositorio` sigue siendo el único
+  que habla con Firebase (las consultas y las reglas no cambiaron). La lógica que se puede
+  probar está aparte y tiene pruebas (`Escaneo.kt`, `Avisos.kt`). Detalle en §1.1.
 - **Datos por semestre** (ADR-005) y **un buzón de avisos por cuenta** (ADR-010).
+
+### 1.1 La app Android por dentro (1 de noviembre de 2026)
+
+```
+app/src/main/java/com/example/cetisasiste/
+  AplicacionCetisAsiste.kt     al abrir la app: prepara Formatos (lee sus palabras de strings.xml)
+  datos/                       SIN cambios de fondo: CetisRepositorio (único que habla con Firebase),
+                               Modelos, Formatos, Avisos, Escaneo (nombres internos en español)
+  pantallas/
+    comun/   PantallaBase          lo que tienen todas las Activities (bordes, sesión, ☰ y campana)
+             PantallaConAlumno     las que muestran la ficha del alumno (alumno y padre)
+             SesionActiva          la sesión y sus escuchas en vivo, UNA vez para toda la app
+             Navegacion + Claves   Intents explícitos, extras y a qué Inicio va cada rol
+             MenuLateral           menú hamburguesa (no es Activity: se pone encima)
+             DialogoCerrarSesion   diálogo (no es Activity)
+             Adaptadores, Llenado  RecyclerView con ViewBinding en cada renglón
+             IniciarSesion, Mensaje, CambiarContrasena, Notificaciones, Calendario,
+             HorarioGrupo, PerfilPersonal (Activities comunes)
+    alumno/  Inicio, Boletin, Horario, Perfil, CodigoQr, Credencial
+    padre/   Inicio, Anuncios, Perfil, EntradasSalidas
+    prefecto/ Inicio, Escaner, Captura, Resultado, Alertas, HorariosGrupos (+ RegistroDeEscaneo)
+    profesor/ Inicio, Boletin, Grupo, AlumnoProfesor, CambiarEstatus, DarSalida (+ Estatus)
+```
+
+| Regla | Cómo se cumple |
+|---|---|
+| Contenedor principal | Todas las vistas (`res/layout`, 42 archivos) tienen raíz `ConstraintLayout`, o `ScrollView` con **un solo** `ConstraintLayout` adentro cuando el contenido no cabe (Inicio del prefecto y del profesor, Perfil del alumno del profesor) o cuando hay que escribir (iniciar sesión, cambiar contraseña, cambiar estatus). Ya no hay `LinearLayout`, `FrameLayout` ni `ListView`; solo `RadioGroup` (que es obligatorio para los `RadioButton`) |
+| Listas | Todo lo que se repite es `RecyclerView`: anuncios, clases, días del calendario, eventos, notificaciones, entradas y salidas, escaneos, alertas, grupos, alumnos, historial, opciones del menú |
+| ViewBinding | `buildFeatures { viewBinding = true }`. Ninguna vista se busca con `findViewById`, tampoco en adaptadores, menú ni diálogo |
+| Cambio de pantallas | `startActivity` con Intent explícito; las 29 Activities están en `AndroidManifest.xml`. Los datos de una pantalla a otra van como extras (`Claves`) |
+| Menú | Menú hamburguesa en todas las pantallas (barra de arriba); las pantallas principales no se apilan: debajo siempre queda el Inicio del rol |
+| Textos | Todos en `res/values/strings.xml` (uno solo), con nombres en español |
+| Firebase | Sin cambios: mismas colecciones, consultas, escrituras y reglas. Solo se agregaron dos ayudantes que reúsan consultas existentes: `gruposDelSemestre()` y `ultimoEstatus()` |
+
+**Escuchas en vivo:** antes cada `*App.kt` escuchaba la cuenta y la campana; ahora
+`SesionActiva` lo hace **una sola vez** para toda la app, y cada pantalla escucha lo suyo
+**solo mientras se ve** (`repeatOnLifecycle`), así no se gastan lecturas con pantallas en
+segundo plano.
+
+**Cómo se revisa sin teléfono:** además de las 29 pruebas, en una sesión sin acceso a Google
+Maven se compiló el Kotlin con `kotlinc` contra `android.jar`, las clases de ViewBinding y `R`
+generadas de los XML y firmas de AndroidX y Firebase, y un revisor de recursos comprobó cada
+`@string`, `@drawable`, `@id` y restricción. Falta la prueba real: `./gradlew assembleDebug`
+en Android Studio (bitácora 01-11-01).
 
 ## 2. Lo que está bien (conviene conservarlo)
 
@@ -75,13 +121,13 @@ de los alumnos; al final, lo que solo hace el código más cómodo.
 
 ### 3.4 Código de la app (prioridad media; ADR-008 sigue vigente)
 
-| ADR-008 | Estado al 20 oct | Comentario |
+| ADR-008 | Estado al 1 nov | Comentario |
 |---|---|---|
-| 1. Borrar código muerto (`Main.kt`, ~530 líneas) | **Pendiente** | Sigue confundiendo; es lo más barato |
-| 2. Ordenar carpetas | Pendiente | |
-| 3. Una sola navegación | Pendiente | Ahora hay 5 copias de la pila contando la web |
-| 4. Pruebas | **Avanzó**: `EscaneoTest`, `AvisosTest` y pruebas de reglas | Faltan `Formatos` y No. de control → correo |
-| 5. `ViewModel` por rol | **Pendiente y más urgente**: `PrefectoApp` ya escucha 4 cosas en vivo y guarda el estado del escaneo | Hacerlo antes de la siguiente pantalla grande del prefecto |
+| 1. Borrar código muerto (`Main.kt`, ~530 líneas) | **Hecho** (1 nov) | Se borró junto con todo Compose |
+| 2. Ordenar carpetas | **Hecho** (1 nov) | `datos/` y `pantallas/{comun,alumno,padre,prefecto,profesor}` |
+| 3. Una sola navegación | **Hecho** (1 nov) | Activities + Intents; `Navegacion.kt` decide a dónde va cada rol |
+| 4. Pruebas | **Avanzó**: `EscaneoPrueba`, `AvisosPrueba` y pruebas de reglas | Faltan `Formatos` y No. de control → correo |
+| 5. `ViewModel` por rol | **Pendiente**: el estado compartido vive en `SesionActiva` y cada Activity lee lo suyo; al girar el teléfono una pantalla vuelve a leer sus datos | Si una pantalla crece, pasarla a `ViewModel` |
 | 6. Paquete propio (`com.example` no se acepta en Google Play) | Pendiente | Antes de publicar |
 | 7. Actualizar librerías / 8. `minSdk` | Pendientes | |
 
@@ -90,7 +136,9 @@ Nuevo:
 | # | Problema | Qué haría |
 |---|---|---|
 | C1 | "Hoy" se calcula al abrir la pantalla: si la app queda abierta después de la medianoche, las listas de "hoy" siguen mostrando ayer | Volver a calcular la fecha al regresar a la app (`ON_RESUME`) |
-| C2 | Cada cambio en vivo vuelve a dibujar las listas completas (`llenarLista` borra y crea los renglones) | Con 8 a 50 renglones está bien; si una lista crece (alertas de un día con muchas), pasar esa a `RecyclerView` |
+| C2 | ~~Cada cambio en vivo vuelve a dibujar las listas completas~~ | **Hecho (1 nov):** todas las listas son `RecyclerView` |
+| C4 | La lista del grupo del profesor lee el último estatus de **cada** alumno (una lectura por alumno al abrirla), porque Figma lo muestra | Si cuesta muchas lecturas, guardar el último estatus en la ficha del alumno (`alumnos/{m}`) desde las reglas o la web |
+| C5 | La barra de arriba mide 80 dp como en Figma y deja 32 dp para la hora; en teléfonos con barra de estado más alta, la hora queda encima de la barra guinda | Medir la barra de estado y sumarla al alto de la barra (como ya hace el menú ☰) |
 | C3 | La lógica de avisos está **dos veces** (Kotlin y JavaScript) | Mantenerla mínima y con pruebas en los dos lados; a la larga, moverla a Cloud Functions |
 
 ### 3.5 Forma de trabajar (prioridad media, barato)

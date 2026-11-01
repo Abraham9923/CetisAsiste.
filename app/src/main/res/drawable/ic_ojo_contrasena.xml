@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ojo de 20 dp (Figma, campo Contraseña) centrado en el área de toque del CheckBox
+     "Mostrar contraseña". -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:drawable="@drawable/ic_eye_field"
+        android:gravity="center" />
+</layer-list>

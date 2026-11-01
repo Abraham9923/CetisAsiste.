@@ -8,27 +8,126 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
+    <!-- Cada pantalla completa es una Activity y se abre con un Intent explícito
+         (pantallas/comun/Navegacion.kt). La primera es Iniciar sesión. El menú hamburguesa,
+         los renglones de lista y los diálogos NO son pantallas: no llevan Activity. -->
     <application
+        android:name=".AplicacionCetisAsiste"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/nombre_app"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CetisAsiste" >
+
+        <!-- Alumno (algunas también las abre el padre) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".pantallas.alumno.BoletinAlumnoActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.alumno.CodigoQrActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.alumno.CredencialActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.alumno.HorarioAlumnoActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.alumno.InicioAlumnoActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.alumno.PerfilAlumnoActividad"
+            android:exported="false" />
+
+        <!-- Comunes a todos los roles -->
+        <activity
+            android:name=".pantallas.comun.CalendarioActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.comun.CambiarContrasenaActividad"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".pantallas.comun.HorarioGrupoActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.comun.IniciarSesionActividad"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.CetisAsiste"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".pantallas.comun.MensajeActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.comun.NotificacionesActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.comun.PerfilPersonalActividad"
+            android:exported="false" />
+
+        <!-- Padre de familia -->
+        <activity
+            android:name=".pantallas.padre.AnunciosPadreActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.padre.EntradasSalidasActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.padre.InicioPadreActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.padre.PerfilPadreActividad"
+            android:exported="false" />
+
+        <!-- Prefecto -->
+        <activity
+            android:name=".pantallas.prefecto.AlertasActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.prefecto.CapturaActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.prefecto.EscanerActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.prefecto.HorariosGruposActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.prefecto.InicioPrefectoActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.prefecto.ResultadoActividad"
+            android:exported="false" />
+
+        <!-- Profesor -->
+        <activity
+            android:name=".pantallas.profesor.AlumnoProfesorActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.profesor.BoletinProfesorActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.profesor.CambiarEstatusActividad"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".pantallas.profesor.DarSalidaActividad"
+            android:exported="false" />
+        <activity
+            android:name=".pantallas.profesor.GrupoActividad"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".pantallas.profesor.InicioProfesorActividad"
+            android:exported="false" />
     </application>
 
 </manifest>

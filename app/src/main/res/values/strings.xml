@@ -1,117 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    TODOS los textos que se ven en la app (regla: ningún texto va escrito directo en una vista).
+    En los XML se usan con "@string/" + su nombre y en Kotlin con getString(R.string.su_nombre).
+    Los nombres van en español. Los datos de cada persona NO van aquí: los pone el código.
+-->
 <resources>
-    <string name="app_name">CetisAsiste</string>
-    <string name="profile_name">Juan Pérez García</string>
-    <string name="profile_group">Grupo: 4°A - Programación</string>
-    <string name="profile_school">CETIS 61</string>
-    <string name="login_title">Iniciar Sesión</string>
-    <string name="login_subtitle">Sistema de Control de Asistencia CETIS 61</string>
-    <string name="matricula_label">No. de control</string>
-    <string name="password_label">Contraseña</string>
-    <string name="login_button">Ingresar</string>
-    <string name="register_title">Crear Cuenta</string>
-    <string name="register_subtitle">Regístrate con tu No. de control y contraseña</string>
-    <string name="register_button">Registrarse</string>
-    <string name="have_account">¿Ya tienes cuenta? Inicia sesión</string>
-    <string name="no_account">¿No tienes cuenta? Regístrate</string>
-    <string name="important_info_title">Información importante</string>
-    <string name="important_info_body">Aquí puede haber más información, como próximas clases, avisos, etc.</string>
-    <string name="quick_access_title">Accesos rápidos</string>
-    <string name="ingresos_egresos">Ingresos y egresos</string>
-    <string name="tablero_anuncios">Tablero de anuncios</string>
-    <string name="nav_ingresos">Ingresos</string>
-    <string name="nav_anuncios">Anuncios</string>
-    <string name="nav_calendario">Calendario</string>
-    <string name="nav_perfil">Perfil</string>
 
-    <!-- Pantallas del apartado de padres (diseño de Figma) -->
-    <string name="nav_inicio">Inicio</string>
-    <string name="action_back">Regresar</string>
-    <string name="action_menu">Menú</string>
-    <string name="school_name">CETis 61 · Cd. Juárez</string>
-    <string name="school_logo_description">Logotipo del CETis 61</string>
-    <string name="role_and_group">%1$s · Grupo %2$s</string>
-    <string name="field_grupo">Grupo</string>
-    <string name="field_no_control">No. de control</string>
-    <string name="field_vigencia">Vigencia</string>
-    <string name="field_correo">Correo</string>
+    <!-- General -->
+    <string name="nombre_app" translatable="false">CetisAsiste</string>
+    <string name="nombre_plantel">CETis 61 · Cd. Juárez</string>
+    <string name="descripcion_logo_plantel">Logotipo del CETis 61</string>
+    <string name="marca_agua_numero" translatable="false">61</string>
+    <string name="texto_hoy">Hoy</string>
+    <string name="texto_guardando">Guardando…</string>
+    <string name="sufijo_am">am</string>
+    <string name="sufijo_pm">pm</string>
 
-    <string name="splash_tagline">Control de entradas y salidas</string>
+    <!-- Formatos (los %1$s, %2$s… los llena el código) -->
+    <string name="formato_dos_partes">%1$s · %2$s</string>
+    <string name="formato_titulo_dia">%1$s %2$s de %3$s</string>
+    <string name="formato_semestre_er">%1$d.er semestre</string>
+    <string name="formato_semestre_o">%1$d.º semestre</string>
+    <string name="formato_hora_sufijo">%1$s %2$s</string>
+    <string name="formato_encabezado_horario">Grupo %1$s · %2$s</string>
+    <string name="formato_campana_sin_leer">%1$s, %2$s sin leer</string>
+    <string name="formato_grupo_ya_salio">Grupo %1$s ya salió de clases</string>
+    <string name="formato_quien_dio_salida">Le dio salida %2$s en %1$s.</string>
+    <string name="formato_numero" translatable="false">%1$d</string>
+    <string name="formato_area_plantel">%1$s · CETis 61</string>
+    <string name="formato_rol_grupo">%1$s · Grupo %2$s</string>
+    <string name="formato_salio_a_las">%1$s salió a las %2$s</string>
+    <string name="formato_ingreso_a_las">%1$s ingresó a las %2$s</string>
+    <string name="formato_grupo_no_control">Grupo %1$s · No. de control %2$s</string>
+    <string name="formato_escaneo_sin_alumno">No. de control %1$s</string>
+    <string name="formato_grupo">Grupo %1$s</string>
+    <string name="formato_escaneo_alerta">%1$s: %2$s</string>
+    <string name="formato_registrando">Registrando: %1$s</string>
+    <string name="formato_hoy_hora_tipo">Hoy · %1$s · %2$s</string>
+    <string name="formato_no_control">No. de control %1$s</string>
+    <string name="formato_ultima_clase">%1$s · última clase del turno</string>
+    <string name="formato_salida_hecha">El grupo salió hoy a las %1$s (autorizó %2$s).</string>
 
-    <string name="login_hero_subtitle">Inicia sesión para continuar</string>
-    <string name="login_no_control_placeholder">Ingresa tu No. de control o usuario</string>
-    <string name="login_password_placeholder">••••••••</string>
-    <string name="login_toggle_password">Mostrar u ocultar la contraseña</string>
-    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
-    <string name="login_submit">Iniciar sesión</string>
+    <!-- Barra de arriba, menú hamburguesa y roles -->
+    <string name="accion_menu">Menú</string>
+    <string name="titulo_notificaciones">Notificaciones</string>
+    <string name="accion_mostrar_contrasena">Mostrar u ocultar la contraseña</string>
+    <string name="titulo_codigo_qr">Código QR</string>
+    <string name="titulo_informacion_importante">Información Importante</string>
+    <string name="accion_mes_anterior">Mes anterior</string>
+    <string name="accion_mes_siguiente">Mes siguiente</string>
+    <string name="titulo_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="titulo_escanear">Escanear</string>
+    <string name="titulo_captura">Capturar No. de control</string>
+    <string name="titulo_resultado">Resultado</string>
+    <string name="titulo_alertas">Alertas de hoy</string>
+    <string name="titulo_horarios_grupos">Horarios de grupos</string>
+    <string name="titulo_dar_salida">Dar salida al grupo</string>
+    <string name="titulo_perfil_alumno">Perfil del alumno</string>
+    <string name="accion_notificar_falta">Notificar una falta</string>
+    <string name="accion_levantar_reporte">Levantar un reporte</string>
+    <string name="accion_llamada_atencion">Llamada de atención</string>
+    <string name="rol_estudiante">Estudiante</string>
+    <string name="menu_inicio">Inicio</string>
+    <string name="menu_boletin">Boletín</string>
+    <string name="menu_horario">Horario</string>
+    <string name="menu_perfil">Perfil</string>
+    <string name="menu_anuncios">Anuncios</string>
+    <string name="menu_calendario">Calendario</string>
+    <string name="menu_escanear">Escanear</string>
+    <string name="menu_alertas">Alertas de hoy</string>
+    <string name="menu_horarios">Horarios</string>
+    <string name="rol_alumno">Alumno</string>
+    <string name="rol_padre">Padre de familia</string>
+    <string name="rol_prefecto">Prefecto</string>
+    <string name="rol_profesor">Profesor</string>
+    <string name="rol_enfermeria">Enfermería</string>
+    <string name="rol_control_escolar">Control Escolar</string>
+    <string name="titulo_calendario">Calendario</string>
+    <string name="titulo_horario">Horario</string>
+    <string name="titulo_perfil">Perfil</string>
+    <string name="titulo_boletin">Boletín de noticias</string>
+    <string name="titulo_mi_horario">Mi horario</string>
+    <string name="titulo_credencial">Credencial digital</string>
+    <string name="titulo_anuncios">Anuncios</string>
+    <string name="titulo_entradas_salidas">Entradas y salidas</string>
+    <string name="titulo_cambiar_estatus">Cambiar estatus</string>
 
-    <string name="home_banner_title">Información Importante</string>
-    <string name="home_banner_body">Aquí podremos encontrar las notificaciones más recientes o los eventos recientes del apartado de anuncios</string>
-    <string name="home_quick_access">Accesos Rápidos</string>
-    <string name="home_qr_title">Código QR de identificación</string>
-    <string name="home_qr_subtitle">Escanea tu código</string>
-    <string name="home_credencial_subtitle">Tu credencial en formato digital</string>
-    <string name="home_entradas_subtitle">Registro de entradas y salidas</string>
-    <string name="home_horario_subtitle">Consulta tus horarios de clase</string>
+    <!-- Iniciar sesión -->
+    <string name="inicio_sesion_subtitulo">Inicia sesión para continuar</string>
+    <string name="campo_usuario_inicio_sesion">No. de control o usuario</string>
+    <string name="pista_usuario_inicio_sesion">Ingresa tu No. de control o usuario</string>
+    <string name="campo_contrasena">Contraseña</string>
+    <string name="pista_contrasena">••••••••</string>
+    <string name="enlace_olvidaste_contrasena"><u>¿Olvidaste tu contraseña?</u></string>
+    <string name="error_inicio_sesion_datos">No. de control, usuario o contraseña incorrectos.</string>
+    <string name="boton_iniciar_sesion">Iniciar sesión</string>
+    <string name="boton_entrando">Entrando…</string>
+    <string name="error_inicio_sesion_campos">Escribe tu No. de control o usuario y tu contraseña.</string>
+    <string name="error_inicio_sesion_desconocido">No se pudo iniciar sesión. Inténtalo de nuevo.</string>
 
-    <string name="qr_title">Código QR</string>
-    <string name="qr_caption">Código para acceso al plantel</string>
-    <string name="qr_image_description">Código QR de acceso</string>
-
-    <string name="credencial_title">Credencial digital</string>
-    <string name="credencial_band_label">CREDENCIAL DIGITAL</string>
-
-    <string name="entradas_title">Entradas y salidas</string>
-    <string name="entradas_entrada">Entrada</string>
-    <string name="entradas_salida">Salida</string>
-    <string name="entradas_entrada_message">%1$s ingresó a las %2$s</string>
-    <string name="entradas_salida_message">%1$s salió a las %2$s</string>
-
-    <string name="horario_title">Horario</string>
-
-    <string name="calendario_previous_month">Mes anterior</string>
-    <string name="calendario_next_month">Mes siguiente</string>
-    <string name="calendario_upcoming">Próximos eventos</string>
-    <string-array name="calendario_weekdays">
-        <item>L</item>
-        <item>M</item>
-        <item>M</item>
-        <item>J</item>
-        <item>V</item>
-        <item>S</item>
-        <item>D</item>
-    </string-array>
-
-    <string name="perfil_option_credencial">Mi credencial digital</string>
-    <string name="perfil_option_entradas">Mis entradas y salidas</string>
-    <string name="perfil_option_password">Cambiar contraseña</string>
-    <string name="perfil_option_logout">Cerrar sesión</string>
-
-    <string name="notificaciones_title">Notificaciones</string>
-    <string name="notificaciones_today">Hoy</string>
-    <string name="notificaciones_earlier">Anteriores</string>
-    <string name="notificaciones_mark_all_read">Marcar todas como leídas</string>
-
-    <!-- Inicio de sesión con Firebase Authentication y datos reales de Firestore -->
-    <string name="login_usuario_label">No. de control o usuario</string>
-    <string name="login_cargando">Entrando…</string>
-    <string name="login_error_campos">Escribe tu No. de control o usuario y tu contraseña.</string>
-    <string name="login_error_datos">No. de control, usuario o contraseña incorrectos.</string>
-    <string name="login_error_no_control">El No. de control tiene 14 dígitos.</string>
-    <string name="login_error_no_registrada">Tu cuenta todavía no está dada de alta. Acude a Control Escolar.</string>
-    <string name="login_error_desactivada">Tu cuenta está desactivada. Acude a Control Escolar.</string>
-    <string name="login_error_conexion">No hay conexión a internet. Inténtalo de nuevo.</string>
-    <string name="login_error_intentos">Demasiados intentos. Espera unos minutos.</string>
-    <string name="login_error_desconocido">No se pudo iniciar sesión. Inténtalo de nuevo.</string>
-    <string name="cargando_datos">Cargando…</string>
-    <string name="error_cargar_datos">No se pudieron cargar los datos. Revisa tu conexión.</string>
-    <string name="sin_alumno_vinculado">Tu cuenta no tiene un alumno vinculado. Acude a Control Escolar.</string>
-    <string name="rol_sin_pantallas">Hola, %1$s. Las pantallas de %2$s todavía no están en la app.</string>
-    <string name="rol_solo_web">Hola, %1$s. El perfil de %2$s se usa desde la web de CetisAsiste, en una computadora. Pide la dirección a Control Escolar.</string>
+    <!-- Errores y avisos -->
+    <string name="aviso_datos_alumno">Tus datos solo los puede cambiar Control Escolar.</string>
     <string name="vacio_anuncios">Todavía no hay anuncios.</string>
-    <string name="vacio_registros">Todavía no hay entradas ni salidas registradas.</string>
-    <string name="vacio_notificaciones">No hay notificaciones de hoy.</string>
-    <string name="vacio_eventos">No hay eventos este mes.</string>
     <string name="vacio_clases">No hay clases registradas para este día.</string>
-    <string name="alumno_clase_ultima">Última clase del turno</string>
-    <string name="ver_mas">Ver más</string>
+    <string name="vacio_registros">Todavía no hay entradas ni salidas registradas.</string>
+    <string name="vacio_eventos">No hay eventos este mes.</string>
+    <string name="vacio_notificaciones">No hay notificaciones de hoy.</string>
+    <string name="aviso_datos_personal">Tus datos los administra Control Escolar.</string>
+    <string name="aviso_contrasena_vencida_titulo">Tu contraseña venció</string>
+    <string name="aviso_contrasena_vencida_texto">Por seguridad, crea una nueva para seguir usando la app.</string>
+    <string name="vacio_escaneos">Todavía no hay escaneos hoy.</string>
+    <string name="vacio_alertas">No ha habido alertas hoy.</string>
+    <string name="vacio_grupos">No hay grupos dados de alta este semestre.</string>
+    <string name="vacio_alumnos">Este grupo todavía no tiene alumnos inscritos.</string>
+    <string name="vacio_grupos_profesor">No tienes grupos asignados este semestre. Acude a Control Escolar.</string>
+    <string name="vacio_historial">Este alumno no tiene estatus registrados.</string>
+    <string name="aviso_solo_ultima_clase">Solo está disponible en la última clase del turno.</string>
+    <string name="error_no_control_invalido">El No. de control tiene 14 dígitos.</string>
+    <string name="error_cuenta_no_registrada">Tu cuenta todavía no está dada de alta. Acude a Control Escolar.</string>
+    <string name="error_cuenta_desactivada">Tu cuenta está desactivada. Acude a Control Escolar.</string>
+    <string name="error_sin_conexion">No hay conexión a internet. Inténtalo de nuevo.</string>
+    <string name="error_demasiados_intentos">Demasiados intentos. Espera unos minutos.</string>
+    <string name="mensaje_sin_alumno_vinculado">Tu cuenta no tiene un alumno vinculado. Acude a Control Escolar.</string>
+    <string name="mensaje_error_cargar_datos">No se pudieron cargar los datos. Revisa tu conexión.</string>
+    <string name="mensaje_rol_sin_pantallas">Hola, %1$s. Las pantallas de %2$s todavía no están en la app.</string>
+    <string name="mensaje_rol_solo_web">Hola, %1$s. El perfil de %2$s se usa desde la web de CetisAsiste, en una computadora. Pide la dirección a Control Escolar.</string>
+    <string name="aviso_contrasena_cambiada">Tu contraseña se cambió.</string>
+    <string name="error_contrasena_vacios">Llena los tres campos.</string>
+    <string name="error_contrasena_corta">La contraseña nueva debe tener al menos 8 caracteres.</string>
+    <string name="error_contrasena_no_coinciden">Las dos contraseñas nuevas no son iguales.</string>
+    <string name="error_contrasena_igual">La contraseña nueva debe ser distinta de la actual.</string>
+    <string name="error_contrasena_actual">La contraseña actual no es correcta.</string>
+    <string name="error_contrasena_debil">Esa contraseña es muy fácil de adivinar. Elige otra.</string>
+    <string name="error_contrasena_desconocido">No se pudo cambiar la contraseña. Inténtalo de nuevo.</string>
+    <string name="aviso_padre_entrada_mensaje">%1$s entró al plantel a las %2$s.</string>
+    <string name="aviso_padre_salida_mensaje">%1$s salió del plantel a las %2$s.</string>
+    <string name="aviso_padre_alerta_entrada">Al registrar la entrada de %1$s a las %2$s hubo una alerta: %3$s.</string>
+    <string name="aviso_padre_alerta_salida">Al registrar la salida de %1$s a las %2$s hubo una alerta: %3$s.</string>
+    <string name="mensaje_qr_ajeno">Ese código no es de CetisAsiste.</string>
+    <string name="mensaje_buscando_alumno">Buscando al alumno…</string>
+    <string name="error_guardar">No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="aviso_sin_ultima_clase">Solo está disponible en la última clase del turno.</string>
+    <string name="error_estatus_tipo">Elige el tipo de estatus.</string>
+    <string name="error_estatus_motivo">Escribe el motivo.</string>
+    <string name="aviso_estatus_titulo">Nuevo estatus: %1$s</string>
+    <string name="aviso_estatus_mensaje">%3$s le registró a %2$s: %1$s. Motivo: %4$s</string>
+    <string name="aviso_estatus_guardado">Se guardó el estatus.</string>
+    <string name="aviso_salida_guardada">Se dio salida al grupo.</string>
+
+    <!-- Campos de datos -->
+    <string name="campo_no_control">No. de control</string>
+    <string name="campo_grupo">Grupo</string>
+    <string name="campo_correo">Correo</string>
+    <string name="campo_vigencia">Vigencia</string>
+    <string name="campo_usuario">Usuario</string>
+    <string name="campo_area">Área</string>
+    <string name="area_prefectura">Prefectura</string>
+    <string name="area_docente">Docente</string>
+    <string name="campo_contrasena_actual">Contraseña actual</string>
+    <string name="campo_contrasena_nueva">Nueva contraseña</string>
+    <string name="campo_contrasena_repetir">Confirmar nueva contraseña</string>
+    <string name="area_prefectura_plantel">Prefectura · CETis 61</string>
+    <string name="campo_no_control_alumno">No. de control del alumno</string>
+    <string name="campo_buscar_alumno">Buscar alumno</string>
+    <string name="pista_buscar_alumno">Nombre o No. de control</string>
+    <string name="area_docente_plantel">Docente · CETis 61</string>
+    <string name="campo_tipo_estatus">Tipo de estatus</string>
+    <string name="campo_motivo">Motivo</string>
+    <string name="pista_motivo">Describe qué pasó</string>
+
+    <!-- Accesos, secciones y opciones -->
+    <string name="descripcion_foto_alumno">Foto del alumno</string>
+    <string name="seccion_accesos_rapidos">Accesos Rápidos</string>
+    <string name="acceso_codigo_qr">Código QR</string>
+    <string name="acceso_codigo_qr_detalle">Muéstralo al entrar y salir</string>
+    <string name="acceso_credencial">Credencial digital</string>
+    <string name="acceso_credencial_detalle">Tu credencial en formato digital</string>
+    <string name="acceso_horario">Horario</string>
+    <string name="acceso_horario_detalle">Consulta tus horarios de clase</string>
+    <string name="acceso_boletin">Boletín de noticias</string>
+    <string name="acceso_boletin_detalle">Avisos del plantel</string>
+    <string name="descripcion_foto">Foto</string>
+    <string name="opcion_mi_codigo_qr">Mi código QR</string>
+    <string name="opcion_mi_credencial">Mi credencial digital</string>
+    <string name="opcion_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="opcion_cerrar_sesion">Cerrar sesión</string>
+    <string name="descripcion_codigo_qr">Código QR de acceso</string>
+    <string name="pie_codigo_qr">Código para acceso al plantel</string>
+    <string name="credencial_etiqueta_banda">CREDENCIAL DIGITAL</string>
+    <string name="acceso_codigo_qr_identificacion">Código QR de identificación</string>
+    <string name="acceso_codigo_qr_identificacion_detalle">Escanea tu código</string>
+    <string name="acceso_entradas_salidas">Entradas y salidas</string>
+    <string name="acceso_entradas_salidas_detalle">Registro de entradas y salidas</string>
+    <string name="enlace_ver_mas"><u>Ver más</u></string>
+    <string name="opcion_mis_entradas_salidas">Mis entradas y salidas</string>
+    <string name="seccion_proximos_eventos">Próximos eventos</string>
+    <string name="seccion_hoy">Hoy</string>
+    <string name="seccion_anteriores">Anteriores</string>
+    <string name="enlace_marcar_leidas"><u>Marcar todas como leídas</u></string>
+    <string name="descripcion_sin_leer">Sin leer</string>
+    <string name="boton_guardar_continuar">Guardar y continuar</string>
+    <string name="acceso_escanear_qr">Escanear código QR</string>
+    <string name="acceso_escanear_qr_detalle">Registra entradas y salidas</string>
+    <string name="acceso_horarios_grupos">Horarios de grupos</string>
+    <string name="acceso_horarios_grupos_detalle">Todos los grupos del plantel</string>
+    <string name="acceso_calendario">Calendario</string>
+    <string name="acceso_calendario_detalle">Eventos escolares</string>
+    <string name="seccion_ultimos_escaneos">Últimos escaneos</string>
+    <string name="boton_permitir_camara">Permitir la cámara</string>
+    <string name="texto_apunta_camara">Apunta la cámara al código QR del alumno</string>
+    <string name="boton_escribir_no_control">Escribir No. de control</string>
+    <string name="boton_registrar_entrada">Registrar entrada</string>
+    <string name="boton_registrar_salida">Registrar salida</string>
+    <string name="boton_escanear_siguiente">Escanear siguiente</string>
+    <string name="detalle_dar_salida">Grupo %1$s · última clase del turno</string>
+    <string name="seccion_mis_grupos">Mis grupos</string>
+    <string name="acceso_boletin_detalle_profesor">Avisos generales del plantel</string>
+    <string name="seccion_cambiar_estatus">Cambiar estatus</string>
+    <string name="seccion_historial">Historial</string>
+    <string name="boton_guardar_estatus">Guardar estatus</string>
+    <string name="nota_dar_salida">Al confirmar, el prefecto recibe un aviso y los alumnos de este grupo pueden salir sin alerta.</string>
+    <string name="boton_dar_salida">Dar salida a todo el grupo</string>
+    <string name="detalle_buscando_ultima_clase">Buscando tu última clase de hoy…</string>
+    <string name="detalle_sin_ultima_clase">Hoy no das la última clase del turno</string>
+    <string name="texto_sin_clases_hoy">Hoy no hay clases registradas para este grupo.</string>
+
+    <!-- Días y calendario -->
+    <string name="dia_lunes">Lunes</string>
+    <string name="dia_martes">Martes</string>
+    <string name="dia_miercoles">Miércoles</string>
+    <string name="dia_jueves">Jueves</string>
+    <string name="dia_viernes">Viernes</string>
+    <string name="dia_lunes_corto">L</string>
+    <string name="dia_martes_corto">M</string>
+    <string name="dia_miercoles_corto">Mi</string>
+    <string name="dia_jueves_corto">J</string>
+    <string name="dia_viernes_corto">V</string>
+    <string name="letra_lunes">L</string>
+    <string name="letra_martes">M</string>
+    <string name="letra_miercoles">M</string>
+    <string name="letra_jueves">J</string>
+    <string name="letra_viernes">V</string>
+    <string name="letra_sabado">S</string>
+    <string name="letra_domingo">D</string>
+
+    <!-- Estatus, estados y alertas -->
+    <string name="dialogo_cerrar_sesion_titulo">¿Cerrar sesión?</string>
+    <string name="dialogo_cerrar_sesion_mensaje">Tendrás que volver a iniciar sesión para usar CetisAsiste.</string>
+    <string name="dialogo_cerrar_sesion_cancelar">Cancelar</string>
+    <string name="dialogo_cerrar_sesion_confirmar">Cerrar sesión</string>
+    <string name="tipo_entrada">Entrada</string>
+    <string name="tipo_salida">Salida</string>
+    <string name="permiso_camara">Para escanear, permite que CetisAsiste use la cámara. También puedes escribir el No. de control.</string>
+    <string name="ayuda_captura">Teclea los 14 dígitos y toca Registrar</string>
+    <string name="tecla_0" translatable="false">0</string>
+    <string name="tecla_1" translatable="false">1</string>
+    <string name="tecla_2" translatable="false">2</string>
+    <string name="tecla_3" translatable="false">3</string>
+    <string name="tecla_4" translatable="false">4</string>
+    <string name="tecla_5" translatable="false">5</string>
+    <string name="tecla_6" translatable="false">6</string>
+    <string name="tecla_7" translatable="false">7</string>
+    <string name="tecla_8" translatable="false">8</string>
+    <string name="tecla_9" translatable="false">9</string>
+    <string name="tecla_borrar">Borrar</string>
+    <string name="tecla_limpiar">Limpiar</string>
+    <string name="estatus_falta">Falta</string>
+    <string name="estatus_reporte">Reporte</string>
+    <string name="estatus_llamada_atencion">Llamada de atención</string>
+    <string name="clase_ultima_del_turno">Última clase del turno</string>
+    <string name="resultado_entrada_registrada">Entrada registrada</string>
+    <string name="resultado_salida_registrada">Salida registrada</string>
+    <string name="resultado_sin_alumno">No hay ningún alumno con este No. de control</string>
+    <string name="iniciales_desconocidas" translatable="false">?</string>
+    <string name="resultado_alerta_guardada_y_aviso">La alerta quedó guardada y se le avisó a su padre o tutor.</string>
+    <string name="resultado_alerta_guardada">La alerta quedó guardada en el registro del alumno.</string>
+    <string name="resultado_sin_padre">No tiene padre o tutor registrado para avisarle.</string>
+    <string name="resultado_aviso_padre_entrada">Se avisó a su padre o tutor que ingresó al plantel.</string>
+    <string name="resultado_aviso_padre_salida">Se avisó a su padre o tutor que salió del plantel.</string>
+    <string name="alerta_no_dado_de_alta">Alumno no dado de alta</string>
+    <string name="alerta_inactivo">Alumno inactivo</string>
+    <string name="alerta_ya_ingreso">El alumno ya ingresó</string>
+    <string name="alerta_no_ha_ingresado">El alumno no ha ingresado</string>
+    <string name="alerta_castigo">Alumno con castigo disciplinario</string>
+    <string name="alerta_salida_fuera">Salida fuera de horario</string>
+    <string name="estado_inactivo_pago">Inactivo por pago</string>
+    <string name="estado_inactivo_salud">Inactivo por salud</string>
+    <string name="etiqueta_ya_ingreso">Ya tiene entrada hoy</string>
+    <string name="etiqueta_no_ha_ingresado">Sin entrada registrada</string>
+    <string name="etiqueta_castigo">Castigo disciplinario</string>
+    <string name="etiqueta_salida_fuera">Sin salida autorizada</string>
+    <string name="estatus_castigo">Castigo</string>
+    <string name="estatus_pase_salud">Pase de salud</string>
+    <string name="estatus_alta_practicas">Alta para prácticas</string>
+    <string name="estatus_sin_incidencias">Sin incidencias</string>
+    <string name="estatus_falta_notificada">Falta notificada</string>
+
+    <plurals name="resumen_alertas">
+        <item quantity="one">%1$d alerta hoy. La lista se actualiza sola.</item>
+        <item quantity="other">%1$d alertas hoy. La lista se actualiza sola.</item>
+    </plurals>
 </resources>

@@ -1,131 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Un grupo del profesor: dar salida, ver el horario y la lista de alumnos
-     ("Lista de alumnos" del documento de roles). Cada alumno es un profesor_item_alumno
-     (StudentRow de Figma); al tocarlo se abre su perfil.
-     Variables: nombre del grupo, si ya salió hoy y la lista de alumnos inscritos. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Lista de alumnos - Profesor" (78:1084). Título "Grupo 102", buscador y la lista de
+     alumnos (RecyclerView, se desplaza sola: sin ScrollView). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- Buscar (78:1226): filtra la lista por nombre o No. de control -->
+    <TextView
+        android:id="@+id/etiquetaBuscar"
+        style="@style/Cetis.Campo.Titulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:labelFor="@+id/campoBuscar"
+        android:text="@string/campo_buscar_alumno"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+    <EditText
+        android:id="@+id/campoBuscar"
+        style="@style/Cetis.Campo.Caja"
+        android:layout_width="0dp"
+        android:layout_marginTop="6dp"
+        android:drawableStart="@drawable/ic_search_field"
+        android:hint="@string/pista_buscar_alumno"
+        android:imeOptions="actionSearch"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etiquetaBuscar" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+    <!-- Alumnos (78:1238): profesor_item_alumno.xml -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaAlumnos"
+        style="@style/Cetis.Lista"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/campoBuscar"
+        tools:listitem="@layout/profesor_item_alumno" />
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
-
-                <!-- "Grupo 102" (lo pone el código) -->
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    tools:text="Grupo {grupo.nombre}" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
-
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
-
-                <!-- Aviso verde si el grupo ya salió hoy (AlertBanner de Figma, en verde) -->
-                <LinearLayout
-                    android:id="@+id/aviso_salida"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_aviso_exito"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/cetis_space_12"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <FrameLayout
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/shape_circulo_exito">
-
-                        <ImageView
-                            style="@style/Cetis.Circulo.Icono"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_check_circle" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/txt_aviso_salida"
-                        style="@style/Cetis.Texto.CuerpoChico"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/cetis_space_12"
-                        android:layout_weight="1"
-                        android:textColor="@color/cetis_brand_900"
-                        tools:text="{salida.hora} · {salida.profesor}" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/opcion_dar_salida"
-                    style="@style/Cetis.Opcion"
-                    android:layout_marginTop="@dimen/cetis_space_16">
-
-                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
-
-                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_flag" />
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/Cetis.Opcion.Texto"
-                        android:text="@string/profesor_opcion_dar_salida" />
-
-                    <ImageView style="@style/Cetis.Opcion.Flecha" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/opcion_horario"
-                    style="@style/Cetis.Opcion">
-
-                    <FrameLayout style="@style/Cetis.Opcion.Circulo">
-
-                        <ImageView style="@style/Cetis.Opcion.Icono" android:src="@drawable/ic_clock" />
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/Cetis.Opcion.Texto"
-                        android:text="@string/profesor_opcion_horario" />
-
-                    <ImageView style="@style/Cetis.Opcion.Flecha" />
-                </LinearLayout>
-
-                <!-- "Alumnos (38)" -->
-                <LinearLayout style="@style/Cetis.Seccion">
-
-                    <View style="@style/Cetis.Seccion.Linea" />
-
-                    <TextView
-                        android:id="@+id/txt_seccion_alumnos"
-                        style="@style/Cetis.Seccion.Pildora"
-                        tools:text="Alumnos ({n})" />
-
-                    <View style="@style/Cetis.Seccion.Linea" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/lista_alumnos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_8"
-                    android:orientation="vertical" />
-
-                <TextView
-                    android:id="@+id/txt_vacio"
-                    style="@style/Cetis.Texto.Vacio"
-                    android:text="@string/profesor_alumnos_vacio"
-                    android:visibility="gone" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <TextView
+        android:id="@+id/textoVacio"
+        style="@style/Cetis.Texto.Vacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/vacio_alumnos"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/campoBuscar" />
+</androidx.constraintlayout.widget.ConstraintLayout>

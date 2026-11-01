@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mensaje a mitad de la pantalla con el botón "Cerrar sesión" (antes MensajeCentrado de
+     Compose). Se ve cuando la cuenta no tiene pantallas en Android (enfermería y Control
+     Escolar usan la web), cuando el padre o el alumno no tienen un alumno vinculado o si no se
+     pudieron cargar los datos. No tiene frame en Figma: usa sus colores, letras y botón.
+     Cabe en la pantalla: sin ScrollView. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Pantalla"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp">
+
+    <TextView
+        android:id="@+id/textoMensaje"
+        style="@style/Cetis.Texto.Cuerpo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/botonCerrarSesion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="{mensaje}" />
+
+    <Button
+        android:id="@+id/botonCerrarSesion"
+        style="@style/Cetis.Boton"
+        android:layout_width="0dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/opcion_cerrar_sesion"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoMensaje" />
+</androidx.constraintlayout.widget.ConstraintLayout>

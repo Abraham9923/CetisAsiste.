@@ -94,9 +94,10 @@ object Escaneo {
         return mismoDia(fecha, ahora)
     }
 
-    private fun mismoDia(a: Date, b: Date): Boolean {
-        val ca = Calendar.getInstance().apply { time = a }
-        val cb = Calendar.getInstance().apply { time = b }
-        return ca.get(Calendar.YEAR) == cb.get(Calendar.YEAR) && ca.get(Calendar.DAY_OF_YEAR) == cb.get(Calendar.DAY_OF_YEAR)
+    private fun mismoDia(primera: Date, segunda: Date): Boolean {
+        val calendarioPrimera = Calendar.getInstance().apply { time = primera }
+        val calendarioSegunda = Calendar.getInstance().apply { time = segunda }
+        return calendarioPrimera.get(Calendar.YEAR) == calendarioSegunda.get(Calendar.YEAR) &&
+            calendarioPrimera.get(Calendar.DAY_OF_YEAR) == calendarioSegunda.get(Calendar.DAY_OF_YEAR)
     }
 }

@@ -18,6 +18,9 @@
     <color name="cetis_status_success_bg">#E2F2E7</color>
     <color name="cetis_status_danger">#C93B3B</color>
     <color name="cetis_status_danger_bg">#FBE3E3</color>
+    <!-- Advertencia (Figma: aviso de contraseña vencida y estatus amarillos de profesor) -->
+    <color name="cetis_status_warning">#B7740C</color>
+    <color name="cetis_status_warning_bg">#FCF0D9</color>
     <!-- Fondo oscuro del escáner (Figma "Escaner - Prefecto" 77:500) -->
     <color name="cetis_escaner_fondo">#241619</color>
 </resources>

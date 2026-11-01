@@ -1,87 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Notificaciones separadas en "Hoy" y "Anteriores" (frame "Notificaciones" de Figma).
-     La usan el padre, el prefecto y el profesor (se abre con la campana de Inicio).
-     Variables: listas de notificaciones de hoy y anteriores. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Notificaciones - Android" del padre (32:436) y "Notificaciones - Prefecto" (77:503).
+     La usan todos los roles (campana y menú ☰). Los avisos están en un RecyclerView: sin ScrollView. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- Group/Hoy: encabezado con "Marcar todas como leídas" a la derecha -->
+    <TextView
+        android:id="@+id/textoHoy"
+        style="@style/Cetis.Subtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/seccion_hoy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+    <TextView
+        android:id="@+id/textoMarcarLeidas"
+        style="@style/Cetis.Texto.SubtituloTarjeta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/enlace_marcar_leidas"
+        android:textColor="@color/cetis_brand_accent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/textoHoy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textoHoy"
+        tools:visibility="visible" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+    <TextView
+        android:id="@+id/textoVacioHoy"
+        style="@style/Cetis.Texto.Vacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/vacio_notificaciones"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoHoy" />
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
-
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/notificaciones_title" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
-
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/Cetis.Texto.Seccion"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:accessibilityHeading="true"
-                        android:text="@string/notificaciones_today" />
-
-                    <TextView
-                        android:id="@+id/txt_marcar_leidas"
-                        style="@style/Cetis.Texto.SubtituloTarjeta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="4dp"
-                        android:text="@string/comun_marcar_leidas"
-                        android:textColor="@color/cetis_brand_accent" />
-                </LinearLayout>
-
-                <!-- Un comun_item_notificacion por aviso -->
-                <LinearLayout
-                    android:id="@+id/lista_hoy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-
-                <TextView
-                    android:id="@+id/txt_vacio_hoy"
-                    style="@style/Cetis.Texto.Vacio"
-                    android:text="@string/vacio_notificaciones"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/txt_anteriores"
-                    style="@style/Cetis.Subtitulo"
-                    android:layout_marginTop="@dimen/cetis_space_20"
-                    android:text="@string/notificaciones_earlier" />
-
-                <LinearLayout
-                    android:id="@+id/lista_anteriores"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <!-- NotificationList: avisos de hoy, el encabezado "Anteriores" y los avisos anteriores
+         (comun_item_notificacion.xml y comun_item_encabezado.xml) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaNotificaciones"
+        style="@style/Cetis.Lista"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoVacioHoy"
+        tools:listitem="@layout/comun_item_notificacion" />
+</androidx.constraintlayout.widget.ConstraintLayout>

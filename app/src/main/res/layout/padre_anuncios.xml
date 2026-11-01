@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: "Anuncios" del padre (antes AnunciosScreen.kt en Compose). Pestaña: la barra
-     inferior la pone el código. Las tarjetas son alumno_item_anuncio.xml (AnnouncementCard).
-     Variable: lista de anuncios dirigidos a "padre". -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Anuncios - Android" del padre (22:240). Las tarjetas son las del boletín del alumno
+     (alumno_item_anuncio.xml). La lista se desplaza sola (RecyclerView): sin ScrollView. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- AnnouncementList (79:1230) · variable: lista de anuncios (alumno_item_anuncio.xml) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaAnuncios"
+        style="@style/Cetis.Lista"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior"
+        tools:listitem="@layout/alumno_item_anuncio" />
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
-
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
-
-                <ImageButton
-                    android:id="@+id/btn_menu"
-                    style="@style/Cetis.BarraSuperior.Menu" />
-
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/nav_anuncios" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/txt_vacio"
-            style="@style/Cetis.Texto.Vacio"
-            android:text="@string/vacio_anuncios"
-            android:visibility="gone" />
-
-        <ListView
-            android:id="@+id/lista_anuncios"
-            style="@style/Cetis.Pantalla.Lista"
-            android:layout_marginTop="@dimen/cetis_space_16"
-            tools:listitem="@layout/alumno_item_anuncio" />
-    </LinearLayout>
-</FrameLayout>
+    <TextView
+        android:id="@+id/textoVacio"
+        style="@style/Cetis.Texto.Vacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/vacio_anuncios"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior" />
+</androidx.constraintlayout.widget.ConstraintLayout>

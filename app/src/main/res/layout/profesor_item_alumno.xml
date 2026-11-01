@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: componente "StudentRow" (76:541), página "Componentes"
-     Variables: alumno.iniciales, alumno.nombre, alumno.noControl y su estado
-     (Activo en verde; Inactivo por pago o por salud en rojo). -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: componente "StudentRow" (76:542), renglón de lista (RecyclerView), no es pantalla.
+     Alumno del grupo (Lista de alumnos 78:1084): iniciales en círculo claro, nombre, No. de
+     control y su último estatus (StatusChip verde, amarillo o rojo).
+     Grupo del profesor (Mis grupos de 78:1121): el número del grupo en círculo guinda, sin
+     etiqueta. Los colores y lo que se ve los pone el código.
+     Variables: alumno.iniciales, alumno.nombre, alumno.noControl, alumno.estatus -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cetis.Tarjeta.Tocable"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/cetis_space_8"
-    android:background="@drawable/shape_tarjeta"
-    android:clickable="true"
-    android:clipToOutline="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
+    android:layout_marginBottom="@dimen/cetis_space_8"
     android:padding="@dimen/cetis_space_12">
 
-    <!-- Initials (76:542) -->
     <TextView
-        android:id="@+id/txt_iniciales"
+        android:id="@+id/textoIniciales"
         style="@style/Cetis.Texto.TituloTarjeta"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -26,47 +23,53 @@
         android:gravity="center"
         android:importantForAccessibility="no"
         android:maxLines="1"
-        tools:text="JP" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="{alumno.iniciales}" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textoNombre"
+        style="@style/Cetis.Texto.TituloTarjeta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/cetis_space_12"
         android:layout_marginEnd="@dimen/cetis_space_12"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toTopOf="@id/textoDetalle"
+        app:layout_constraintEnd_toStartOf="@id/imagenFlecha"
+        app:layout_constraintStart_toEndOf="@id/textoIniciales"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="{alumno.nombre}" />
 
-        <TextView
-            android:id="@+id/txt_nombre"
-            style="@style/Cetis.Texto.TituloTarjeta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="{alumno.nombre}" />
+    <TextView
+        android:id="@+id/textoDetalle"
+        style="@style/Cetis.Texto.SubtituloTarjeta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toTopOf="@id/textoEstatus"
+        app:layout_constraintEnd_toEndOf="@id/textoNombre"
+        app:layout_constraintStart_toStartOf="@id/textoNombre"
+        app:layout_constraintTop_toBottomOf="@id/textoNombre"
+        tools:text="No. de control {alumno.noControl}" />
 
-        <TextView
-            android:id="@+id/txt_detalle"
-            style="@style/Cetis.Texto.SubtituloTarjeta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="{alumno.noControl}" />
+    <!-- StatusChip (el punto es el drawableStart; color según el estatus) -->
+    <TextView
+        android:id="@+id/textoEstatus"
+        style="@style/Cetis.Estatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/textoNombre"
+        app:layout_constraintTop_toBottomOf="@id/textoDetalle"
+        tools:text="{alumno.estatus}" />
 
-        <!-- StatusChip (76:538) -->
-        <LinearLayout
-            android:id="@+id/chip_estado"
-            style="@style/Cetis.Estatus"
-            android:layout_marginTop="4dp">
-
-            <View
-                android:id="@+id/punto_estado"
-                style="@style/Cetis.Estatus.Punto" />
-
-            <TextView
-                android:id="@+id/txt_estado"
-                style="@style/Cetis.Estatus.Texto"
-                tools:text="{alumno.estado}" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <ImageView style="@style/Cetis.Opcion.Flecha" />
-</LinearLayout>
+    <ImageView
+        android:id="@+id/imagenFlecha"
+        style="@style/Cetis.Flecha"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

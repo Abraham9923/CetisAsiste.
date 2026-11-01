@@ -1,136 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: "Captura por matricula - Prefecto" (89:859), con "No. de control".
-     Para cuando el QR no se puede leer: el prefecto teclea los 14 dígitos del No. de control.
-     El teclado es propio (KeypadKey de "Componentes"); no abre el teclado del teléfono.
-     Los números de las teclas van escritos aquí (no se traducen), por eso tools:ignore.
-     Variables: tipo (entrada o salida), los dígitos tecleados y el mensaje de error. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Captura por matricula - Prefecto" (89:859). Cabe en la pantalla: sin ScrollView
+     (no abre el teclado del teléfono: trae su propio teclado de 14 dígitos).
+     Entrada o Salida es un RadioGroup. "Matrícula" de Figma es "No. de control" desde ADR-009. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Cetis.Pantalla"
-    tools:ignore="HardcodedText">
+    style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- ModeToggle (78:647): Entrada o Salida. RadioGroup: se elige UNA de las dos -->
+    <RadioGroup
+        android:id="@+id/grupoTipo"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:background="@drawable/shape_segmento"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <RadioButton
+            android:id="@+id/opcionEntrada"
+            style="@style/Cetis.Segmento"
+            android:checked="true"
+            android:text="@string/tipo_entrada" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+        <RadioButton
+            android:id="@+id/opcionSalida"
+            style="@style/Cetis.Segmento"
+            android:text="@string/tipo_salida" />
+    </RadioGroup>
 
-                <ImageButton
-                    android:id="@+id/btn_regresar"
-                    style="@style/Cetis.BarraSuperior.Regresar" />
+    <!-- MatriculaDisplay (89:884): lo que se ha tecleado, con el cursor -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaNoControl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:background="@drawable/shape_input_activo"
+        android:paddingStart="@dimen/cetis_space_16"
+        android:paddingTop="14dp"
+        android:paddingEnd="@dimen/cetis_space_16"
+        android:paddingBottom="14dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/grupoTipo">
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/prefecto_titulo_captura" />
-            </LinearLayout>
-        </FrameLayout>
+        <TextView
+            android:id="@+id/etiquetaNoControl"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/campo_no_control_alumno"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <TextView
+            android:id="@+id/textoTecleado"
+            style="@style/Cetis.Texto"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/plus_jakarta_sans_semibold"
+            android:gravity="center_vertical"
+            android:letterSpacing="0.077"
+            android:maxLines="1"
+            android:textSize="26sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etiquetaNoControl"
+            tools:text="{noControl}" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <!-- Caret: 2 × 28 a 2 dp de los dígitos -->
+        <View
+            android:id="@+id/cursor"
+            android:layout_width="2dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="2dp"
+            android:background="@color/cetis_brand_800"
+            app:layout_constraintBottom_toBottomOf="@id/textoTecleado"
+            app:layout_constraintStart_toEndOf="@id/textoTecleado"
+            app:layout_constraintTop_toTopOf="@id/textoTecleado" />
 
-                <LinearLayout style="@style/Cetis.Segmento">
+        <!-- Ayuda; si falta algo, aquí sale el error en rojo (lo pone el código) -->
+        <TextView
+            android:id="@+id/textoAyuda"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/ayuda_captura"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoTecleado" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <TextView
-                        android:id="@+id/opcion_entrada"
-                        style="@style/Cetis.Segmento.Opcion"
-                        android:text="@string/prefecto_entrada"
-                        tools:background="@drawable/shape_chip_activo"
-                        tools:textColor="@color/cetis_text_on_brand" />
+    <!-- Keypad (89:890): 3 columnas con 8 dp entre teclas y 8 dp entre renglones -->
+    <Button
+        android:id="@+id/tecla1"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_1"
+        app:layout_constraintEnd_toStartOf="@id/tecla2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tarjetaNoControl" />
 
-                    <TextView
-                        android:id="@+id/opcion_salida"
-                        style="@style/Cetis.Segmento.Opcion"
-                        android:text="@string/prefecto_salida" />
-                </LinearLayout>
+    <Button
+        android:id="@+id/tecla2"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_2"
+        app:layout_constraintEnd_toStartOf="@id/tecla3"
+        app:layout_constraintStart_toEndOf="@id/tecla1"
+        app:layout_constraintTop_toTopOf="@id/tecla1" />
 
-                <!-- Lo que se ha tecleado -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_input_activo"
-                    android:orientation="vertical"
-                    android:padding="@dimen/cetis_space_16">
+    <Button
+        android:id="@+id/tecla3"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:text="@string/tecla_3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tecla2"
+        app:layout_constraintTop_toTopOf="@id/tecla1" />
 
-                    <TextView
-                        style="@style/Cetis.Texto.SubtituloTarjeta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/prefecto_no_control_alumno" />
+    <Button
+        android:id="@+id/tecla4"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_4"
+        app:layout_constraintEnd_toStartOf="@id/tecla5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tecla1" />
 
-                    <TextView
-                        android:id="@+id/txt_tecleado"
-                        style="@style/Cetis.Texto"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="@dimen/cetis_space_4"
-                        android:fontFamily="@font/plus_jakarta_sans_medium"
-                        android:gravity="center_vertical"
-                        android:letterSpacing="0.06"
-                        android:maxLines="1"
-                        android:textSize="24sp"
-                        tools:text="{noControl}" />
+    <Button
+        android:id="@+id/tecla5"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_5"
+        app:layout_constraintEnd_toStartOf="@id/tecla6"
+        app:layout_constraintStart_toEndOf="@id/tecla4"
+        app:layout_constraintTop_toTopOf="@id/tecla4" />
 
-                    <!-- Ayuda; si falta algo, aquí sale el error en rojo -->
-                    <TextView
-                        android:id="@+id/txt_ayuda"
-                        style="@style/Cetis.Texto.SubtituloTarjeta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_4"
-                        android:text="@string/prefecto_captura_ayuda" />
-                </LinearLayout>
+    <Button
+        android:id="@+id/tecla6"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:text="@string/tecla_6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tecla5"
+        app:layout_constraintTop_toTopOf="@id/tecla4" />
 
-                <!-- Teclado -->
-                <LinearLayout
-                    style="@style/Cetis.FilaDeTeclas"
-                    android:layout_marginTop="@dimen/cetis_space_16">
+    <Button
+        android:id="@+id/tecla7"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_7"
+        app:layout_constraintEnd_toStartOf="@id/tecla8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tecla4" />
 
-                    <TextView android:id="@+id/tecla_1" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="1" />
-                    <TextView android:id="@+id/tecla_2" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="2" />
-                    <TextView android:id="@+id/tecla_3" style="@style/Cetis.Tecla" android:text="3" />
-                </LinearLayout>
+    <Button
+        android:id="@+id/tecla8"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_8"
+        app:layout_constraintEnd_toStartOf="@id/tecla9"
+        app:layout_constraintStart_toEndOf="@id/tecla7"
+        app:layout_constraintTop_toTopOf="@id/tecla7" />
 
-                <LinearLayout style="@style/Cetis.FilaDeTeclas">
+    <Button
+        android:id="@+id/tecla9"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:text="@string/tecla_9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tecla8"
+        app:layout_constraintTop_toTopOf="@id/tecla7" />
 
-                    <TextView android:id="@+id/tecla_4" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="4" />
-                    <TextView android:id="@+id/tecla_5" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="5" />
-                    <TextView android:id="@+id/tecla_6" style="@style/Cetis.Tecla" android:text="6" />
-                </LinearLayout>
+    <Button
+        android:id="@+id/teclaBorrar"
+        style="@style/Cetis.Tecla.Accion"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_8"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_borrar"
+        app:layout_constraintEnd_toStartOf="@id/tecla0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tecla7" />
 
-                <LinearLayout style="@style/Cetis.FilaDeTeclas">
+    <Button
+        android:id="@+id/tecla0"
+        style="@style/Cetis.Tecla"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/tecla_0"
+        app:layout_constraintEnd_toStartOf="@id/teclaLimpiar"
+        app:layout_constraintStart_toEndOf="@id/teclaBorrar"
+        app:layout_constraintTop_toTopOf="@id/teclaBorrar" />
 
-                    <TextView android:id="@+id/tecla_7" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="7" />
-                    <TextView android:id="@+id/tecla_8" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="8" />
-                    <TextView android:id="@+id/tecla_9" style="@style/Cetis.Tecla" android:text="9" />
-                </LinearLayout>
+    <Button
+        android:id="@+id/teclaLimpiar"
+        style="@style/Cetis.Tecla.Accion"
+        android:layout_width="0dp"
+        android:layout_marginStart="4dp"
+        android:text="@string/tecla_limpiar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tecla0"
+        app:layout_constraintTop_toTopOf="@id/teclaBorrar" />
 
-                <LinearLayout style="@style/Cetis.FilaDeTeclas">
-
-                    <TextView
-                        android:id="@+id/tecla_borrar"
-                        style="@style/Cetis.Tecla.Accion"
-                        android:layout_marginEnd="@dimen/cetis_space_8"
-                        android:text="@string/prefecto_borrar" />
-
-                    <TextView android:id="@+id/tecla_0" style="@style/Cetis.Tecla" android:layout_marginEnd="@dimen/cetis_space_8" android:text="0" />
-
-                    <TextView
-                        android:id="@+id/tecla_limpiar"
-                        style="@style/Cetis.Tecla.Accion"
-                        android:text="@string/prefecto_limpiar" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_registrar"
-                    style="@style/Cetis.Boton"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:text="@string/prefecto_registrar_entrada" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <!-- Boton/Registrar (89:919) -->
+    <Button
+        android:id="@+id/botonRegistrar"
+        style="@style/Cetis.Boton"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/boton_registrar_entrada"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/teclaBorrar" />
+</androidx.constraintlayout.widget.ConstraintLayout>

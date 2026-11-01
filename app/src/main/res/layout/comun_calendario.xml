@@ -1,129 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Calendario del plantel (frame "Calendario" de Figma). Lo usan el padre y el prefecto.
-     Pestaña: el botón ☰ abre el menú del rol.
-     Variables: mes (título, días, hoy, días con evento) y la lista de eventos. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Calendario - Android" del padre (22:241). También lo abre el prefecto.
+     Los eventos están en un RecyclerView que se desplaza solo: sin ScrollView.
+     Variables: mes.titulo, los días del mes (con hoy y los días con evento) y los eventos. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Cetis.Pantalla">
 
-    <LinearLayout style="@style/Cetis.Pantalla.Columna">
+    <include
+        android:id="@+id/barraSuperior"
+        layout="@layout/comun_barra_superior"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cetis_app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout style="@style/Cetis.BarraSuperior">
+    <!-- MonthCard (25:346): flechas, mes, letras de los días y la rejilla del mes -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tarjetaMes"
+        style="@style/Cetis.Tarjeta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:paddingStart="@dimen/cetis_space_12"
+        android:paddingTop="@dimen/cetis_space_16"
+        android:paddingEnd="@dimen/cetis_space_12"
+        android:paddingBottom="@dimen/cetis_space_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraSuperior">
 
-            <ImageView style="@style/Cetis.BarraSuperior.Adorno" />
+        <!-- Flechas de 20 dp con 40 dp de toque (se recorren 10 dp para quedar donde dice Figma) -->
+        <ImageButton
+            android:id="@+id/botonMesAnterior"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/accion_mes_anterior"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_chevron_left_dark"
+            android:translationX="-10dp"
+            app:layout_constraintBottom_toBottomOf="@id/textoMes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoMes" />
 
-            <LinearLayout style="@style/Cetis.BarraSuperior.Fila">
+        <TextView
+            android:id="@+id/textoMes"
+            style="@style/Cetis.Texto.Seccion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:accessibilityHeading="true"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="{mes.titulo}" />
 
-                <ImageButton
-                    android:id="@+id/btn_menu"
-                    style="@style/Cetis.BarraSuperior.Menu" />
+        <ImageButton
+            android:id="@+id/botonMesSiguiente"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/accion_mes_siguiente"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_chevron_right_dark"
+            android:translationX="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/textoMes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textoMes" />
 
-                <TextView
-                    android:id="@+id/txt_titulo"
-                    style="@style/Cetis.BarraSuperior.Titulo"
-                    android:text="@string/nav_calendario" />
-            </LinearLayout>
-        </FrameLayout>
+        <!-- Weekdays: siete columnas iguales (cadena de restricciones) -->
+        <TextView
+            android:id="@+id/letraLunes"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_lunes"
+            app:layout_constraintEnd_toStartOf="@id/letraMartes"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-        <ScrollView style="@style/Cetis.Pantalla.Scroll">
+        <TextView
+            android:id="@+id/letraMartes"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_martes"
+            app:layout_constraintEnd_toStartOf="@id/letraMiercoles"
+            app:layout_constraintStart_toEndOf="@id/letraLunes"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-            <LinearLayout style="@style/Cetis.Pantalla.Contenido">
+        <TextView
+            android:id="@+id/letraMiercoles"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_miercoles"
+            app:layout_constraintEnd_toStartOf="@id/letraJueves"
+            app:layout_constraintStart_toEndOf="@id/letraMartes"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-                <!-- MonthCard · variable: mes -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/cetis_space_16"
-                    android:background="@drawable/shape_tarjeta"
-                    android:orientation="vertical"
-                    android:paddingStart="@dimen/cetis_space_12"
-                    android:paddingTop="@dimen/cetis_space_16"
-                    android:paddingEnd="@dimen/cetis_space_12"
-                    android:paddingBottom="@dimen/cetis_space_16">
+        <TextView
+            android:id="@+id/letraJueves"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_jueves"
+            app:layout_constraintEnd_toStartOf="@id/letraViernes"
+            app:layout_constraintStart_toEndOf="@id/letraMiercoles"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/letraViernes"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_viernes"
+            app:layout_constraintEnd_toStartOf="@id/letraSabado"
+            app:layout_constraintStart_toEndOf="@id/letraJueves"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-                        <ImageButton
-                            android:id="@+id/btn_mes_anterior"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginStart="-10dp"
-                            android:background="?android:attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/calendario_previous_month"
-                            android:padding="10dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_chevron_left_dark" />
+        <TextView
+            android:id="@+id/letraSabado"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_sabado"
+            app:layout_constraintEnd_toStartOf="@id/letraDomingo"
+            app:layout_constraintStart_toEndOf="@id/letraViernes"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-                        <TextView
-                            android:id="@+id/txt_mes"
-                            style="@style/Cetis.Texto.Seccion"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:accessibilityHeading="true"
-                            android:gravity="center"
-                            tools:text="{mes.titulo}" />
+        <TextView
+            android:id="@+id/letraDomingo"
+            style="@style/Cetis.Texto.SubtituloTarjeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            android:gravity="center"
+            android:text="@string/letra_domingo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/letraSabado"
+            app:layout_constraintTop_toBottomOf="@id/textoMes" />
 
-                        <ImageButton
-                            android:id="@+id/btn_mes_siguiente"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginEnd="-10dp"
-                            android:background="?android:attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/calendario_next_month"
-                            android:padding="10dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_chevron_right_dark" />
-                    </LinearLayout>
+        <!-- Semanas: rejilla de 7 columnas (RecyclerView con comun_item_dia.xml) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listaDias"
+            style="@style/Cetis.Lista.Fija"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/cetis_space_8"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/letraLunes"
+            app:spanCount="7"
+            tools:itemCount="31"
+            tools:listitem="@layout/comun_item_dia" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- L M M J V S D (el código pone las letras de calendario_weekdays) -->
-                    <LinearLayout
-                        android:id="@+id/dias_semana"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_8"
-                        android:orientation="horizontal">
+    <!-- UpcomingEvents (25:472) -->
+    <TextView
+        android:id="@+id/textoProximosEventos"
+        style="@style/Cetis.Subtitulo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/cetis_space_16"
+        android:text="@string/seccion_proximos_eventos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tarjetaMes" />
 
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="L" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="M" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="M" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="J" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="V" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="S" />
-                        <TextView style="@style/Cetis.Texto.SubtituloTarjeta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" tools:text="D" />
-                    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaEventos"
+        style="@style/Cetis.Lista"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoProximosEventos"
+        tools:listitem="@layout/comun_item_lista" />
 
-                    <!-- Semanas: el código agrega un renglón de 7 casillas (comun_item_dia) por semana -->
-                    <LinearLayout
-                        android:id="@+id/calendario_semanas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/cetis_space_8"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <TextView
-                    style="@style/Cetis.Subtitulo"
-                    android:text="@string/calendario_upcoming" />
-
-                <!-- Eventos: un comun_item_lista por evento -->
-                <LinearLayout
-                    android:id="@+id/lista_eventos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    tools:layout_height="64dp" />
-
-                <TextView
-                    android:id="@+id/txt_vacio"
-                    style="@style/Cetis.Texto.Vacio"
-                    android:text="@string/vacio_eventos"
-                    android:visibility="gone" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+    <TextView
+        android:id="@+id/textoVacio"
+        style="@style/Cetis.Texto.Vacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/vacio_eventos"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textoProximosEventos" />
+</androidx.constraintlayout.widget.ConstraintLayout>

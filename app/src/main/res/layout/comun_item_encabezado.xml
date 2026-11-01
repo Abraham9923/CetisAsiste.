@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Encabezado de un grupo de renglones, por ejemplo el día en Entradas y salidas
-     ("Hoy · lunes 19 de octubre"). Variable: el texto. -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Encabezado de un grupo de renglones dentro de una lista (RecyclerView), por ejemplo el día
+     en Entradas y salidas ("Hoy · lunes 5 de octubre") o "Hoy" / "Anteriores" en Notificaciones.
+     Variable: el texto. El primero de la lista queda a 16 dp de la barra (lo pone el código). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/txt_encabezado"
-    style="@style/Cetis.Subtitulo"
-    android:layout_marginTop="@dimen/cetis_space_20"
-    tools:text="{dia.fecha}" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/cetis_space_20">
+
+    <TextView
+        android:id="@+id/textoEncabezado"
+        style="@style/Cetis.Subtitulo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="{dia.fecha}" />
+</androidx.constraintlayout.widget.ConstraintLayout>
